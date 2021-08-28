@@ -13,10 +13,12 @@ repositories {
 		name 'xtend-bootstrap'
 		url "$JENKINS_URL/job/xtend-bootstrap/lastStableBuild/artifact/build-result/maven-repository/"
 	}
+	mavenLocal()
 }
 
 configurations {
 	xtendCompiler {
+		repositories.mavenLocal()
 		description 'Bootstrap dependencies for the Xtend compiler'
 		resolutionStrategy {
 			eachDependency {
@@ -32,5 +34,5 @@ dependencies {
 	xtendCompiler "org.eclipse.xtend:org.eclipse.xtend.core:${versions.xtext_bootstrap}"
 	xtendCompiler "org.eclipse.xtext:org.eclipse.xtext.smap:${versions.xtext_bootstrap}"
 	xtendCompiler "org.xtext:xtext-gradle-builder:$versions.xtext_gradle_plugin"
-	xtendCompiler platform("org.eclipse.xtext:xtext-dev-bom:${versions.xtext_bootstrap}")
+	//xtendCompiler platform("org.eclipse.xtext:xtext-dev-bom:${versions.xtext_bootstrap}")
 }

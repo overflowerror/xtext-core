@@ -25,6 +25,7 @@ def jenkinsPipelineRepo = { jobName, branch ->
 
 repositories {
   mavenCentral()
+
   if (findProperty('useJenkinsSnapshots') == 'true') {
     maven { url "$JENKINS_URL/job/lsp4j/$MVN_REPOPATH" }
     maven { url jenkinsPipelineRepo('xtext-lib','autodetect') }
@@ -32,6 +33,7 @@ repositories {
     mavenLocal()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
   }
+  mavenLocal()
 }
 
 /**
