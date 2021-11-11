@@ -9,49 +9,49 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
 
-import org.eclipse.xtext.Annotation;
+import org.eclipse.xtext.JavaCode;
 import org.eclipse.xtext.XtextPackage;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Annotation</b></em>'.
+ * An implementation of the model object '<em><b>Java Code</b></em>'.
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * </p>
  * <ul>
- *   <li>{@link org.eclipse.xtext.impl.AnnotationImpl#getName <em>Name</em>}</li>
+ *   <li>{@link org.eclipse.xtext.impl.JavaCodeImpl#getSource <em>Source</em>}</li>
  * </ul>
  *
  * @generated
  */
-public class AnnotationImpl extends MinimalEObjectImpl.Container implements Annotation {
+public class JavaCodeImpl extends MinimalEObjectImpl.Container implements JavaCode {
 	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * The default value of the '{@link #getSource() <em>Source</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getName()
+	 * @see #getSource()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final String NAME_EDEFAULT = null;
+	protected static final String SOURCE_EDEFAULT = "source";
 
 	/**
-	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * The cached value of the '{@link #getSource() <em>Source</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getName()
+	 * @see #getSource()
 	 * @generated
 	 * @ordered
 	 */
-	protected String name = NAME_EDEFAULT;
+	protected String source = SOURCE_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected AnnotationImpl() {
+	protected JavaCodeImpl() {
 		super();
 	}
 
@@ -62,7 +62,7 @@ public class AnnotationImpl extends MinimalEObjectImpl.Container implements Anno
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return XtextPackage.Literals.ANNOTATION;
+		return XtextPackage.Literals.JAVA_CODE;
 	}
 
 	/**
@@ -71,8 +71,8 @@ public class AnnotationImpl extends MinimalEObjectImpl.Container implements Anno
 	 * @generated
 	 */
 	@Override
-	public String getName() {
-		return name;
+	public String getSource() {
+		return source;
 	}
 
 	/**
@@ -81,11 +81,11 @@ public class AnnotationImpl extends MinimalEObjectImpl.Container implements Anno
 	 * @generated
 	 */
 	@Override
-	public void setName(String newName) {
-		String oldName = name;
-		name = newName;
+	public void setSource(String newSource) {
+		String oldSource = source;
+		source = newSource;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, XtextPackage.ANNOTATION__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, XtextPackage.JAVA_CODE__SOURCE, oldSource, source));
 	}
 
 	/**
@@ -96,8 +96,8 @@ public class AnnotationImpl extends MinimalEObjectImpl.Container implements Anno
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case XtextPackage.ANNOTATION__NAME:
-				return getName();
+			case XtextPackage.JAVA_CODE__SOURCE:
+				return getSource();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -110,8 +110,8 @@ public class AnnotationImpl extends MinimalEObjectImpl.Container implements Anno
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case XtextPackage.ANNOTATION__NAME:
-				setName((String)newValue);
+			case XtextPackage.JAVA_CODE__SOURCE:
+				setSource((String)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -125,8 +125,8 @@ public class AnnotationImpl extends MinimalEObjectImpl.Container implements Anno
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case XtextPackage.ANNOTATION__NAME:
-				setName(NAME_EDEFAULT);
+			case XtextPackage.JAVA_CODE__SOURCE:
+				setSource(SOURCE_EDEFAULT);
 				return;
 		}
 		super.eUnset(featureID);
@@ -140,8 +140,8 @@ public class AnnotationImpl extends MinimalEObjectImpl.Container implements Anno
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case XtextPackage.ANNOTATION__NAME:
-				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
+			case XtextPackage.JAVA_CODE__SOURCE:
+				return SOURCE_EDEFAULT == null ? source != null : !SOURCE_EDEFAULT.equals(source);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -156,10 +156,10 @@ public class AnnotationImpl extends MinimalEObjectImpl.Container implements Anno
 		if (eIsProxy()) return super.toString();
 
 		StringBuilder result = new StringBuilder(super.toString());
-		result.append(" (name: ");
-		result.append(name);
+		result.append(" (source: ");
+		result.append(source);
 		result.append(')');
 		return result.toString();
 	}
 
-} //AnnotationImpl
+} //JavaCodeImpl

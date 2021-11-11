@@ -19,7 +19,6 @@ import org.eclipse.emf.ecore.EObject;
  * @see org.eclipse.xtext.XtextPackage#getParameter()
  * @model
  * @generated
- * @since 2.9
  */
 public interface Parameter extends EObject {
 	/**

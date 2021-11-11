@@ -62,6 +62,7 @@ public class AbstractNegatedTokenImpl extends AbstractElementImpl implements Abs
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public AbstractElement getTerminal() {
 		return terminal;
 	}
@@ -86,6 +87,7 @@ public class AbstractNegatedTokenImpl extends AbstractElementImpl implements Abs
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setTerminal(AbstractElement newTerminal) {
 		if (newTerminal != terminal) {
 			NotificationChain msgs = null;

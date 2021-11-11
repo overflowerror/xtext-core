@@ -92,6 +92,7 @@ public class XtextParser extends AbstractContentAssistParser {
 			builder.put(grammarAccess.getUnorderedGroupAccess().getGroup_1_1(), "rule__UnorderedGroup__Group_1_1__0");
 			builder.put(grammarAccess.getGroupAccess().getGroup(), "rule__Group__Group__0");
 			builder.put(grammarAccess.getGroupAccess().getGroup_1(), "rule__Group__Group_1__0");
+			builder.put(grammarAccess.getGatedSemanticPredicateAccess().getGroup(), "rule__GatedSemanticPredicate__Group__0");
 			builder.put(grammarAccess.getAbstractTokenWithCardinalityAccess().getGroup(), "rule__AbstractTokenWithCardinality__Group__0");
 			builder.put(grammarAccess.getActionAccess().getGroup(), "rule__Action__Group__0");
 			builder.put(grammarAccess.getActionAccess().getGroup_2(), "rule__Action__Group_2__0");
@@ -180,6 +181,8 @@ public class XtextParser extends AbstractContentAssistParser {
 			builder.put(grammarAccess.getConditionalBranchAccess().getElementsAssignment_1_4(), "rule__ConditionalBranch__ElementsAssignment_1_4");
 			builder.put(grammarAccess.getUnorderedGroupAccess().getElementsAssignment_1_1_1(), "rule__UnorderedGroup__ElementsAssignment_1_1_1");
 			builder.put(grammarAccess.getGroupAccess().getElementsAssignment_1_1(), "rule__Group__ElementsAssignment_1_1");
+			builder.put(grammarAccess.getGatedSemanticPredicateAccess().getCodeAssignment_0(), "rule__GatedSemanticPredicate__CodeAssignment_0");
+			builder.put(grammarAccess.getJavaCodeAccess().getSourceAssignment(), "rule__JavaCode__SourceAssignment");
 			builder.put(grammarAccess.getAbstractTokenWithCardinalityAccess().getCardinalityAssignment_1(), "rule__AbstractTokenWithCardinality__CardinalityAssignment_1");
 			builder.put(grammarAccess.getActionAccess().getTypeAssignment_1(), "rule__Action__TypeAssignment_1");
 			builder.put(grammarAccess.getActionAccess().getFeatureAssignment_2_1(), "rule__Action__FeatureAssignment_2_1");

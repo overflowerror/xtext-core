@@ -69,6 +69,7 @@ public class TerminalRuleImpl extends AbstractRuleImpl implements TerminalRule {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public boolean isFragment() {
 		return fragment;
 	}
@@ -78,6 +79,7 @@ public class TerminalRuleImpl extends AbstractRuleImpl implements TerminalRule {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setFragment(boolean newFragment) {
 		boolean oldFragment = fragment;
 		fragment = newFragment;
@@ -152,7 +154,7 @@ public class TerminalRuleImpl extends AbstractRuleImpl implements TerminalRule {
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
+		StringBuilder result = new StringBuilder(super.toString());
 		result.append(" (fragment: ");
 		result.append(fragment);
 		result.append(')');

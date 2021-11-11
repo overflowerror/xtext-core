@@ -112,6 +112,7 @@ public class AbstractRuleImpl extends MinimalEObjectImpl.Container implements Ab
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -121,6 +122,7 @@ public class AbstractRuleImpl extends MinimalEObjectImpl.Container implements Ab
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setName(String newName) {
 		String oldName = name;
 		name = newName;
@@ -133,6 +135,7 @@ public class AbstractRuleImpl extends MinimalEObjectImpl.Container implements Ab
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public TypeRef getType() {
 		return type;
 	}
@@ -157,6 +160,7 @@ public class AbstractRuleImpl extends MinimalEObjectImpl.Container implements Ab
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setType(TypeRef newType) {
 		if (newType != type) {
 			NotificationChain msgs = null;
@@ -176,6 +180,7 @@ public class AbstractRuleImpl extends MinimalEObjectImpl.Container implements Ab
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public AbstractElement getAlternatives() {
 		return alternatives;
 	}
@@ -200,6 +205,7 @@ public class AbstractRuleImpl extends MinimalEObjectImpl.Container implements Ab
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setAlternatives(AbstractElement newAlternatives) {
 		if (newAlternatives != alternatives) {
 			NotificationChain msgs = null;
@@ -219,6 +225,7 @@ public class AbstractRuleImpl extends MinimalEObjectImpl.Container implements Ab
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EList<Annotation> getAnnotations() {
 		if (annotations == null) {
 			annotations = new EObjectContainmentEList<Annotation>(Annotation.class, this, XtextPackage.ABSTRACT_RULE__ANNOTATIONS);
@@ -343,7 +350,7 @@ public class AbstractRuleImpl extends MinimalEObjectImpl.Container implements Ab
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
+		StringBuilder result = new StringBuilder(super.toString());
 		result.append(" (name: ");
 		result.append(name);
 		result.append(')');

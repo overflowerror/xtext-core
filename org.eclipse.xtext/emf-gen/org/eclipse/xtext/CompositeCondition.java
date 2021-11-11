@@ -19,9 +19,6 @@ package org.eclipse.xtext;
  * @see org.eclipse.xtext.XtextPackage#getCompositeCondition()
  * @model
  * @generated
- * @since 2.9
- * @noimplement This interface is not intended to be implemented by clients.
- * @noextend This interface is not intended to be extended by clients.
  */
 public interface CompositeCondition extends Condition {
 	/**

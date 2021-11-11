@@ -74,6 +74,7 @@ public class EnumLiteralDeclarationImpl extends AbstractElementImpl implements E
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EEnumLiteral getEnumLiteral() {
 		if (enumLiteral != null && enumLiteral.eIsProxy()) {
 			InternalEObject oldEnumLiteral = (InternalEObject)enumLiteral;
@@ -100,6 +101,7 @@ public class EnumLiteralDeclarationImpl extends AbstractElementImpl implements E
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setEnumLiteral(EEnumLiteral newEnumLiteral) {
 		EEnumLiteral oldEnumLiteral = enumLiteral;
 		enumLiteral = newEnumLiteral;
@@ -112,6 +114,7 @@ public class EnumLiteralDeclarationImpl extends AbstractElementImpl implements E
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Keyword getLiteral() {
 		return literal;
 	}
@@ -136,6 +139,7 @@ public class EnumLiteralDeclarationImpl extends AbstractElementImpl implements E
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setLiteral(Keyword newLiteral) {
 		if (newLiteral != literal) {
 			NotificationChain msgs = null;

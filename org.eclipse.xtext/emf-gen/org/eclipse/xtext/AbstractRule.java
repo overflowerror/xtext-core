@@ -116,7 +116,6 @@ public interface AbstractRule extends EObject {
 	 * @see org.eclipse.xtext.XtextPackage#getAbstractRule_Annotations()
 	 * @model containment="true"
 	 * @generated
-	 * @since 2.11
 	 */
 	EList<Annotation> getAnnotations();
 

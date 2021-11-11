@@ -66,6 +66,7 @@ public class CompoundElementImpl extends AbstractElementImpl implements Compound
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EList<AbstractElement> getElements() {
 		if (elements == null) {
 			elements = new EObjectContainmentEList<AbstractElement>(AbstractElement.class, this, XtextPackage.COMPOUND_ELEMENT__ELEMENTS);

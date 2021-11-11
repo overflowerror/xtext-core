@@ -27,10 +27,6 @@ import org.eclipse.xtext.XtextPackage;
  * </ul>
  *
  * @generated
- * @noreference This class is not intended to be referenced by clients.
- * @noextend This class is not intended to be subclassed by clients.
- * @noinstantiate This class is not intended to be instantiated by clients.
- * @since 2.9
  */
 public class CompositeConditionImpl extends ConditionImpl implements CompositeCondition {
 	/**
@@ -77,6 +73,7 @@ public class CompositeConditionImpl extends ConditionImpl implements CompositeCo
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Condition getLeft() {
 		return left;
 	}
@@ -101,6 +98,7 @@ public class CompositeConditionImpl extends ConditionImpl implements CompositeCo
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setLeft(Condition newLeft) {
 		if (newLeft != left) {
 			NotificationChain msgs = null;
@@ -120,6 +118,7 @@ public class CompositeConditionImpl extends ConditionImpl implements CompositeCo
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Condition getRight() {
 		return right;
 	}
@@ -144,6 +143,7 @@ public class CompositeConditionImpl extends ConditionImpl implements CompositeCo
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setRight(Condition newRight) {
 		if (newRight != right) {
 			NotificationChain msgs = null;

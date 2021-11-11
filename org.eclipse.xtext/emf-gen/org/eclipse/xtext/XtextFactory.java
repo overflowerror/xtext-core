@@ -11,8 +11,6 @@ import org.eclipse.emf.ecore.EFactory;
  * <!-- end-user-doc -->
  * @see org.eclipse.xtext.XtextPackage
  * @generated
- * @noextend This interface is not intended to be extended by clients.
- * @noimplement This interface is not intended to be implemented by clients.
  */
 public interface XtextFactory extends EFactory {
 	/**
@@ -355,6 +353,24 @@ public interface XtextFactory extends EFactory {
 	 * @generated
 	 */
 	Annotation createAnnotation();
+
+	/**
+	 * Returns a new object of class '<em>Gated Semantic Predicate</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Gated Semantic Predicate</em>'.
+	 * @generated
+	 */
+	GatedSemanticPredicate createGatedSemanticPredicate();
+
+	/**
+	 * Returns a new object of class '<em>Java Code</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Java Code</em>'.
+	 * @generated
+	 */
+	JavaCode createJavaCode();
 
 	/**
 	 * Returns the package supported by this factory.

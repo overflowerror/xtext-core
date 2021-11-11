@@ -17,9 +17,6 @@ import org.eclipse.xtext.*;
  * An implementation of the model <b>Factory</b>.
  * <!-- end-user-doc -->
  * @generated
- * @noextend This class is not intended to be subclassed by clients.
- * @noinstantiate This class is not intended to be instantiated by clients.
- * @noreference This class is not intended to be referenced by clients.
  */
 public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	/**
@@ -95,6 +92,8 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 			case XtextPackage.PARAMETER_REFERENCE: return createParameterReference();
 			case XtextPackage.LITERAL_CONDITION: return createLiteralCondition();
 			case XtextPackage.ANNOTATION: return createAnnotation();
+			case XtextPackage.GATED_SEMANTIC_PREDICATE: return createGatedSemanticPredicate();
+			case XtextPackage.JAVA_CODE: return createJavaCode();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -105,6 +104,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Grammar createGrammar() {
 		GrammarImpl grammar = new GrammarImpl();
 		return grammar;
@@ -115,6 +115,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public AbstractRule createAbstractRule() {
 		AbstractRuleImpl abstractRule = new AbstractRuleImpl();
 		return abstractRule;
@@ -125,6 +126,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public AbstractMetamodelDeclaration createAbstractMetamodelDeclaration() {
 		AbstractMetamodelDeclarationImpl abstractMetamodelDeclaration = new AbstractMetamodelDeclarationImpl();
 		return abstractMetamodelDeclaration;
@@ -135,6 +137,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public GeneratedMetamodel createGeneratedMetamodel() {
 		GeneratedMetamodelImpl generatedMetamodel = new GeneratedMetamodelImpl();
 		return generatedMetamodel;
@@ -145,6 +148,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public ReferencedMetamodel createReferencedMetamodel() {
 		ReferencedMetamodelImpl referencedMetamodel = new ReferencedMetamodelImpl();
 		return referencedMetamodel;
@@ -155,6 +159,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public ParserRule createParserRule() {
 		ParserRuleImpl parserRule = new ParserRuleImpl();
 		return parserRule;
@@ -165,6 +170,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public TypeRef createTypeRef() {
 		TypeRefImpl typeRef = new TypeRefImpl();
 		return typeRef;
@@ -175,6 +181,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public AbstractElement createAbstractElement() {
 		AbstractElementImpl abstractElement = new AbstractElementImpl();
 		return abstractElement;
@@ -185,6 +192,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Action createAction() {
 		ActionImpl action = new ActionImpl();
 		return action;
@@ -195,6 +203,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Keyword createKeyword() {
 		KeywordImpl keyword = new KeywordImpl();
 		return keyword;
@@ -205,6 +214,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public RuleCall createRuleCall() {
 		RuleCallImpl ruleCall = new RuleCallImpl();
 		return ruleCall;
@@ -215,6 +225,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Assignment createAssignment() {
 		AssignmentImpl assignment = new AssignmentImpl();
 		return assignment;
@@ -225,6 +236,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public CrossReference createCrossReference() {
 		CrossReferenceImpl crossReference = new CrossReferenceImpl();
 		return crossReference;
@@ -235,6 +247,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public TerminalRule createTerminalRule() {
 		TerminalRuleImpl terminalRule = new TerminalRuleImpl();
 		return terminalRule;
@@ -245,6 +258,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public AbstractNegatedToken createAbstractNegatedToken() {
 		AbstractNegatedTokenImpl abstractNegatedToken = new AbstractNegatedTokenImpl();
 		return abstractNegatedToken;
@@ -255,6 +269,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public NegatedToken createNegatedToken() {
 		NegatedTokenImpl negatedToken = new NegatedTokenImpl();
 		return negatedToken;
@@ -265,6 +280,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public UntilToken createUntilToken() {
 		UntilTokenImpl untilToken = new UntilTokenImpl();
 		return untilToken;
@@ -275,6 +291,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Wildcard createWildcard() {
 		WildcardImpl wildcard = new WildcardImpl();
 		return wildcard;
@@ -285,6 +302,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EnumRule createEnumRule() {
 		EnumRuleImpl enumRule = new EnumRuleImpl();
 		return enumRule;
@@ -295,6 +313,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EnumLiteralDeclaration createEnumLiteralDeclaration() {
 		EnumLiteralDeclarationImpl enumLiteralDeclaration = new EnumLiteralDeclarationImpl();
 		return enumLiteralDeclaration;
@@ -305,6 +324,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Alternatives createAlternatives() {
 		AlternativesImpl alternatives = new AlternativesImpl();
 		return alternatives;
@@ -315,6 +335,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public UnorderedGroup createUnorderedGroup() {
 		UnorderedGroupImpl unorderedGroup = new UnorderedGroupImpl();
 		return unorderedGroup;
@@ -325,6 +346,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Group createGroup() {
 		GroupImpl group = new GroupImpl();
 		return group;
@@ -335,6 +357,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public CharacterRange createCharacterRange() {
 		CharacterRangeImpl characterRange = new CharacterRangeImpl();
 		return characterRange;
@@ -345,6 +368,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public CompoundElement createCompoundElement() {
 		CompoundElementImpl compoundElement = new CompoundElementImpl();
 		return compoundElement;
@@ -355,6 +379,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EOF createEOF() {
 		EOFImpl eof = new EOFImpl();
 		return eof;
@@ -366,6 +391,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Parameter createParameter() {
 		ParameterImpl parameter = new ParameterImpl();
 		return parameter;
@@ -377,6 +403,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public NamedArgument createNamedArgument() {
 		NamedArgumentImpl namedArgument = new NamedArgumentImpl();
 		return namedArgument;
@@ -387,6 +414,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Condition createCondition() {
 		ConditionImpl condition = new ConditionImpl();
 		return condition;
@@ -397,6 +425,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Conjunction createConjunction() {
 		ConjunctionImpl conjunction = new ConjunctionImpl();
 		return conjunction;
@@ -407,6 +436,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Negation createNegation() {
 		NegationImpl negation = new NegationImpl();
 		return negation;
@@ -417,6 +447,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Disjunction createDisjunction() {
 		DisjunctionImpl disjunction = new DisjunctionImpl();
 		return disjunction;
@@ -427,6 +458,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public CompositeCondition createCompositeCondition() {
 		CompositeConditionImpl compositeCondition = new CompositeConditionImpl();
 		return compositeCondition;
@@ -437,6 +469,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public ParameterReference createParameterReference() {
 		ParameterReferenceImpl parameterReference = new ParameterReferenceImpl();
 		return parameterReference;
@@ -447,6 +480,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public LiteralCondition createLiteralCondition() {
 		LiteralConditionImpl literalCondition = new LiteralConditionImpl();
 		return literalCondition;
@@ -457,6 +491,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Annotation createAnnotation() {
 		AnnotationImpl annotation = new AnnotationImpl();
 		return annotation;
@@ -467,6 +502,29 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
+	public GatedSemanticPredicate createGatedSemanticPredicate() {
+		GatedSemanticPredicateImpl gatedSemanticPredicate = new GatedSemanticPredicateImpl();
+		return gatedSemanticPredicate;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public JavaCode createJavaCode() {
+		JavaCodeImpl javaCode = new JavaCodeImpl();
+		return javaCode;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public XtextPackage getXtextPackage() {
 		return (XtextPackage)getEPackage();
 	}

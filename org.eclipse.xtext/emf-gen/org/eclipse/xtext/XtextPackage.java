@@ -1934,6 +1934,144 @@ public interface XtextPackage extends EPackage {
 	int ANNOTATION_FEATURE_COUNT = 1;
 
 	/**
+	 * The meta object id for the '{@link org.eclipse.xtext.impl.AbstractSemanticPredicateImpl <em>Abstract Semantic Predicate</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.xtext.impl.AbstractSemanticPredicateImpl
+	 * @see org.eclipse.xtext.impl.XtextPackageImpl#getAbstractSemanticPredicate()
+	 * @generated
+	 */
+	int ABSTRACT_SEMANTIC_PREDICATE = 36;
+
+	/**
+	 * The feature id for the '<em><b>Cardinality</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ABSTRACT_SEMANTIC_PREDICATE__CARDINALITY = ABSTRACT_ELEMENT__CARDINALITY;
+
+	/**
+	 * The feature id for the '<em><b>Predicated</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ABSTRACT_SEMANTIC_PREDICATE__PREDICATED = ABSTRACT_ELEMENT__PREDICATED;
+
+	/**
+	 * The feature id for the '<em><b>First Set Predicated</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ABSTRACT_SEMANTIC_PREDICATE__FIRST_SET_PREDICATED = ABSTRACT_ELEMENT__FIRST_SET_PREDICATED;
+
+	/**
+	 * The feature id for the '<em><b>Code</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ABSTRACT_SEMANTIC_PREDICATE__CODE = ABSTRACT_ELEMENT_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Abstract Semantic Predicate</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ABSTRACT_SEMANTIC_PREDICATE_FEATURE_COUNT = ABSTRACT_ELEMENT_FEATURE_COUNT + 1;
+
+	/**
+	 * The meta object id for the '{@link org.eclipse.xtext.impl.GatedSemanticPredicateImpl <em>Gated Semantic Predicate</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.xtext.impl.GatedSemanticPredicateImpl
+	 * @see org.eclipse.xtext.impl.XtextPackageImpl#getGatedSemanticPredicate()
+	 * @generated
+	 */
+	int GATED_SEMANTIC_PREDICATE = 37;
+
+	/**
+	 * The feature id for the '<em><b>Cardinality</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int GATED_SEMANTIC_PREDICATE__CARDINALITY = ABSTRACT_SEMANTIC_PREDICATE__CARDINALITY;
+
+	/**
+	 * The feature id for the '<em><b>Predicated</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int GATED_SEMANTIC_PREDICATE__PREDICATED = ABSTRACT_SEMANTIC_PREDICATE__PREDICATED;
+
+	/**
+	 * The feature id for the '<em><b>First Set Predicated</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int GATED_SEMANTIC_PREDICATE__FIRST_SET_PREDICATED = ABSTRACT_SEMANTIC_PREDICATE__FIRST_SET_PREDICATED;
+
+	/**
+	 * The feature id for the '<em><b>Code</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int GATED_SEMANTIC_PREDICATE__CODE = ABSTRACT_SEMANTIC_PREDICATE__CODE;
+
+	/**
+	 * The number of structural features of the '<em>Gated Semantic Predicate</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int GATED_SEMANTIC_PREDICATE_FEATURE_COUNT = ABSTRACT_SEMANTIC_PREDICATE_FEATURE_COUNT + 0;
+
+	/**
+	 * The meta object id for the '{@link org.eclipse.xtext.impl.JavaCodeImpl <em>Java Code</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.xtext.impl.JavaCodeImpl
+	 * @see org.eclipse.xtext.impl.XtextPackageImpl#getJavaCode()
+	 * @generated
+	 */
+	int JAVA_CODE = 38;
+
+	/**
+	 * The feature id for the '<em><b>Source</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int JAVA_CODE__SOURCE = 0;
+
+	/**
+	 * The number of structural features of the '<em>Java Code</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int JAVA_CODE_FEATURE_COUNT = 1;
+
+	/**
 	 * Returns the meta object for class '{@link org.eclipse.xtext.Grammar <em>Grammar</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2902,6 +3040,58 @@ public interface XtextPackage extends EPackage {
 	EAttribute getAnnotation_Name();
 
 	/**
+	 * Returns the meta object for class '{@link org.eclipse.xtext.AbstractSemanticPredicate <em>Abstract Semantic Predicate</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Abstract Semantic Predicate</em>'.
+	 * @see org.eclipse.xtext.AbstractSemanticPredicate
+	 * @generated
+	 */
+	EClass getAbstractSemanticPredicate();
+
+	/**
+	 * Returns the meta object for the containment reference '{@link org.eclipse.xtext.AbstractSemanticPredicate#getCode <em>Code</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Code</em>'.
+	 * @see org.eclipse.xtext.AbstractSemanticPredicate#getCode()
+	 * @see #getAbstractSemanticPredicate()
+	 * @generated
+	 */
+	EReference getAbstractSemanticPredicate_Code();
+
+	/**
+	 * Returns the meta object for class '{@link org.eclipse.xtext.GatedSemanticPredicate <em>Gated Semantic Predicate</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Gated Semantic Predicate</em>'.
+	 * @see org.eclipse.xtext.GatedSemanticPredicate
+	 * @generated
+	 */
+	EClass getGatedSemanticPredicate();
+
+	/**
+	 * Returns the meta object for class '{@link org.eclipse.xtext.JavaCode <em>Java Code</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Java Code</em>'.
+	 * @see org.eclipse.xtext.JavaCode
+	 * @generated
+	 */
+	EClass getJavaCode();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.xtext.JavaCode#getSource <em>Source</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Source</em>'.
+	 * @see org.eclipse.xtext.JavaCode#getSource()
+	 * @see #getJavaCode()
+	 * @generated
+	 */
+	EAttribute getJavaCode_Source();
+
+	/**
 	 * Returns the factory that creates the instances of the model.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3731,6 +3921,52 @@ public interface XtextPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute ANNOTATION__NAME = eINSTANCE.getAnnotation_Name();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.xtext.impl.AbstractSemanticPredicateImpl <em>Abstract Semantic Predicate</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.xtext.impl.AbstractSemanticPredicateImpl
+		 * @see org.eclipse.xtext.impl.XtextPackageImpl#getAbstractSemanticPredicate()
+		 * @generated
+		 */
+		EClass ABSTRACT_SEMANTIC_PREDICATE = eINSTANCE.getAbstractSemanticPredicate();
+
+		/**
+		 * The meta object literal for the '<em><b>Code</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference ABSTRACT_SEMANTIC_PREDICATE__CODE = eINSTANCE.getAbstractSemanticPredicate_Code();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.xtext.impl.GatedSemanticPredicateImpl <em>Gated Semantic Predicate</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.xtext.impl.GatedSemanticPredicateImpl
+		 * @see org.eclipse.xtext.impl.XtextPackageImpl#getGatedSemanticPredicate()
+		 * @generated
+		 */
+		EClass GATED_SEMANTIC_PREDICATE = eINSTANCE.getGatedSemanticPredicate();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.xtext.impl.JavaCodeImpl <em>Java Code</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.xtext.impl.JavaCodeImpl
+		 * @see org.eclipse.xtext.impl.XtextPackageImpl#getJavaCode()
+		 * @generated
+		 */
+		EClass JAVA_CODE = eINSTANCE.getJavaCode();
+
+		/**
+		 * The meta object literal for the '<em><b>Source</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute JAVA_CODE__SOURCE = eINSTANCE.getJavaCode_Source();
 
 	}
 

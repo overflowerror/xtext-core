@@ -146,6 +146,7 @@ public class XtextSyntacticSequencer extends AbstractSyntacticSequencer {
 	 * This ambiguous syntax occurs at:
 	 *     (rule start) (ambiguity) '<' guardCondition=Disjunction
 	 *     (rule start) (ambiguity) '{' type=TypeRef
+	 *     (rule start) (ambiguity) code=JavaCode
 	 *     (rule start) (ambiguity) feature=ValidID
 	 *     (rule start) (ambiguity) firstSetPredicated?='->'
 	 *     (rule start) (ambiguity) predicated?='=>'
@@ -166,6 +167,7 @@ public class XtextSyntacticSequencer extends AbstractSyntacticSequencer {
 	 * This ambiguous syntax occurs at:
 	 *     (rule start) (ambiguity) '<' guardCondition=Disjunction
 	 *     (rule start) (ambiguity) '{' type=TypeRef
+	 *     (rule start) (ambiguity) code=JavaCode
 	 *     (rule start) (ambiguity) feature=ValidID
 	 *     (rule start) (ambiguity) firstSetPredicated?='->'
 	 *     (rule start) (ambiguity) predicated?='=>'

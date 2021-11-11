@@ -809,12 +809,13 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 		private final Alternatives cAlternatives = (Alternatives)rule.eContents().get(1);
 		private final RuleCall cAbstractTokenWithCardinalityParserRuleCall_0 = (RuleCall)cAlternatives.eContents().get(0);
 		private final RuleCall cActionParserRuleCall_1 = (RuleCall)cAlternatives.eContents().get(1);
+		private final RuleCall cSemanticPredicateParserRuleCall_2 = (RuleCall)cAlternatives.eContents().get(2);
 		
 		//AbstractToken AbstractElement:
-		//	AbstractTokenWithCardinality | Action;
+		//	AbstractTokenWithCardinality | Action | SemanticPredicate;
 		@Override public ParserRule getRule() { return rule; }
 		
-		//AbstractTokenWithCardinality | Action
+		//AbstractTokenWithCardinality | Action | SemanticPredicate
 		public Alternatives getAlternatives() { return cAlternatives; }
 		
 		//AbstractTokenWithCardinality
@@ -822,6 +823,58 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 		
 		//Action
 		public RuleCall getActionParserRuleCall_1() { return cActionParserRuleCall_1; }
+		
+		//SemanticPredicate
+		public RuleCall getSemanticPredicateParserRuleCall_2() { return cSemanticPredicateParserRuleCall_2; }
+	}
+	public class SemanticPredicateElements extends AbstractParserRuleElementFinder {
+		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "org.eclipse.xtext.Xtext.SemanticPredicate");
+		private final RuleCall cGatedSemanticPredicateParserRuleCall = (RuleCall)rule.eContents().get(1);
+		
+		//SemanticPredicate AbstractSemanticPredicate:
+		//	GatedSemanticPredicate;
+		@Override public ParserRule getRule() { return rule; }
+		
+		//GatedSemanticPredicate
+		public RuleCall getGatedSemanticPredicateParserRuleCall() { return cGatedSemanticPredicateParserRuleCall; }
+	}
+	public class GatedSemanticPredicateElements extends AbstractParserRuleElementFinder {
+		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "org.eclipse.xtext.Xtext.GatedSemanticPredicate");
+		private final Group cGroup = (Group)rule.eContents().get(1);
+		private final Assignment cCodeAssignment_0 = (Assignment)cGroup.eContents().get(0);
+		private final RuleCall cCodeJavaCodeParserRuleCall_0_0 = (RuleCall)cCodeAssignment_0.eContents().get(0);
+		private final Keyword cQuestionMarkEqualsSignGreaterThanSignKeyword_1 = (Keyword)cGroup.eContents().get(1);
+		
+		//GatedSemanticPredicate:
+		//	code=JavaCode '?=>';
+		@Override public ParserRule getRule() { return rule; }
+		
+		//code=JavaCode '?=>'
+		public Group getGroup() { return cGroup; }
+		
+		//code=JavaCode
+		public Assignment getCodeAssignment_0() { return cCodeAssignment_0; }
+		
+		//JavaCode
+		public RuleCall getCodeJavaCodeParserRuleCall_0_0() { return cCodeJavaCodeParserRuleCall_0_0; }
+		
+		//'?=>'
+		public Keyword getQuestionMarkEqualsSignGreaterThanSignKeyword_1() { return cQuestionMarkEqualsSignGreaterThanSignKeyword_1; }
+	}
+	public class JavaCodeElements extends AbstractParserRuleElementFinder {
+		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "org.eclipse.xtext.Xtext.JavaCode");
+		private final Assignment cSourceAssignment = (Assignment)rule.eContents().get(1);
+		private final RuleCall cSourceJAVACODESTRINGTerminalRuleCall_0 = (RuleCall)cSourceAssignment.eContents().get(0);
+		
+		//JavaCode:
+		//	source=JAVACODESTRING;
+		@Override public ParserRule getRule() { return rule; }
+		
+		//source=JAVACODESTRING
+		public Assignment getSourceAssignment() { return cSourceAssignment; }
+		
+		//JAVACODESTRING
+		public RuleCall getSourceJAVACODESTRINGTerminalRuleCall_0() { return cSourceJAVACODESTRINGTerminalRuleCall_0; }
 	}
 	public class AbstractTokenWithCardinalityElements extends AbstractParserRuleElementFinder {
 		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "org.eclipse.xtext.Xtext.AbstractTokenWithCardinality");
@@ -2325,6 +2378,10 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 	private final UnorderedGroupElements pUnorderedGroup;
 	private final GroupElements pGroup;
 	private final AbstractTokenElements pAbstractToken;
+	private final SemanticPredicateElements pSemanticPredicate;
+	private final GatedSemanticPredicateElements pGatedSemanticPredicate;
+	private final JavaCodeElements pJavaCode;
+	private final TerminalRule tJAVACODESTRING;
 	private final AbstractTokenWithCardinalityElements pAbstractTokenWithCardinality;
 	private final ActionElements pAction;
 	private final AbstractTerminalElements pAbstractTerminal;
@@ -2392,6 +2449,10 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 		this.pUnorderedGroup = new UnorderedGroupElements();
 		this.pGroup = new GroupElements();
 		this.pAbstractToken = new AbstractTokenElements();
+		this.pSemanticPredicate = new SemanticPredicateElements();
+		this.pGatedSemanticPredicate = new GatedSemanticPredicateElements();
+		this.pJavaCode = new JavaCodeElements();
+		this.tJAVACODESTRING = (TerminalRule) GrammarUtil.findRuleForName(getGrammar(), "org.eclipse.xtext.Xtext.JAVACODESTRING");
 		this.pAbstractTokenWithCardinality = new AbstractTokenWithCardinalityElements();
 		this.pAction = new ActionElements();
 		this.pAbstractTerminal = new AbstractTerminalElements();
@@ -2629,13 +2690,49 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 	}
 	
 	//AbstractToken AbstractElement:
-	//	AbstractTokenWithCardinality | Action;
+	//	AbstractTokenWithCardinality | Action | SemanticPredicate;
 	public AbstractTokenElements getAbstractTokenAccess() {
 		return pAbstractToken;
 	}
 	
 	public ParserRule getAbstractTokenRule() {
 		return getAbstractTokenAccess().getRule();
+	}
+	
+	//SemanticPredicate AbstractSemanticPredicate:
+	//	GatedSemanticPredicate;
+	public SemanticPredicateElements getSemanticPredicateAccess() {
+		return pSemanticPredicate;
+	}
+	
+	public ParserRule getSemanticPredicateRule() {
+		return getSemanticPredicateAccess().getRule();
+	}
+	
+	//GatedSemanticPredicate:
+	//	code=JavaCode '?=>';
+	public GatedSemanticPredicateElements getGatedSemanticPredicateAccess() {
+		return pGatedSemanticPredicate;
+	}
+	
+	public ParserRule getGatedSemanticPredicateRule() {
+		return getGatedSemanticPredicateAccess().getRule();
+	}
+	
+	//JavaCode:
+	//	source=JAVACODESTRING;
+	public JavaCodeElements getJavaCodeAccess() {
+		return pJavaCode;
+	}
+	
+	public ParserRule getJavaCodeRule() {
+		return getJavaCodeAccess().getRule();
+	}
+	
+	//terminal JAVACODESTRING:
+	//	'$$'->'$$';
+	public TerminalRule getJAVACODESTRINGRule() {
+		return tJAVACODESTRING;
 	}
 	
 	///* SuppressWarnings[potentialOverride]: Handled in CardinalityAwareEcoreFactory */ AbstractTokenWithCardinality

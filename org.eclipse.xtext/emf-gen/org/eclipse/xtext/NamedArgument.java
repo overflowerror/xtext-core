@@ -21,7 +21,6 @@ import org.eclipse.emf.ecore.EObject;
  * @see org.eclipse.xtext.XtextPackage#getNamedArgument()
  * @model
  * @generated
- * @since 2.9
  */
 public interface NamedArgument extends EObject {
 	/**

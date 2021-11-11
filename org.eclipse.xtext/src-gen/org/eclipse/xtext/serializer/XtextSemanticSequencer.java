@@ -18,9 +18,11 @@ import org.eclipse.xtext.Disjunction;
 import org.eclipse.xtext.EOF;
 import org.eclipse.xtext.EnumLiteralDeclaration;
 import org.eclipse.xtext.EnumRule;
+import org.eclipse.xtext.GatedSemanticPredicate;
 import org.eclipse.xtext.GeneratedMetamodel;
 import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.Group;
+import org.eclipse.xtext.JavaCode;
 import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.LiteralCondition;
 import org.eclipse.xtext.NamedArgument;
@@ -183,6 +185,27 @@ public class XtextSemanticSequencer extends AbstractDelegatingSemanticSequencer 
 			case XtextPackage.ENUM_RULE:
 				sequence_EnumRule(context, (EnumRule) semanticObject); 
 				return; 
+			case XtextPackage.GATED_SEMANTIC_PREDICATE:
+				if (rule == grammarAccess.getAlternativesRule()
+						|| action == grammarAccess.getAlternativesAccess().getAlternativesElementsAction_1_0()
+						|| rule == grammarAccess.getConditionalBranchRule()
+						|| rule == grammarAccess.getUnorderedGroupRule()
+						|| action == grammarAccess.getUnorderedGroupAccess().getUnorderedGroupElementsAction_1_0()
+						|| rule == grammarAccess.getGroupRule()
+						|| action == grammarAccess.getGroupAccess().getGroupElementsAction_1_0()
+						|| rule == grammarAccess.getAbstractTokenRule()
+						|| rule == grammarAccess.getAbstractTokenWithCardinalityRule()
+						|| rule == grammarAccess.getAbstractTerminalRule()
+						|| rule == grammarAccess.getParenthesizedElementRule()) {
+					sequence_AbstractTokenWithCardinality_GatedSemanticPredicate(context, (GatedSemanticPredicate) semanticObject); 
+					return; 
+				}
+				else if (rule == grammarAccess.getSemanticPredicateRule()
+						|| rule == grammarAccess.getGatedSemanticPredicateRule()) {
+					sequence_GatedSemanticPredicate(context, (GatedSemanticPredicate) semanticObject); 
+					return; 
+				}
+				else break;
 			case XtextPackage.GENERATED_METAMODEL:
 				sequence_GeneratedMetamodel(context, (GeneratedMetamodel) semanticObject); 
 				return; 
@@ -219,6 +242,9 @@ public class XtextSemanticSequencer extends AbstractDelegatingSemanticSequencer 
 					return; 
 				}
 				else break;
+			case XtextPackage.JAVA_CODE:
+				sequence_JavaCode(context, (JavaCode) semanticObject); 
+				return; 
 			case XtextPackage.KEYWORD:
 				if (rule == grammarAccess.getAlternativesRule()
 						|| action == grammarAccess.getAlternativesAccess().getAlternativesElementsAction_1_0()
@@ -485,6 +511,28 @@ public class XtextSemanticSequencer extends AbstractDelegatingSemanticSequencer 
 	 *     )
 	 */
 	protected void sequence_AbstractTokenWithCardinality_ConditionalBranch_Group_PredicatedGroup(ISerializationContext context, Group semanticObject) {
+		genericSequencer.createSequence(context, semanticObject);
+	}
+	
+	
+	/**
+	 * Contexts:
+	 *     Alternatives returns GatedSemanticPredicate
+	 *     Alternatives.Alternatives_1_0 returns GatedSemanticPredicate
+	 *     ConditionalBranch returns GatedSemanticPredicate
+	 *     UnorderedGroup returns GatedSemanticPredicate
+	 *     UnorderedGroup.UnorderedGroup_1_0 returns GatedSemanticPredicate
+	 *     Group returns GatedSemanticPredicate
+	 *     Group.Group_1_0 returns GatedSemanticPredicate
+	 *     AbstractToken returns GatedSemanticPredicate
+	 *     AbstractTokenWithCardinality returns GatedSemanticPredicate
+	 *     AbstractTerminal returns GatedSemanticPredicate
+	 *     ParenthesizedElement returns GatedSemanticPredicate
+	 *
+	 * Constraint:
+	 *     (code=JavaCode (cardinality='?' | cardinality='*' | cardinality='+')*)
+	 */
+	protected void sequence_AbstractTokenWithCardinality_GatedSemanticPredicate(ISerializationContext context, GatedSemanticPredicate semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
 	}
 	
@@ -798,6 +846,25 @@ public class XtextSemanticSequencer extends AbstractDelegatingSemanticSequencer 
 	
 	/**
 	 * Contexts:
+	 *     SemanticPredicate returns GatedSemanticPredicate
+	 *     GatedSemanticPredicate returns GatedSemanticPredicate
+	 *
+	 * Constraint:
+	 *     code=JavaCode
+	 */
+	protected void sequence_GatedSemanticPredicate(ISerializationContext context, GatedSemanticPredicate semanticObject) {
+		if (errorAcceptor != null) {
+			if (transientValues.isValueTransient(semanticObject, XtextPackage.Literals.ABSTRACT_SEMANTIC_PREDICATE__CODE) == ValueTransient.YES)
+				errorAcceptor.accept(diagnosticProvider.createFeatureValueMissing(semanticObject, XtextPackage.Literals.ABSTRACT_SEMANTIC_PREDICATE__CODE));
+		}
+		SequenceFeeder feeder = createSequencerFeeder(context, semanticObject);
+		feeder.accept(grammarAccess.getGatedSemanticPredicateAccess().getCodeJavaCodeParserRuleCall_0_0(), semanticObject.getCode());
+		feeder.finish();
+	}
+	
+	
+	/**
+	 * Contexts:
 	 *     AbstractMetamodelDeclaration returns GeneratedMetamodel
 	 *     GeneratedMetamodel returns GeneratedMetamodel
 	 *
@@ -824,6 +891,24 @@ public class XtextSemanticSequencer extends AbstractDelegatingSemanticSequencer 
 	 */
 	protected void sequence_Grammar(ISerializationContext context, Grammar semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
+	}
+	
+	
+	/**
+	 * Contexts:
+	 *     JavaCode returns JavaCode
+	 *
+	 * Constraint:
+	 *     source=JAVACODESTRING
+	 */
+	protected void sequence_JavaCode(ISerializationContext context, JavaCode semanticObject) {
+		if (errorAcceptor != null) {
+			if (transientValues.isValueTransient(semanticObject, XtextPackage.Literals.JAVA_CODE__SOURCE) == ValueTransient.YES)
+				errorAcceptor.accept(diagnosticProvider.createFeatureValueMissing(semanticObject, XtextPackage.Literals.JAVA_CODE__SOURCE));
+		}
+		SequenceFeeder feeder = createSequencerFeeder(context, semanticObject);
+		feeder.accept(grammarAccess.getJavaCodeAccess().getSourceJAVACODESTRINGTerminalRuleCall_0(), semanticObject.getSource());
+		feeder.finish();
 	}
 	
 	

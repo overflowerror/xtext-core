@@ -4,23 +4,23 @@ package org.eclipse.xtext.impl;
 
 import org.eclipse.emf.ecore.EClass;
 
-import org.eclipse.xtext.Conjunction;
+import org.eclipse.xtext.GatedSemanticPredicate;
 import org.eclipse.xtext.XtextPackage;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Conjunction</b></em>'.
+ * An implementation of the model object '<em><b>Gated Semantic Predicate</b></em>'.
  * <!-- end-user-doc -->
  *
  * @generated
  */
-public class ConjunctionImpl extends CompositeConditionImpl implements Conjunction {
+public class GatedSemanticPredicateImpl extends AbstractSemanticPredicateImpl implements GatedSemanticPredicate {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected ConjunctionImpl() {
+	protected GatedSemanticPredicateImpl() {
 		super();
 	}
 
@@ -31,7 +31,7 @@ public class ConjunctionImpl extends CompositeConditionImpl implements Conjuncti
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return XtextPackage.Literals.CONJUNCTION;
+		return XtextPackage.Literals.GATED_SEMANTIC_PREDICATE;
 	}
 
-} //ConjunctionImpl
+} //GatedSemanticPredicateImpl

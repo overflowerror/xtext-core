@@ -10,40 +10,40 @@ import org.eclipse.emf.ecore.InternalEObject;
 
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
-import org.eclipse.xtext.Condition;
-import org.eclipse.xtext.Negation;
+import org.eclipse.xtext.AbstractSemanticPredicate;
+import org.eclipse.xtext.JavaCode;
 import org.eclipse.xtext.XtextPackage;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Negation</b></em>'.
+ * An implementation of the model object '<em><b>Abstract Semantic Predicate</b></em>'.
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * </p>
  * <ul>
- *   <li>{@link org.eclipse.xtext.impl.NegationImpl#getValue <em>Value</em>}</li>
+ *   <li>{@link org.eclipse.xtext.impl.AbstractSemanticPredicateImpl#getCode <em>Code</em>}</li>
  * </ul>
  *
  * @generated
  */
-public class NegationImpl extends ConditionImpl implements Negation {
+public abstract class AbstractSemanticPredicateImpl extends AbstractElementImpl implements AbstractSemanticPredicate {
 	/**
-	 * The cached value of the '{@link #getValue() <em>Value</em>}' containment reference.
+	 * The cached value of the '{@link #getCode() <em>Code</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getValue()
+	 * @see #getCode()
 	 * @generated
 	 * @ordered
 	 */
-	protected Condition value;
+	protected JavaCode code;
 
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected NegationImpl() {
+	protected AbstractSemanticPredicateImpl() {
 		super();
 	}
 
@@ -54,7 +54,7 @@ public class NegationImpl extends ConditionImpl implements Negation {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return XtextPackage.Literals.NEGATION;
+		return XtextPackage.Literals.ABSTRACT_SEMANTIC_PREDICATE;
 	}
 
 	/**
@@ -63,8 +63,8 @@ public class NegationImpl extends ConditionImpl implements Negation {
 	 * @generated
 	 */
 	@Override
-	public Condition getValue() {
-		return value;
+	public JavaCode getCode() {
+		return code;
 	}
 
 	/**
@@ -72,11 +72,11 @@ public class NegationImpl extends ConditionImpl implements Negation {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetValue(Condition newValue, NotificationChain msgs) {
-		Condition oldValue = value;
-		value = newValue;
+	public NotificationChain basicSetCode(JavaCode newCode, NotificationChain msgs) {
+		JavaCode oldCode = code;
+		code = newCode;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, XtextPackage.NEGATION__VALUE, oldValue, newValue);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, XtextPackage.ABSTRACT_SEMANTIC_PREDICATE__CODE, oldCode, newCode);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -88,18 +88,18 @@ public class NegationImpl extends ConditionImpl implements Negation {
 	 * @generated
 	 */
 	@Override
-	public void setValue(Condition newValue) {
-		if (newValue != value) {
+	public void setCode(JavaCode newCode) {
+		if (newCode != code) {
 			NotificationChain msgs = null;
-			if (value != null)
-				msgs = ((InternalEObject)value).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - XtextPackage.NEGATION__VALUE, null, msgs);
-			if (newValue != null)
-				msgs = ((InternalEObject)newValue).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - XtextPackage.NEGATION__VALUE, null, msgs);
-			msgs = basicSetValue(newValue, msgs);
+			if (code != null)
+				msgs = ((InternalEObject)code).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - XtextPackage.ABSTRACT_SEMANTIC_PREDICATE__CODE, null, msgs);
+			if (newCode != null)
+				msgs = ((InternalEObject)newCode).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - XtextPackage.ABSTRACT_SEMANTIC_PREDICATE__CODE, null, msgs);
+			msgs = basicSetCode(newCode, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, XtextPackage.NEGATION__VALUE, newValue, newValue));
+			eNotify(new ENotificationImpl(this, Notification.SET, XtextPackage.ABSTRACT_SEMANTIC_PREDICATE__CODE, newCode, newCode));
 	}
 
 	/**
@@ -110,8 +110,8 @@ public class NegationImpl extends ConditionImpl implements Negation {
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case XtextPackage.NEGATION__VALUE:
-				return basicSetValue(null, msgs);
+			case XtextPackage.ABSTRACT_SEMANTIC_PREDICATE__CODE:
+				return basicSetCode(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -124,8 +124,8 @@ public class NegationImpl extends ConditionImpl implements Negation {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case XtextPackage.NEGATION__VALUE:
-				return getValue();
+			case XtextPackage.ABSTRACT_SEMANTIC_PREDICATE__CODE:
+				return getCode();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -138,8 +138,8 @@ public class NegationImpl extends ConditionImpl implements Negation {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case XtextPackage.NEGATION__VALUE:
-				setValue((Condition)newValue);
+			case XtextPackage.ABSTRACT_SEMANTIC_PREDICATE__CODE:
+				setCode((JavaCode)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -153,8 +153,8 @@ public class NegationImpl extends ConditionImpl implements Negation {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case XtextPackage.NEGATION__VALUE:
-				setValue((Condition)null);
+			case XtextPackage.ABSTRACT_SEMANTIC_PREDICATE__CODE:
+				setCode((JavaCode)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -168,10 +168,10 @@ public class NegationImpl extends ConditionImpl implements Negation {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case XtextPackage.NEGATION__VALUE:
-				return value != null;
+			case XtextPackage.ABSTRACT_SEMANTIC_PREDICATE__CODE:
+				return code != null;
 		}
 		return super.eIsSet(featureID);
 	}
 
-} //NegationImpl
+} //AbstractSemanticPredicateImpl

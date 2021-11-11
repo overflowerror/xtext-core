@@ -86,7 +86,24 @@ Group returns AbstractElement:
 
 AbstractToken returns AbstractElement:
 	AbstractTokenWithCardinality |
-	Action
+	Action |
+	SemanticPredicate
+;
+
+SemanticPredicate returns AbstractSemanticPredicate:
+	GatedSemanticPredicate
+;
+
+GatedSemanticPredicate returns GatedSemanticPredicate:
+	code=JavaCode '?=>'
+;
+
+JavaCode returns JavaCode:
+	source=JAVACODESTRING
+;
+
+terminal JAVACODESTRING returns ecore::EString:
+	'$$' -> '$$'
 ;
 
 /* SuppressWarnings[potentialOverride]: Handled in CardinalityAwareEcoreFactory */

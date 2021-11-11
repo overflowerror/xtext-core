@@ -23,10 +23,6 @@ import org.eclipse.xtext.XtextPackage;
  * </ul>
  *
  * @generated
- * @noreference This class is not intended to be referenced by clients.
- * @noextend This class is not intended to be subclassed by clients.
- * @noinstantiate This class is not intended to be instantiated by clients.
- * @since 2.9
  */
 public class LiteralConditionImpl extends ConditionImpl implements LiteralCondition {
 	/**
@@ -73,6 +69,7 @@ public class LiteralConditionImpl extends ConditionImpl implements LiteralCondit
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public boolean isTrue() {
 		return true_;
 	}
@@ -82,6 +79,7 @@ public class LiteralConditionImpl extends ConditionImpl implements LiteralCondit
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setTrue(boolean newTrue) {
 		boolean oldTrue = true_;
 		true_ = newTrue;
@@ -156,7 +154,7 @@ public class LiteralConditionImpl extends ConditionImpl implements LiteralCondit
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
+		StringBuilder result = new StringBuilder(super.toString());
 		result.append(" (true: ");
 		result.append(true_);
 		result.append(')');

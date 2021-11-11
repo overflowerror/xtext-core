@@ -212,6 +212,18 @@ public class XtextAdapterFactory extends AdapterFactoryImpl {
 				return createAnnotationAdapter();
 			}
 			@Override
+			public Adapter caseAbstractSemanticPredicate(AbstractSemanticPredicate object) {
+				return createAbstractSemanticPredicateAdapter();
+			}
+			@Override
+			public Adapter caseGatedSemanticPredicate(GatedSemanticPredicate object) {
+				return createGatedSemanticPredicateAdapter();
+			}
+			@Override
+			public Adapter caseJavaCode(JavaCode object) {
+				return createJavaCodeAdapter();
+			}
+			@Override
 			public Adapter defaultCase(EObject object) {
 				return createEObjectAdapter();
 			}
@@ -741,6 +753,48 @@ public class XtextAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createAnnotationAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link org.eclipse.xtext.AbstractSemanticPredicate <em>Abstract Semantic Predicate</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see org.eclipse.xtext.AbstractSemanticPredicate
+	 * @generated
+	 */
+	public Adapter createAbstractSemanticPredicateAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link org.eclipse.xtext.GatedSemanticPredicate <em>Gated Semantic Predicate</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see org.eclipse.xtext.GatedSemanticPredicate
+	 * @generated
+	 */
+	public Adapter createGatedSemanticPredicateAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link org.eclipse.xtext.JavaCode <em>Java Code</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see org.eclipse.xtext.JavaCode
+	 * @generated
+	 */
+	public Adapter createJavaCodeAdapter() {
 		return null;
 	}
 

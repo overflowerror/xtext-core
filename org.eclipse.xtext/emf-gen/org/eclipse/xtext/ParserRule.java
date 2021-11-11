@@ -20,8 +20,6 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link org.eclipse.xtext.ParserRule#isWildcard <em>Wildcard</em>}</li>
  * </ul>
  *
- * @noimplement This interface is not intended to be implemented by clients.
- * @noextend This interface is not intended to be extended by clients.
  * @see org.eclipse.xtext.XtextPackage#getParserRule()
  * @model
  * @generated

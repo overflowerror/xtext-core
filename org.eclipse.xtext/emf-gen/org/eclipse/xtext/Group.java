@@ -20,8 +20,6 @@ import org.eclipse.emf.common.util.EList;
  * @see org.eclipse.xtext.XtextPackage#getGroup()
  * @model
  * @generated
- * @noextend This interface is not intended to be extended by clients.
- * @noimplement This interface is not intended to be implemented by clients.
  */
 public interface Group extends CompoundElement {
 	/**

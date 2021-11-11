@@ -24,7 +24,6 @@ import org.eclipse.xtext.XtextPackage;
  * </ul>
  *
  * @generated
- * @since 2.9
  */
 public class ParameterImpl extends MinimalEObjectImpl.Container implements Parameter {
 	/**
@@ -71,6 +70,7 @@ public class ParameterImpl extends MinimalEObjectImpl.Container implements Param
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -80,6 +80,7 @@ public class ParameterImpl extends MinimalEObjectImpl.Container implements Param
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setName(String newName) {
 		String oldName = name;
 		name = newName;
@@ -154,7 +155,7 @@ public class ParameterImpl extends MinimalEObjectImpl.Container implements Param
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
+		StringBuilder result = new StringBuilder(super.toString());
 		result.append(" (name: ");
 		result.append(name);
 		result.append(')');

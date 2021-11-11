@@ -147,6 +147,7 @@ public class GrammarImpl extends MinimalEObjectImpl.Container implements Grammar
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -156,6 +157,7 @@ public class GrammarImpl extends MinimalEObjectImpl.Container implements Grammar
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setName(String newName) {
 		String oldName = name;
 		name = newName;
@@ -168,6 +170,7 @@ public class GrammarImpl extends MinimalEObjectImpl.Container implements Grammar
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EList<Grammar> getUsedGrammars() {
 		if (usedGrammars == null) {
 			usedGrammars = new EObjectResolvingEList<Grammar>(Grammar.class, this, XtextPackage.GRAMMAR__USED_GRAMMARS);
@@ -180,6 +183,7 @@ public class GrammarImpl extends MinimalEObjectImpl.Container implements Grammar
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public boolean isDefinesHiddenTokens() {
 		return definesHiddenTokens;
 	}
@@ -189,6 +193,7 @@ public class GrammarImpl extends MinimalEObjectImpl.Container implements Grammar
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setDefinesHiddenTokens(boolean newDefinesHiddenTokens) {
 		boolean oldDefinesHiddenTokens = definesHiddenTokens;
 		definesHiddenTokens = newDefinesHiddenTokens;
@@ -201,6 +206,7 @@ public class GrammarImpl extends MinimalEObjectImpl.Container implements Grammar
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EList<AbstractRule> getHiddenTokens() {
 		if (hiddenTokens == null) {
 			hiddenTokens = new EObjectResolvingEList<AbstractRule>(AbstractRule.class, this, XtextPackage.GRAMMAR__HIDDEN_TOKENS);
@@ -213,6 +219,7 @@ public class GrammarImpl extends MinimalEObjectImpl.Container implements Grammar
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EList<AbstractMetamodelDeclaration> getMetamodelDeclarations() {
 		if (metamodelDeclarations == null) {
 			metamodelDeclarations = new EObjectContainmentEList<AbstractMetamodelDeclaration>(AbstractMetamodelDeclaration.class, this, XtextPackage.GRAMMAR__METAMODEL_DECLARATIONS);
@@ -225,6 +232,7 @@ public class GrammarImpl extends MinimalEObjectImpl.Container implements Grammar
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EList<AbstractRule> getRules() {
 		if (rules == null) {
 			rules = new EObjectContainmentEList<AbstractRule>(AbstractRule.class, this, XtextPackage.GRAMMAR__RULES);
@@ -370,7 +378,7 @@ public class GrammarImpl extends MinimalEObjectImpl.Container implements Grammar
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
+		StringBuilder result = new StringBuilder(super.toString());
 		result.append(" (name: ");
 		result.append(name);
 		result.append(", definesHiddenTokens: ");

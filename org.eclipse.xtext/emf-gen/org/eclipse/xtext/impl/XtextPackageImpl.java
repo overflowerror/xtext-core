@@ -14,6 +14,7 @@ import org.eclipse.xtext.AbstractElement;
 import org.eclipse.xtext.AbstractMetamodelDeclaration;
 import org.eclipse.xtext.AbstractNegatedToken;
 import org.eclipse.xtext.AbstractRule;
+import org.eclipse.xtext.AbstractSemanticPredicate;
 import org.eclipse.xtext.Action;
 import org.eclipse.xtext.Alternatives;
 import org.eclipse.xtext.Annotation;
@@ -27,9 +28,11 @@ import org.eclipse.xtext.CrossReference;
 import org.eclipse.xtext.Disjunction;
 import org.eclipse.xtext.EnumLiteralDeclaration;
 import org.eclipse.xtext.EnumRule;
+import org.eclipse.xtext.GatedSemanticPredicate;
 import org.eclipse.xtext.GeneratedMetamodel;
 import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.Group;
+import org.eclipse.xtext.JavaCode;
 import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.LiteralCondition;
 import org.eclipse.xtext.NamedArgument;
@@ -53,9 +56,6 @@ import org.eclipse.xtext.XtextPackage;
  * An implementation of the model <b>Package</b>.
  * <!-- end-user-doc -->
  * @generated
- * @noextend This class is not intended to be subclassed by clients.
- * @noinstantiate This class is not intended to be instantiated by clients.
- * @noreference This class is not intended to be referenced by clients.
  */
 public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	/**
@@ -311,6 +311,27 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	private EClass annotationEClass = null;
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass abstractSemanticPredicateEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass gatedSemanticPredicateEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass javaCodeEClass = null;
+
+	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
 	 * {@link org.eclipse.emf.ecore.EPackage.Registry EPackage.Registry} by the package
 	 * package URI value.
@@ -338,7 +359,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 
 	/**
 	 * Creates, registers, and initializes the <b>Package</b> for this model, and for any others upon which it depends.
-	 * 
+	 *
 	 * <p>This method is used to initialize {@link XtextPackage#eINSTANCE} when that field is accessed.
 	 * Clients should not invoke it directly. Instead, they should simply access that field to obtain the package.
 	 * <!-- begin-user-doc -->
@@ -352,7 +373,8 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 		if (isInited) return (XtextPackage)EPackage.Registry.INSTANCE.getEPackage(XtextPackage.eNS_URI);
 
 		// Obtain or create and register package
-		XtextPackageImpl theXtextPackage = (XtextPackageImpl)(EPackage.Registry.INSTANCE.get(eNS_URI) instanceof XtextPackageImpl ? EPackage.Registry.INSTANCE.get(eNS_URI) : new XtextPackageImpl());
+		Object registeredXtextPackage = EPackage.Registry.INSTANCE.get(eNS_URI);
+		XtextPackageImpl theXtextPackage = registeredXtextPackage instanceof XtextPackageImpl ? (XtextPackageImpl)registeredXtextPackage : new XtextPackageImpl();
 
 		isInited = true;
 
@@ -368,7 +390,6 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 		// Mark meta-data to indicate it can't be changed
 		theXtextPackage.freeze();
 
-  
 		// Update the registry and return the package
 		EPackage.Registry.INSTANCE.put(XtextPackage.eNS_URI, theXtextPackage);
 		return theXtextPackage;
@@ -379,6 +400,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getGrammar() {
 		return grammarEClass;
 	}
@@ -388,6 +410,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EAttribute getGrammar_Name() {
 		return (EAttribute)grammarEClass.getEStructuralFeatures().get(0);
 	}
@@ -397,6 +420,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getGrammar_UsedGrammars() {
 		return (EReference)grammarEClass.getEStructuralFeatures().get(1);
 	}
@@ -406,6 +430,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EAttribute getGrammar_DefinesHiddenTokens() {
 		return (EAttribute)grammarEClass.getEStructuralFeatures().get(2);
 	}
@@ -415,6 +440,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getGrammar_HiddenTokens() {
 		return (EReference)grammarEClass.getEStructuralFeatures().get(3);
 	}
@@ -424,6 +450,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getGrammar_MetamodelDeclarations() {
 		return (EReference)grammarEClass.getEStructuralFeatures().get(4);
 	}
@@ -433,6 +460,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getGrammar_Rules() {
 		return (EReference)grammarEClass.getEStructuralFeatures().get(5);
 	}
@@ -442,6 +470,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getAbstractRule() {
 		return abstractRuleEClass;
 	}
@@ -451,6 +480,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EAttribute getAbstractRule_Name() {
 		return (EAttribute)abstractRuleEClass.getEStructuralFeatures().get(0);
 	}
@@ -460,6 +490,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getAbstractRule_Type() {
 		return (EReference)abstractRuleEClass.getEStructuralFeatures().get(1);
 	}
@@ -469,6 +500,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getAbstractRule_Alternatives() {
 		return (EReference)abstractRuleEClass.getEStructuralFeatures().get(2);
 	}
@@ -478,6 +510,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getAbstractRule_Annotations() {
 		return (EReference)abstractRuleEClass.getEStructuralFeatures().get(3);
 	}
@@ -487,6 +520,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getAbstractMetamodelDeclaration() {
 		return abstractMetamodelDeclarationEClass;
 	}
@@ -496,6 +530,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getAbstractMetamodelDeclaration_EPackage() {
 		return (EReference)abstractMetamodelDeclarationEClass.getEStructuralFeatures().get(0);
 	}
@@ -505,6 +540,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EAttribute getAbstractMetamodelDeclaration_Alias() {
 		return (EAttribute)abstractMetamodelDeclarationEClass.getEStructuralFeatures().get(1);
 	}
@@ -514,6 +550,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getGeneratedMetamodel() {
 		return generatedMetamodelEClass;
 	}
@@ -523,6 +560,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EAttribute getGeneratedMetamodel_Name() {
 		return (EAttribute)generatedMetamodelEClass.getEStructuralFeatures().get(0);
 	}
@@ -532,6 +570,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getReferencedMetamodel() {
 		return referencedMetamodelEClass;
 	}
@@ -541,6 +580,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getParserRule() {
 		return parserRuleEClass;
 	}
@@ -550,6 +590,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EAttribute getParserRule_DefinesHiddenTokens() {
 		return (EAttribute)parserRuleEClass.getEStructuralFeatures().get(0);
 	}
@@ -559,6 +600,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getParserRule_HiddenTokens() {
 		return (EReference)parserRuleEClass.getEStructuralFeatures().get(1);
 	}
@@ -569,6 +611,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getParserRule_Parameters() {
 		return (EReference)parserRuleEClass.getEStructuralFeatures().get(2);
 	}
@@ -579,6 +622,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EAttribute getParserRule_Fragment() {
 		return (EAttribute)parserRuleEClass.getEStructuralFeatures().get(3);
 	}
@@ -589,6 +633,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EAttribute getParserRule_Wildcard() {
 		return (EAttribute)parserRuleEClass.getEStructuralFeatures().get(4);
 	}
@@ -598,6 +643,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getTypeRef() {
 		return typeRefEClass;
 	}
@@ -607,6 +653,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getTypeRef_Metamodel() {
 		return (EReference)typeRefEClass.getEStructuralFeatures().get(0);
 	}
@@ -616,6 +663,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getTypeRef_Classifier() {
 		return (EReference)typeRefEClass.getEStructuralFeatures().get(1);
 	}
@@ -625,6 +673,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getAbstractElement() {
 		return abstractElementEClass;
 	}
@@ -634,6 +683,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EAttribute getAbstractElement_Cardinality() {
 		return (EAttribute)abstractElementEClass.getEStructuralFeatures().get(0);
 	}
@@ -643,6 +693,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EAttribute getAbstractElement_Predicated() {
 		return (EAttribute)abstractElementEClass.getEStructuralFeatures().get(1);
 	}
@@ -653,6 +704,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EAttribute getAbstractElement_FirstSetPredicated() {
 		return (EAttribute)abstractElementEClass.getEStructuralFeatures().get(2);
 	}
@@ -662,6 +714,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getAction() {
 		return actionEClass;
 	}
@@ -671,6 +724,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getAction_Type() {
 		return (EReference)actionEClass.getEStructuralFeatures().get(0);
 	}
@@ -680,6 +734,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EAttribute getAction_Feature() {
 		return (EAttribute)actionEClass.getEStructuralFeatures().get(1);
 	}
@@ -689,6 +744,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EAttribute getAction_Operator() {
 		return (EAttribute)actionEClass.getEStructuralFeatures().get(2);
 	}
@@ -698,6 +754,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getKeyword() {
 		return keywordEClass;
 	}
@@ -707,6 +764,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EAttribute getKeyword_Value() {
 		return (EAttribute)keywordEClass.getEStructuralFeatures().get(0);
 	}
@@ -716,6 +774,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getRuleCall() {
 		return ruleCallEClass;
 	}
@@ -725,6 +784,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getRuleCall_Rule() {
 		return (EReference)ruleCallEClass.getEStructuralFeatures().get(0);
 	}
@@ -735,6 +795,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getRuleCall_Arguments() {
 		return (EReference)ruleCallEClass.getEStructuralFeatures().get(1);
 	}
@@ -745,6 +806,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EAttribute getRuleCall_ExplicitlyCalled() {
 		return (EAttribute)ruleCallEClass.getEStructuralFeatures().get(2);
 	}
@@ -754,6 +816,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getAssignment() {
 		return assignmentEClass;
 	}
@@ -763,6 +826,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EAttribute getAssignment_Feature() {
 		return (EAttribute)assignmentEClass.getEStructuralFeatures().get(0);
 	}
@@ -772,6 +836,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EAttribute getAssignment_Operator() {
 		return (EAttribute)assignmentEClass.getEStructuralFeatures().get(1);
 	}
@@ -781,6 +846,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getAssignment_Terminal() {
 		return (EReference)assignmentEClass.getEStructuralFeatures().get(2);
 	}
@@ -790,6 +856,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getCrossReference() {
 		return crossReferenceEClass;
 	}
@@ -799,6 +866,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getCrossReference_Type() {
 		return (EReference)crossReferenceEClass.getEStructuralFeatures().get(0);
 	}
@@ -808,6 +876,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getCrossReference_Terminal() {
 		return (EReference)crossReferenceEClass.getEStructuralFeatures().get(1);
 	}
@@ -817,6 +886,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getTerminalRule() {
 		return terminalRuleEClass;
 	}
@@ -826,6 +896,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EAttribute getTerminalRule_Fragment() {
 		return (EAttribute)terminalRuleEClass.getEStructuralFeatures().get(0);
 	}
@@ -835,6 +906,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getAbstractNegatedToken() {
 		return abstractNegatedTokenEClass;
 	}
@@ -844,6 +916,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getAbstractNegatedToken_Terminal() {
 		return (EReference)abstractNegatedTokenEClass.getEStructuralFeatures().get(0);
 	}
@@ -853,6 +926,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getNegatedToken() {
 		return negatedTokenEClass;
 	}
@@ -862,6 +936,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getUntilToken() {
 		return untilTokenEClass;
 	}
@@ -871,6 +946,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getWildcard() {
 		return wildcardEClass;
 	}
@@ -880,6 +956,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getEnumRule() {
 		return enumRuleEClass;
 	}
@@ -889,6 +966,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getEnumLiteralDeclaration() {
 		return enumLiteralDeclarationEClass;
 	}
@@ -898,6 +976,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getEnumLiteralDeclaration_EnumLiteral() {
 		return (EReference)enumLiteralDeclarationEClass.getEStructuralFeatures().get(0);
 	}
@@ -907,6 +986,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getEnumLiteralDeclaration_Literal() {
 		return (EReference)enumLiteralDeclarationEClass.getEStructuralFeatures().get(1);
 	}
@@ -916,6 +996,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getAlternatives() {
 		return alternativesEClass;
 	}
@@ -925,6 +1006,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getUnorderedGroup() {
 		return unorderedGroupEClass;
 	}
@@ -934,6 +1016,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getGroup() {
 		return groupEClass;
 	}
@@ -943,6 +1026,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getGroup_GuardCondition() {
 		return (EReference)groupEClass.getEStructuralFeatures().get(0);
 	}
@@ -952,6 +1036,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getCharacterRange() {
 		return characterRangeEClass;
 	}
@@ -961,6 +1046,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getCharacterRange_Left() {
 		return (EReference)characterRangeEClass.getEStructuralFeatures().get(0);
 	}
@@ -970,6 +1056,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getCharacterRange_Right() {
 		return (EReference)characterRangeEClass.getEStructuralFeatures().get(1);
 	}
@@ -979,6 +1066,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getCompoundElement() {
 		return compoundElementEClass;
 	}
@@ -988,6 +1076,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getCompoundElement_Elements() {
 		return (EReference)compoundElementEClass.getEStructuralFeatures().get(0);
 	}
@@ -997,6 +1086,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getEOF() {
 		return eofEClass;
 	}
@@ -1007,6 +1097,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getParameter() {
 		return parameterEClass;
 	}
@@ -1017,6 +1108,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EAttribute getParameter_Name() {
 		return (EAttribute)parameterEClass.getEStructuralFeatures().get(0);
 	}
@@ -1027,6 +1119,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getNamedArgument() {
 		return namedArgumentEClass;
 	}
@@ -1037,6 +1130,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getNamedArgument_Parameter() {
 		return (EReference)namedArgumentEClass.getEStructuralFeatures().get(0);
 	}
@@ -1047,6 +1141,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getNamedArgument_Value() {
 		return (EReference)namedArgumentEClass.getEStructuralFeatures().get(1);
 	}
@@ -1056,6 +1151,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EAttribute getNamedArgument_CalledByName() {
 		return (EAttribute)namedArgumentEClass.getEStructuralFeatures().get(2);
 	}
@@ -1065,6 +1161,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getCondition() {
 		return conditionEClass;
 	}
@@ -1074,6 +1171,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getConjunction() {
 		return conjunctionEClass;
 	}
@@ -1083,6 +1181,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getNegation() {
 		return negationEClass;
 	}
@@ -1092,6 +1191,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getNegation_Value() {
 		return (EReference)negationEClass.getEStructuralFeatures().get(0);
 	}
@@ -1101,6 +1201,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getDisjunction() {
 		return disjunctionEClass;
 	}
@@ -1110,6 +1211,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getCompositeCondition() {
 		return compositeConditionEClass;
 	}
@@ -1119,6 +1221,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getCompositeCondition_Left() {
 		return (EReference)compositeConditionEClass.getEStructuralFeatures().get(0);
 	}
@@ -1128,6 +1231,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getCompositeCondition_Right() {
 		return (EReference)compositeConditionEClass.getEStructuralFeatures().get(1);
 	}
@@ -1137,6 +1241,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getParameterReference() {
 		return parameterReferenceEClass;
 	}
@@ -1146,6 +1251,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getParameterReference_Parameter() {
 		return (EReference)parameterReferenceEClass.getEStructuralFeatures().get(0);
 	}
@@ -1155,6 +1261,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getLiteralCondition() {
 		return literalConditionEClass;
 	}
@@ -1164,6 +1271,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EAttribute getLiteralCondition_True() {
 		return (EAttribute)literalConditionEClass.getEStructuralFeatures().get(0);
 	}
@@ -1173,6 +1281,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getAnnotation() {
 		return annotationEClass;
 	}
@@ -1182,6 +1291,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EAttribute getAnnotation_Name() {
 		return (EAttribute)annotationEClass.getEStructuralFeatures().get(0);
 	}
@@ -1191,6 +1301,57 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
+	public EClass getAbstractSemanticPredicate() {
+		return abstractSemanticPredicateEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public EReference getAbstractSemanticPredicate_Code() {
+		return (EReference)abstractSemanticPredicateEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public EClass getGatedSemanticPredicate() {
+		return gatedSemanticPredicateEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public EClass getJavaCode() {
+		return javaCodeEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public EAttribute getJavaCode_Source() {
+		return (EAttribute)javaCodeEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public XtextFactory getXtextFactory() {
 		return (XtextFactory)getEFactoryInstance();
 	}
@@ -1338,6 +1499,14 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 
 		annotationEClass = createEClass(ANNOTATION);
 		createEAttribute(annotationEClass, ANNOTATION__NAME);
+
+		abstractSemanticPredicateEClass = createEClass(ABSTRACT_SEMANTIC_PREDICATE);
+		createEReference(abstractSemanticPredicateEClass, ABSTRACT_SEMANTIC_PREDICATE__CODE);
+
+		gatedSemanticPredicateEClass = createEClass(GATED_SEMANTIC_PREDICATE);
+
+		javaCodeEClass = createEClass(JAVA_CODE);
+		createEAttribute(javaCodeEClass, JAVA_CODE__SOURCE);
 	}
 
 	/**
@@ -1398,6 +1567,8 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 		compositeConditionEClass.getESuperTypes().add(this.getCondition());
 		parameterReferenceEClass.getESuperTypes().add(this.getCondition());
 		literalConditionEClass.getESuperTypes().add(this.getCondition());
+		abstractSemanticPredicateEClass.getESuperTypes().add(this.getAbstractElement());
+		gatedSemanticPredicateEClass.getESuperTypes().add(this.getAbstractSemanticPredicate());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(grammarEClass, Grammar.class, "Grammar", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1524,6 +1695,14 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 
 		initEClass(annotationEClass, Annotation.class, "Annotation", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getAnnotation_Name(), theEcorePackage.getEString(), "name", null, 0, 1, Annotation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(abstractSemanticPredicateEClass, AbstractSemanticPredicate.class, "AbstractSemanticPredicate", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getAbstractSemanticPredicate_Code(), this.getJavaCode(), null, "code", null, 0, 1, AbstractSemanticPredicate.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(gatedSemanticPredicateEClass, GatedSemanticPredicate.class, "GatedSemanticPredicate", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+		initEClass(javaCodeEClass, JavaCode.class, "JavaCode", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getJavaCode_Source(), theEcorePackage.getEString(), "source", "source", 0, 1, JavaCode.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Create resource
 		createResource(eNS_URI);

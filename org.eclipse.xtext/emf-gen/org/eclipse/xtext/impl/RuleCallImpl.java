@@ -105,6 +105,7 @@ public class RuleCallImpl extends AbstractElementImpl implements RuleCall {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public AbstractRule getRule() {
 		if (rule != null && rule.eIsProxy()) {
 			InternalEObject oldRule = (InternalEObject)rule;
@@ -131,6 +132,7 @@ public class RuleCallImpl extends AbstractElementImpl implements RuleCall {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setRule(AbstractRule newRule) {
 		AbstractRule oldRule = rule;
 		rule = newRule;
@@ -144,6 +146,7 @@ public class RuleCallImpl extends AbstractElementImpl implements RuleCall {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EList<NamedArgument> getArguments() {
 		if (arguments == null) {
 			arguments = new EObjectContainmentEList<NamedArgument>(NamedArgument.class, this, XtextPackage.RULE_CALL__ARGUMENTS);
@@ -157,6 +160,7 @@ public class RuleCallImpl extends AbstractElementImpl implements RuleCall {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public boolean isExplicitlyCalled() {
 		return explicitlyCalled;
 	}
@@ -167,6 +171,7 @@ public class RuleCallImpl extends AbstractElementImpl implements RuleCall {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setExplicitlyCalled(boolean newExplicitlyCalled) {
 		boolean oldExplicitlyCalled = explicitlyCalled;
 		explicitlyCalled = newExplicitlyCalled;
@@ -278,7 +283,7 @@ public class RuleCallImpl extends AbstractElementImpl implements RuleCall {
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
+		StringBuilder result = new StringBuilder(super.toString());
 		result.append(" (explicitlyCalled: ");
 		result.append(explicitlyCalled);
 		result.append(')');

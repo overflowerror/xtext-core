@@ -11,11 +11,8 @@ import org.eclipse.emf.ecore.EObject;
  *
  *
  * @see org.eclipse.xtext.XtextPackage#getCondition()
- * @since 2.9
  * @model
  * @generated
- * @noextend This interface is not intended to be extended by clients.
- * @noimplement This interface is not intended to be implemented by clients.
  */
 public interface Condition extends EObject {
 

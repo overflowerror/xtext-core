@@ -30,7 +30,6 @@ import org.eclipse.xtext.XtextPackage;
  * </ul>
  *
  * @generated
- * @since 2.9
  */
 public class NamedArgumentImpl extends MinimalEObjectImpl.Container implements NamedArgument {
 	/**
@@ -97,6 +96,7 @@ public class NamedArgumentImpl extends MinimalEObjectImpl.Container implements N
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Parameter getParameter() {
 		if (parameter != null && parameter.eIsProxy()) {
 			InternalEObject oldParameter = (InternalEObject)parameter;
@@ -123,6 +123,7 @@ public class NamedArgumentImpl extends MinimalEObjectImpl.Container implements N
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setParameter(Parameter newParameter) {
 		Parameter oldParameter = parameter;
 		parameter = newParameter;
@@ -135,6 +136,7 @@ public class NamedArgumentImpl extends MinimalEObjectImpl.Container implements N
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Condition getValue() {
 		return value;
 	}
@@ -159,6 +161,7 @@ public class NamedArgumentImpl extends MinimalEObjectImpl.Container implements N
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setValue(Condition newValue) {
 		if (newValue != value) {
 			NotificationChain msgs = null;
@@ -178,6 +181,7 @@ public class NamedArgumentImpl extends MinimalEObjectImpl.Container implements N
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public boolean isCalledByName() {
 		return calledByName;
 	}
@@ -187,6 +191,7 @@ public class NamedArgumentImpl extends MinimalEObjectImpl.Container implements N
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setCalledByName(boolean newCalledByName) {
 		boolean oldCalledByName = calledByName;
 		calledByName = newCalledByName;
@@ -296,7 +301,7 @@ public class NamedArgumentImpl extends MinimalEObjectImpl.Container implements N
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
+		StringBuilder result = new StringBuilder(super.toString());
 		result.append(" (calledByName: ");
 		result.append(calledByName);
 		result.append(')');

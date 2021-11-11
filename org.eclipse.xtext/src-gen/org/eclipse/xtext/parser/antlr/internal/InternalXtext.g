@@ -1263,6 +1263,117 @@ ruleAbstractToken returns [EObject current=null]
 			$current = $this_Action_1.current;
 			afterParserOrEnumRuleCall();
 		}
+		    |
+		{
+			newCompositeNode(grammarAccess.getAbstractTokenAccess().getSemanticPredicateParserRuleCall_2());
+		}
+		this_SemanticPredicate_2=ruleSemanticPredicate
+		{
+			$current = $this_SemanticPredicate_2.current;
+			afterParserOrEnumRuleCall();
+		}
+	)
+;
+
+// Entry rule entryRuleSemanticPredicate
+entryRuleSemanticPredicate returns [EObject current=null]:
+	{ newCompositeNode(grammarAccess.getSemanticPredicateRule()); }
+	iv_ruleSemanticPredicate=ruleSemanticPredicate
+	{ $current=$iv_ruleSemanticPredicate.current; }
+	EOF;
+
+// Rule SemanticPredicate
+ruleSemanticPredicate returns [EObject current=null]
+@init {
+	enterRule();
+}
+@after {
+	leaveRule();
+}:
+	{
+		newCompositeNode(grammarAccess.getSemanticPredicateAccess().getGatedSemanticPredicateParserRuleCall());
+	}
+	this_GatedSemanticPredicate_0=ruleGatedSemanticPredicate
+	{
+		$current = $this_GatedSemanticPredicate_0.current;
+		afterParserOrEnumRuleCall();
+	}
+;
+
+// Entry rule entryRuleGatedSemanticPredicate
+entryRuleGatedSemanticPredicate returns [EObject current=null]:
+	{ newCompositeNode(grammarAccess.getGatedSemanticPredicateRule()); }
+	iv_ruleGatedSemanticPredicate=ruleGatedSemanticPredicate
+	{ $current=$iv_ruleGatedSemanticPredicate.current; }
+	EOF;
+
+// Rule GatedSemanticPredicate
+ruleGatedSemanticPredicate returns [EObject current=null]
+@init {
+	enterRule();
+}
+@after {
+	leaveRule();
+}:
+	(
+		(
+			(
+				{
+					newCompositeNode(grammarAccess.getGatedSemanticPredicateAccess().getCodeJavaCodeParserRuleCall_0_0());
+				}
+				lv_code_0_0=ruleJavaCode
+				{
+					if ($current==null) {
+						$current = createModelElementForParent(grammarAccess.getGatedSemanticPredicateRule());
+					}
+					set(
+						$current,
+						"code",
+						lv_code_0_0,
+						"org.eclipse.xtext.Xtext.JavaCode");
+					afterParserOrEnumRuleCall();
+				}
+			)
+		)
+		otherlv_1='?=>'
+		{
+			newLeafNode(otherlv_1, grammarAccess.getGatedSemanticPredicateAccess().getQuestionMarkEqualsSignGreaterThanSignKeyword_1());
+		}
+	)
+;
+
+// Entry rule entryRuleJavaCode
+entryRuleJavaCode returns [EObject current=null]:
+	{ newCompositeNode(grammarAccess.getJavaCodeRule()); }
+	iv_ruleJavaCode=ruleJavaCode
+	{ $current=$iv_ruleJavaCode.current; }
+	EOF;
+
+// Rule JavaCode
+ruleJavaCode returns [EObject current=null]
+@init {
+	enterRule();
+}
+@after {
+	leaveRule();
+}:
+	(
+		(
+			lv_source_0_0=RULE_JAVACODESTRING
+			{
+				newLeafNode(lv_source_0_0, grammarAccess.getJavaCodeAccess().getSourceJAVACODESTRINGTerminalRuleCall_0());
+			}
+			{
+				if ($current==null) {
+					$current = createModelElement(grammarAccess.getJavaCodeRule());
+				}
+				setWithLastConsumed(
+					$current,
+					"source",
+					lv_source_0_0,
+					"org.eclipse.xtext.Xtext.JAVACODESTRING");
+			}
+		)
 	)
 ;
 
@@ -3752,6 +3863,8 @@ ruleEnumLiteralDeclaration returns [EObject current=null]
 		)?
 	)
 ;
+
+RULE_JAVACODESTRING : '$$' ( options {greedy=false;} : . )*'$$';
 
 RULE_ID : '^'? ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')*;
 

@@ -104,6 +104,7 @@ public class AssignmentImpl extends AbstractElementImpl implements Assignment {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public String getFeature() {
 		return feature;
 	}
@@ -113,6 +114,7 @@ public class AssignmentImpl extends AbstractElementImpl implements Assignment {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setFeature(String newFeature) {
 		String oldFeature = feature;
 		feature = newFeature;
@@ -125,6 +127,7 @@ public class AssignmentImpl extends AbstractElementImpl implements Assignment {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public String getOperator() {
 		return operator;
 	}
@@ -134,6 +137,7 @@ public class AssignmentImpl extends AbstractElementImpl implements Assignment {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setOperator(String newOperator) {
 		String oldOperator = operator;
 		operator = newOperator;
@@ -146,6 +150,7 @@ public class AssignmentImpl extends AbstractElementImpl implements Assignment {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public AbstractElement getTerminal() {
 		return terminal;
 	}
@@ -170,6 +175,7 @@ public class AssignmentImpl extends AbstractElementImpl implements Assignment {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setTerminal(AbstractElement newTerminal) {
 		if (newTerminal != terminal) {
 			NotificationChain msgs = null;
@@ -285,7 +291,7 @@ public class AssignmentImpl extends AbstractElementImpl implements Assignment {
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
+		StringBuilder result = new StringBuilder(super.toString());
 		result.append(" (feature: ");
 		result.append(feature);
 		result.append(", operator: ");

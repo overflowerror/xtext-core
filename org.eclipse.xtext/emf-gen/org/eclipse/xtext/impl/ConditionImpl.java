@@ -20,9 +20,6 @@ import org.eclipse.xtext.XtextPackage;
  * <!-- end-user-doc -->
  *
  * @generated
- * @noextend This class is not intended to be subclassed by clients.
- * @noinstantiate This class is not intended to be instantiated by clients.
- * @noreference This class is not intended to be referenced by clients.
  */
 public class ConditionImpl extends MinimalEObjectImpl.Container implements Condition {
 	/**
