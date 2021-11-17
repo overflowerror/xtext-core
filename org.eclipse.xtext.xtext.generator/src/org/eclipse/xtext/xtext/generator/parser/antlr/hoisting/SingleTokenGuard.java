@@ -11,9 +11,15 @@ package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
 /**
  * @author overflow - Initial contribution and API
  */
-public interface TokenGuard extends Guard {
+public class SingleTokenGuard implements TokenGuard {
+	private Token token;
+	
+	public SingleTokenGuard(Token token) {
+		this.token = token;
+	}
+
 	@Override
-	default boolean isTrivial() {
-		return false;
+	public String render() {
+		return token.negatedCondition();
 	}
 }

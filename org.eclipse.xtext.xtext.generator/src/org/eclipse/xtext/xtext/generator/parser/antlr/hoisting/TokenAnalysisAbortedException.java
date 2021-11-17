@@ -11,6 +11,6 @@ package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
 /**
  * @author overflow - Initial contribution and API
  */
-public class TokenAnalysisAbortedException extends Exception {
+public class TokenAnalysisAbortedException extends RuntimeException {
 	private static final long serialVersionUID = 4303267001950479292L;
 }

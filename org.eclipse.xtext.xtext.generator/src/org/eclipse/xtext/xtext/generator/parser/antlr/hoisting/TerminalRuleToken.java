@@ -13,12 +13,17 @@ import org.eclipse.xtext.TerminalRule;
 /**
  * @author overflow - Initial contribution and API
  */
-public class TerminalRuleToken extends Token {
+public class TerminalRuleToken implements Token {
 	private TerminalRule rule;
 	private int position;
 	
 	public TerminalRuleToken(TerminalRule rule, int position) {
 		this.rule = rule;
 		this.position = position;
+	}
+
+	@Override
+	public String negatedCondition() {
+		return "input.LT(" + position + ").getType() != " + rule.getName();
 	}
 }

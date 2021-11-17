@@ -8,22 +8,36 @@
  *******************************************************************************/
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
 
-import org.eclipse.xtext.Keyword;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * @author overflow - Initial contribution and API
  */
-public class KeywordToken implements Token {
-	private Keyword keyword;
-	private int position;
+public class TokenSequenceGuard implements TokenGuard {
+	private Collection<? extends TokenGuard> sequence;
 	
-	public KeywordToken(Keyword keyword, int position) {
-		this.keyword = keyword;
-		this.position = position;
+	public TokenSequenceGuard(Collection<? extends TokenGuard> sequence) {
+		this.sequence = sequence;
 	}
 
 	@Override
-	public String negatedCondition() {
-		return "!\"" + keyword.getValue().replace("\"", "\\\"") + "\".equals(input.LT(" + position + ").getText()";
+	public String render() {
+		boolean addParentheses = sequence.size() != 1;
+		String result = "";
+		
+		if (addParentheses) {
+			result += "(";
+		}
+		
+		result += sequence.stream()
+				.map(TokenGuard::render)
+				.collect(Collectors.joining(" || "));
+
+		if (addParentheses) {
+			result += ")";
+		}
+		
+		return result;
 	}
 }

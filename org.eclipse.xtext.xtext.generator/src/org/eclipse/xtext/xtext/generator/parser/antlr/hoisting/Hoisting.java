@@ -8,11 +8,15 @@
  *******************************************************************************/
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.eclipse.xtext.AbstractElement;
 import org.eclipse.xtext.AbstractRule;
@@ -36,7 +40,9 @@ import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.StreamUtils
 public class Hoisting {
 	private Map<String, HoistingGuard> ruleCache = new HashMap<>();
 	private Map<Group, HoistingGuard> groupCache = new HashMap<>();
-
+	
+	private static final int TOKEN_ANALYSIS_LIMIT = 10;
+	
 	private boolean isParserRule(AbstractElement element) {
 		return (element instanceof RuleCall) && (((RuleCall) element).getRule() instanceof ParserRule);
 	}
@@ -185,11 +191,51 @@ public class Hoisting {
 	}
 	
 	private boolean arePathsIdenticalSymbolic(AbstractElement path1, AbstractElement path2) throws SymbolicAnalysisFailedException {
-		return false;
+		// ignore symbolic analysis for the moment
+		// TODO
+		throw new SymbolicAnalysisFailedException(); 
+	}
+	
+	private List<Integer> range(int i, int j) {
+		return IntStream.rangeClosed(i, j).boxed().collect(Collectors.toList());
 	}
 	
 	private boolean arePathsIdenticalFallback(AbstractElement path1, AbstractElement path2) {
-		return false;
+		for (int i = 1; i < TOKEN_ANALYSIS_LIMIT; i++) {
+			Set<List<Token>> tokenListSet1;
+			Set<List<Token>> tokenListSet2;
+			
+			List<Integer> range = range(1,  i);
+			
+			try {
+				tokenListSet1 = getTokenForIndexes(path1, range);
+			} catch (TokenAnalysisAbortedException e) {
+				tokenListSet1 = null;
+			}
+			
+			try {
+				tokenListSet2 = getTokenForIndexes(path2, range);
+			} catch (TokenAnalysisAbortedException e) {
+				tokenListSet2 = null;
+			}
+			
+			if (tokenListSet1 == null && tokenListSet2 == null) {
+				return true;
+			}
+			if (tokenListSet1 == null || tokenListSet2 == null) {
+				// the paths have different length
+				return false;
+			}
+			if (!tokenListSet1.equals(tokenListSet2)) {
+				// TODO: hashCode method of Token classes
+				return false;
+			}
+		}
+		
+		// we can't analyze the paths any further
+		// we can assume that the paths are identical because the path diff analysis would cause an error anyway.
+		// TODO maybe warning?
+		return true;
 	}
 	
 	private boolean arePathsIdentical(AbstractElement path1, AbstractElement path2) {
@@ -200,10 +246,75 @@ public class Hoisting {
 		}
 	}
 	
-	private List<Set<Token>> findMinimalPathDifference(List<AbstractElement> paths) {
-		return null;
+	
+	private void tokenCombinations(Function<List<Integer>, Boolean> callback) {
+		for (int i = 1; i <= TOKEN_ANALYSIS_LIMIT; i++) {
+			if (tokenCombinations(0, 0, i, callback)) {
+				return;
+			}
+		}
+	}
+	private boolean tokenCombinations(long prefix, int prefixLength, int ones, Function<List<Integer>, Boolean> callback) {
+		if (ones == 0) {
+			List<Integer> indexes = new ArrayList<>(TOKEN_ANALYSIS_LIMIT);
+			for (int i = 0; i < TOKEN_ANALYSIS_LIMIT; i++) {
+				if ((prefix & (1 << i)) > 0) {
+					indexes.add(i + 1);
+				}
+			}
+			return callback.apply(indexes);
+		} else if (prefixLength + ones > TOKEN_ANALYSIS_LIMIT) {
+			// prefix is too long
+			return false;
+		} else {
+			for (int i = prefixLength; i < TOKEN_ANALYSIS_LIMIT - ones + 1; i++) {
+				long current = prefix | (1 << i);
+				if (tokenCombinations(current, i + 1, ones - 1, callback)) {
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 	
+	private List<Set<List<Token>>> findMinimalPathDifference(List<AbstractElement> paths) throws TokenAnalysisAbortedException {
+		List<Set<List<Token>>> result = paths.stream()
+				.map(p -> (Set<List<Token>>) null)
+				.collect(Collectors.toList());
+		
+		tokenCombinations(indexList -> {
+			// will throw TokenAnalysisAborted if any path is too short
+			List<Set<List<Token>>> tokenListSets = paths.stream()
+					.map(p -> getTokenForIndexes(p, indexList))
+					.collect(Collectors.toList());
+			
+			int size = result.size();
+			for (int i = 0; i < size; i++) {
+				if (result.get(i) == null) {
+					continue;
+				}
+				
+				Set<List<Token>> tokenSet = tokenListSets.get(i);
+				if (!tokenSet.stream()
+					.anyMatch(tokenList -> tokenListSets.stream()
+							.filter(s -> s != tokenSet)
+							.anyMatch(s -> s.contains(tokenList))
+					)
+				) {
+					// token list set is unique for path i
+					result.set(i, tokenSet);
+				}
+				
+			}
+			
+			return result.stream()
+					.allMatch(Objects::nonNull);
+		});
+		
+		return result;
+	}
+	
+	// TODO: handling for TokenAnalysisAbortedException
 	private HoistingGuard findGuardForAlternatives(Alternatives alternatives) {
 		List<AbstractElement> paths = alternatives.getElements();
 		List<MergedPathGuard> guards = paths.stream()
@@ -225,15 +336,22 @@ public class Hoisting {
 			}
 		}
 		
+		// if all paths are empty the above step will eliminate all paths
+		// -> size = 1
 		if (size > 1) {
 			return StreamUtils.zip(
 				findMinimalPathDifference(paths).stream()
-					.map(s -> s.stream()
-						.map(TokenGuard::new)
+					.map(a -> a.stream()
+						.map(s -> s.stream()
+								.map(SingleTokenGuard::new)
+								.collect(Collectors.toList())
+						)
+						.map(TokenSequenceGuard::new)
 						.collect(Collectors.toSet())
-					),
+					)
+					.map(AlternativeTokenSequenceGuard::new),
 				guards.stream(),
-				(Set<TokenGuard> tokenSet, MergedPathGuard guard) -> Tuples.pair(tokenSet, guard)
+				(TokenGuard tokenGuard, MergedPathGuard pathGuard) -> Tuples.pair(tokenGuard, pathGuard)
 			).map(p -> new PathGuard(p.getFirst(), p.getSecond()))
 			.collect(AlternativesGuard.collector());
 		} else {

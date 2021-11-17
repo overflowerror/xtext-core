@@ -8,19 +8,15 @@
  *******************************************************************************/
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * @author overflow - Initial contribution and API
  */
 public class PathGuard implements HoistingGuard {
-	private Collection<TokenGuard> tokenGuards;
+	private TokenGuard tokenGuard;
 	private HoistingGuard hoistngGuard;
 	
-	public PathGuard(Collection<TokenGuard> tokenGuards, HoistingGuard hoistingGuard) {
-		this.tokenGuards = tokenGuards;
+	public PathGuard(TokenGuard tokenGuard, HoistingGuard hoistingGuard) {
+		this.tokenGuard = tokenGuard;
 		this.hoistngGuard = hoistingGuard;
 	}
 	
@@ -32,13 +28,13 @@ public class PathGuard implements HoistingGuard {
 	@Override
 	public boolean hasTerminal() {
 		// empty paths are only allowed when all paths are empty
-		// in that case a MergedPathGuard is returned.
+		// in that case a MergedPathGuard is returned by findGuardForAlternatives.
 		return true;
 	}
 	
 	@Override
 	public String render() {
-		// TODO
-		return null;
+		// parentheses needed since tokenGuard is never empty
+		return "(" + tokenGuard.render() + " || " + hoistngGuard.render() + ")";
 	}
 }

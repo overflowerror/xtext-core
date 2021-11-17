@@ -17,17 +17,14 @@ import org.eclipse.xtext.TerminalRule;
 /**
  * @author overflow - Initial contribution and API
  */
-public class Token {
+public interface Token {
+	String negatedCondition();
 	
 	static boolean isToken(AbstractElement element) {
 		if (element instanceof Keyword) {
 			return true;
 		} else if (element instanceof RuleCall) {
-			if (((RuleCall) element).getRule() instanceof TerminalRule) {
-				return true;
-			} else {
-				return false;
-			}
+			return (((RuleCall) element).getRule() instanceof TerminalRule);
 		} else {
 			return false;
 		}
