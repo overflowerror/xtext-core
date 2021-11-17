@@ -51,6 +51,7 @@ import org.eclipse.xtext.xtext.generator.parser.antlr.CombinedGrammarMarker;
 import org.eclipse.xtext.xtext.generator.parser.antlr.GrammarNaming;
 import org.eclipse.xtext.xtext.generator.parser.antlr.KeywordHelper;
 import org.eclipse.xtext.xtext.generator.parser.antlr.TerminalRuleToLexerBody;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.HoistingProcessor;
 import org.eclipse.xtext.xtext.generator.util.SyntheticTerminalDetector;
 
 @SuppressWarnings("all")
@@ -66,6 +67,10 @@ public abstract class AbstractAntlrGrammarGenerator {
   @Inject
   @Extension
   protected SyntheticTerminalDetector _syntheticTerminalDetector;
+  
+  @Inject
+  @Extension
+  protected HoistingProcessor _hoistingProcessor;
   
   @Inject
   private CodeConfig codeConfig;
@@ -801,6 +806,8 @@ public abstract class AbstractAntlrGrammarGenerator {
         } else {
           _builder.appendImmediate("\n    |", "");
         }
+        String _renderPredicate = this._hoistingProcessor.findGuardForElement(it).renderPredicate();
+        _builder.append(_renderPredicate);
         String _dataTypeEbnf = this.dataTypeEbnf(e, supportActions);
         _builder.append(_dataTypeEbnf);
       }

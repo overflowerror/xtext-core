@@ -37,7 +37,7 @@ import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.StreamUtils
 /**
  * @author overflow - Initial contribution and API
  */
-public class Hoisting {
+public class HoistingProcessor {
 	private Map<String, HoistingGuard> ruleCache = new HashMap<>();
 	private Map<Group, HoistingGuard> groupCache = new HashMap<>();
 	
@@ -376,7 +376,7 @@ public class Hoisting {
 		return groupGuard;
 	}
 	
-	private HoistingGuard findGuardForElement(AbstractElement element) {
+	public HoistingGuard findGuardForElement(AbstractElement element) {
 		if (element instanceof Alternatives) {
 			return findGuardForAlternatives((Alternatives) element);
 		} else if (element instanceof Group) {

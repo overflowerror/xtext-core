@@ -36,6 +36,7 @@ import static extension org.eclipse.xtext.GrammarUtil.*
 import static extension org.eclipse.xtext.xtext.generator.parser.antlr.AntlrGrammarGenUtil.*
 import static extension org.eclipse.xtext.xtext.generator.parser.antlr.TerminalRuleToLexerBody.*
 import org.eclipse.xtext.xtext.generator.util.SyntheticTerminalDetector
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.HoistingProcessor
 
 abstract class AbstractAntlrGrammarGenerator {
 	
@@ -47,6 +48,9 @@ abstract class AbstractAntlrGrammarGenerator {
 	
 	@Inject
 	protected extension SyntheticTerminalDetector
+	
+	@Inject
+	protected extension HoistingProcessor
 	
 	@Inject CodeConfig codeConfig
 	
@@ -326,7 +330,7 @@ abstract class AbstractAntlrGrammarGenerator {
 	protected dispatch def String dataTypeEbnf2(AbstractElement it, boolean supportActions) '''ERROR «eClass.name» not matched'''
 
 	protected dispatch def String dataTypeEbnf2(Alternatives it, boolean supportActions) '''
-		«FOR e:elements SEPARATOR '\n    |'»«e.dataTypeEbnf(supportActions)»«ENDFOR»
+		«FOR e:elements SEPARATOR '\n    |'»«findGuardForElement.renderPredicate»«e.dataTypeEbnf(supportActions)»«ENDFOR»
 	'''
 
 	protected dispatch def String dataTypeEbnf2(Group it, boolean supportActions) '''

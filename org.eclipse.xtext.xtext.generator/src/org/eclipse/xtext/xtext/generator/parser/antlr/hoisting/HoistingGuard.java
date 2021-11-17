@@ -12,6 +12,10 @@ package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
  * @author overflow - Initial contribution and API
  */
 public interface HoistingGuard extends Guard {
+	default String renderPredicate() {
+		return "{" + render() + "}?=>";
+	}
+	
 	boolean hasTerminal();
 	
 	static public HoistingGuard unguarded() {
