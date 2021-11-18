@@ -28,9 +28,6 @@ public class TokenAnalysisPaths {
 				.collect(Collectors.toSet());
 	}
 	
-	private TokenAnalysisPaths() {
-	}
-	
 	public TokenAnalysisPaths(List<Integer> indexes) {
 		tokenPaths.add(new TokenAnalysisPath(indexes));
 	}
@@ -42,7 +39,7 @@ public class TokenAnalysisPaths {
 	}
 	
 	public boolean isDone() {
-		return tokenPaths.stream().allMatch(TokenAnalysisPath::isDone);
+		return !isEmpty && tokenPaths.stream().allMatch(TokenAnalysisPath::isDone);
 	}
 	
 	public void add(AbstractElement element) {
@@ -58,8 +55,8 @@ public class TokenAnalysisPaths {
 		}
 	}
 	
-	static public TokenAnalysisPaths empty() {
-		TokenAnalysisPaths empty = new TokenAnalysisPaths();
+	static public TokenAnalysisPaths empty(TokenAnalysisPaths prefix) {
+		TokenAnalysisPaths empty = new TokenAnalysisPaths(prefix);
 		empty.isEmpty = true;
 		return empty;
 	}

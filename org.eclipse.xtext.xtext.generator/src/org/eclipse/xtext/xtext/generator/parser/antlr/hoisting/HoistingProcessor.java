@@ -74,7 +74,7 @@ public class HoistingProcessor {
 				throw new TokenAnalysisAbortedException();
 			}
 		} else {
-			result = TokenAnalysisPaths.empty();
+			result = TokenAnalysisPaths.empty(prefix);
 		}
 		
 		boolean loop = cardinalityAllowsRepetition(path);
@@ -120,12 +120,12 @@ public class HoistingProcessor {
 				throw new TokenAnalysisAbortedException();
 			}
 		} else {
-			result = TokenAnalysisPaths.empty();
+			result = TokenAnalysisPaths.empty(prefix);
 		}
 		
 		boolean loop = cardinalityAllowsRepetition(path);
 		
-		log.info(prefix);
+		log.info("group: " + prefix);
 		
 		do {
 			for (AbstractElement element : path.getElements()) {
@@ -133,6 +133,9 @@ public class HoistingProcessor {
 				
 				if (current.isDone()) {
 					// no need to look further
+					
+					log.info("done: " + current);
+					
 					return result.merge(current);
 				}
 			}
@@ -163,7 +166,7 @@ public class HoistingProcessor {
 				throw new TokenAnalysisAbortedException();
 			}
 		} else {
-			result = TokenAnalysisPaths.empty();
+			result = TokenAnalysisPaths.empty(prefix);
 		}
 		
 		TokenAnalysisPaths current = new TokenAnalysisPaths(prefix);
@@ -204,7 +207,7 @@ public class HoistingProcessor {
 		           path instanceof AbstractSemanticPredicate
 				) {
 			// TODO: make sure empty token analysis paths don't cause problems down the line
-			return TokenAnalysisPaths.empty();
+			return TokenAnalysisPaths.empty(prefix);
 		} else {
 			return getTokenForIndexesDefault(path, prefix, needsLength);
 		}
@@ -310,9 +313,13 @@ public class HoistingProcessor {
 			log.info("current index list: " + indexList);
 			
 			// will throw TokenAnalysisAborted if any path is too short
+			// TODO: when TokenAnalysisAborted, add new index
 			List<Set<List<Token>>> tokenListSets = paths.stream()
+					.peek(p -> log.info("next path: " + p))
 					.map(p -> getTokenForIndexes(p, indexList))
 					.collect(Collectors.toList());
+
+			log.info("sets: " + tokenListSets);
 			
 			int size = result.size();
 			for (int i = 0; i < size; i++) {
@@ -320,15 +327,16 @@ public class HoistingProcessor {
 					continue;
 				}
 				
-				Set<List<Token>> tokenSet = tokenListSets.get(i);
-				if (!tokenSet.stream()
+				Set<List<Token>> tokenListSet = tokenListSets.get(i);
+				if (!tokenListSet.stream()
 					.anyMatch(tokenList -> tokenListSets.stream()
-							.filter(s -> s != tokenSet)
+							.filter(s -> s != tokenListSet)
 							.anyMatch(s -> s.contains(tokenList))
 					)
 				) {
+					log.info("set:  " + tokenListSet);
 					// token list set is unique for path i
-					result.set(i, tokenSet);
+					result.set(i, tokenListSet);
 				}
 				
 			}
@@ -367,6 +375,8 @@ public class HoistingProcessor {
 				}
 			}
 		}
+		
+		log.info("paths:" + paths);
 		
 		log.info("minimal path difference");
 		

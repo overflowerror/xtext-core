@@ -23,7 +23,7 @@ public class TokenAnalysisPath {
 	private int position = 1;
 	
 	public TokenAnalysisPath(List<Integer> indexes) {
-		this.remainingIndexes = indexes;
+		this.remainingIndexes = new LinkedList<>(indexes);
 	}
 	
 	public TokenAnalysisPath(TokenAnalysisPath prefix) {

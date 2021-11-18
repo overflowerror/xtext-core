@@ -31,4 +31,34 @@ public class TerminalRuleToken implements Token {
 	public String toString() {
 		return "terminal " + rule.getName();
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + position;
+		result = prime * result + ((rule == null) ? 0 : rule.getName().hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TerminalRuleToken other = (TerminalRuleToken) obj;
+		if (position != other.position)
+			return false;
+		if (rule == null) {
+			if (other.rule != null)
+				return false;
+		} else if (!rule.getName().equals(other.rule.getName()))
+			return false;
+		return true;
+	}
+	
+	
 }

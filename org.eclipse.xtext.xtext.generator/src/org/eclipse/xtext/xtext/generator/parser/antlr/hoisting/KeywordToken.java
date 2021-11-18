@@ -24,11 +24,39 @@ public class KeywordToken implements Token {
 
 	@Override
 	public String negatedCondition() {
-		return "!\"" + keyword.getValue().replace("\"", "\\\"") + "\".equals(input.LT(" + position + ").getText()";
+		return "!\"" + keyword.getValue().replace("\"", "\\\"") + "\".equals(input.LT(" + position + ").getText())";
 	}
 	
 	@Override
 	public String toString() {
 		return "keyword " + keyword.getValue();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((keyword == null) ? 0 : keyword.getValue().hashCode());
+		result = prime * result + position;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		KeywordToken other = (KeywordToken) obj;
+		if (keyword == null) {
+			if (other.keyword != null)
+				return false;
+		} else if (!keyword.getValue().equals(other.keyword.getValue()))
+			return false;
+		if (position != other.position)
+			return false;
+		return true;
 	}
 }

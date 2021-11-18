@@ -10,6 +10,7 @@ package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -25,21 +26,22 @@ public class AlternativesGuard implements HoistingGuard {
 	
 	@Override
 	public boolean isTrivial() {
-		return paths.stream().anyMatch(Guard::isTrivial);
+		return paths.stream().allMatch(Guard::isTrivial);
 	}
 
 	@Override
 	public String render() {
 		return "(" + paths.stream()
+					.filter(Predicate.not(Guard::isTrivial))
 					.map(Guard::render)
-					.collect(Collectors.joining(" || ")) +
+					.collect(Collectors.joining(" && ")) +
 				")";
 	}
 
 	@Override
 	public boolean hasTerminal() {
 		// empty paths are only allowed when all paths are empty
-		// in that case a MergedPathGuard ist returned.
+		// in that case a MergedPathGuard is returned.
 		return true;
 	}
 	
