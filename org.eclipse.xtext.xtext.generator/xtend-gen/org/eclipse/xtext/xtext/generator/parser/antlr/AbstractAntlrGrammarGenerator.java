@@ -18,6 +18,7 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.AbstractElement;
 import org.eclipse.xtext.AbstractRule;
+import org.eclipse.xtext.AbstractSemanticPredicate;
 import org.eclipse.xtext.Action;
 import org.eclipse.xtext.Alternatives;
 import org.eclipse.xtext.Assignment;
@@ -635,6 +636,14 @@ public abstract class AbstractAntlrGrammarGenerator {
     String _name = AntlrGrammarGenUtil.<AbstractRule>getOriginalElement(it).getName();
     _builder.append(_name);
     _builder.newLineIfNotEmpty();
+    {
+      if ((it instanceof ParserRule)) {
+        _builder.append("// Guard: ");
+        String _renderDescription = this._hoistingProcessor.findGuardForRule(((ParserRule)it)).renderDescription();
+        _builder.append(_renderDescription);
+        _builder.newLineIfNotEmpty();
+      }
+    }
     String _ruleName = this._grammarAccessExtensions.ruleName(it);
     _builder.append(_ruleName);
     String _compileInit = this.compileInit(it, options);
@@ -797,6 +806,10 @@ public abstract class AbstractAntlrGrammarGenerator {
   
   protected String _dataTypeEbnf2(final Alternatives it, final boolean supportActions) {
     StringConcatenation _builder = new StringConcatenation();
+    _builder.append("// ");
+    int _size = it.getElements().size();
+    _builder.append(_size);
+    _builder.newLineIfNotEmpty();
     {
       EList<AbstractElement> _elements = it.getElements();
       boolean _hasElements = false;
@@ -806,7 +819,11 @@ public abstract class AbstractAntlrGrammarGenerator {
         } else {
           _builder.appendImmediate("\n    |", "");
         }
-        String _renderPredicate = this._hoistingProcessor.findGuardForElement(it).renderPredicate();
+        _builder.append("// ");
+        String _string = e.toString();
+        _builder.append(_string);
+        _builder.newLineIfNotEmpty();
+        String _renderPredicate = this._hoistingProcessor.findGuardForElement(e).renderPredicate();
         _builder.append(_renderPredicate);
         String _dataTypeEbnf = this.dataTypeEbnf(e, supportActions);
         _builder.append(_dataTypeEbnf);
@@ -869,6 +886,10 @@ public abstract class AbstractAntlrGrammarGenerator {
   
   protected String _ebnf2(final Alternatives it, final AntlrOptions options, final boolean supportActions) {
     StringConcatenation _builder = new StringConcatenation();
+    _builder.append("// ");
+    int _size = it.getElements().size();
+    _builder.append(_size);
+    _builder.newLineIfNotEmpty();
     {
       EList<AbstractElement> _elements = it.getElements();
       boolean _hasElements = false;
@@ -878,6 +899,12 @@ public abstract class AbstractAntlrGrammarGenerator {
         } else {
           _builder.appendImmediate("\n    |", "");
         }
+        _builder.append("// ");
+        String _string = element.toString();
+        _builder.append(_string);
+        _builder.newLineIfNotEmpty();
+        String _renderPredicate = this._hoistingProcessor.findGuardForElement(element).renderPredicate();
+        _builder.append(_renderPredicate);
         String _ebnf = this.ebnf(element, options, supportActions);
         _builder.append(_ebnf);
       }
@@ -930,6 +957,16 @@ public abstract class AbstractAntlrGrammarGenerator {
   
   protected String _ebnf2(final Action it, final AntlrOptions options, final boolean supportActions) {
     return "";
+  }
+  
+  protected String _ebnf2(final AbstractSemanticPredicate it, final AntlrOptions options, final boolean supportActions) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("{");
+    String _source = it.getCode().getSource();
+    _builder.append(_source);
+    _builder.append("}?=>");
+    _builder.newLineIfNotEmpty();
+    return _builder.toString();
   }
   
   protected String ebnf(final Keyword it) {
@@ -1158,6 +1195,8 @@ public abstract class AbstractAntlrGrammarGenerator {
       return _ebnf2((Group)it, options, supportActions);
     } else if (it instanceof UnorderedGroup) {
       return _ebnf2((UnorderedGroup)it, options, supportActions);
+    } else if (it instanceof AbstractSemanticPredicate) {
+      return _ebnf2((AbstractSemanticPredicate)it, options, supportActions);
     } else if (it instanceof Action) {
       return _ebnf2((Action)it, options, supportActions);
     } else if (it instanceof Assignment) {

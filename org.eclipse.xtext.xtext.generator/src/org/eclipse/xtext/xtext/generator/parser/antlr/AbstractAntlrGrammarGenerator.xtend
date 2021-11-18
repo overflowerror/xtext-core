@@ -37,6 +37,8 @@ import static extension org.eclipse.xtext.xtext.generator.parser.antlr.AntlrGram
 import static extension org.eclipse.xtext.xtext.generator.parser.antlr.TerminalRuleToLexerBody.*
 import org.eclipse.xtext.xtext.generator.util.SyntheticTerminalDetector
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.HoistingProcessor
+import java.lang.reflect.Parameter
+import org.eclipse.xtext.AbstractSemanticPredicate
 
 abstract class AbstractAntlrGrammarGenerator {
 	
@@ -289,6 +291,9 @@ abstract class AbstractAntlrGrammarGenerator {
 	
 	protected def String compileEBNF(AbstractRule it, AntlrOptions options) '''
 		// Rule «originalElement.name»
+		«IF it instanceof ParserRule»
+		// Guard: «findGuardForRule.renderDescription»
+		«ENDIF»
 		«ruleName»«compileInit(options)»:
 			«IF it instanceof ParserRule && originalElement.datatypeRule»
 				«dataTypeEbnf(alternatives, true)»
@@ -330,7 +335,10 @@ abstract class AbstractAntlrGrammarGenerator {
 	protected dispatch def String dataTypeEbnf2(AbstractElement it, boolean supportActions) '''ERROR «eClass.name» not matched'''
 
 	protected dispatch def String dataTypeEbnf2(Alternatives it, boolean supportActions) '''
-		«FOR e:elements SEPARATOR '\n    |'»«findGuardForElement.renderPredicate»«e.dataTypeEbnf(supportActions)»«ENDFOR»
+		// «elements.size»
+		«FOR e:elements SEPARATOR '\n    |'»
+		// «e.toString»
+		«e.findGuardForElement.renderPredicate»«e.dataTypeEbnf(supportActions)»«ENDFOR»
 	'''
 
 	protected dispatch def String dataTypeEbnf2(Group it, boolean supportActions) '''
@@ -352,7 +360,10 @@ abstract class AbstractAntlrGrammarGenerator {
 	protected dispatch def String ebnf2(AbstractElement it, AntlrOptions options, boolean supportActions) '''ERROR «eClass.name» not matched'''
 	
 	protected dispatch def String ebnf2(Alternatives it, AntlrOptions options, boolean supportActions) '''
-		«FOR element:elements SEPARATOR '\n    |'»«element.ebnf(options, supportActions)»«ENDFOR»
+		// «elements.size»
+		«FOR element:elements SEPARATOR '\n    |'»
+		// «element.toString»
+		«element.findGuardForElement.renderPredicate»«element.ebnf(options, supportActions)»«ENDFOR»
 	'''
 	
 	protected dispatch def String ebnf2(Group it, AntlrOptions options, boolean supportActions) '''
@@ -370,6 +381,10 @@ abstract class AbstractAntlrGrammarGenerator {
 	protected dispatch def String ebnf2(Action it, AntlrOptions options, boolean supportActions) {
 		''
 	}
+	
+	protected dispatch def String ebnf2(AbstractSemanticPredicate it, AntlrOptions options, boolean supportActions) '''
+		{«it.code.source»}?=>
+	'''
 	
 	protected def String ebnf(Keyword it) {
 		if (combinedGrammar) "'" + value.toAntlrString + "'" else keywordHelper.getRuleName(value)

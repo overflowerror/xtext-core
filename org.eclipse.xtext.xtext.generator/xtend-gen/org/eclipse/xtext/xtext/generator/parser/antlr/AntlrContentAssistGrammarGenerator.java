@@ -18,6 +18,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.AbstractElement;
 import org.eclipse.xtext.AbstractRule;
+import org.eclipse.xtext.AbstractSemanticPredicate;
 import org.eclipse.xtext.Action;
 import org.eclipse.xtext.Alternatives;
 import org.eclipse.xtext.Assignment;
@@ -1390,6 +1391,8 @@ public class AntlrContentAssistGrammarGenerator extends AbstractAntlrGrammarWith
       return _ebnf2((Group)it, options, supportActions);
     } else if (it instanceof UnorderedGroup) {
       return _ebnf2((UnorderedGroup)it, options, supportActions);
+    } else if (it instanceof AbstractSemanticPredicate) {
+      return _ebnf2((AbstractSemanticPredicate)it, options, supportActions);
     } else if (it instanceof Action) {
       return _ebnf2((Action)it, options, supportActions);
     } else if (it instanceof Assignment) {

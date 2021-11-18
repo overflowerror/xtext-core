@@ -18,6 +18,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.xtext.AbstractElement;
+import org.eclipse.xtext.AbstractSemanticPredicate;
 import org.eclipse.xtext.Action;
 import org.eclipse.xtext.Assignment;
 import org.eclipse.xtext.EnumRule;
@@ -648,6 +649,9 @@ public class SyntacticSequencerPDAProvider implements ISyntacticSequencerPDAProv
 						return SynStateType.UNASSIGEND_ACTION_CALL;
 					else
 						return SynStateType.ASSIGNED_ACTION_CALL;
+				} else if (ele instanceof AbstractSemanticPredicate) {
+					// TODO sem-predicates: Do something useful here.
+					return SynStateType.ASSIGNED_ACTION_CALL;
 				} else if (GrammarUtil.containingCrossReference(ele) != null) {
 					if (ele instanceof RuleCall) {
 						RuleCall rc = (RuleCall) ele;
