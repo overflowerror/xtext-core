@@ -13,7 +13,19 @@ package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
  */
 public interface HoistingGuard extends Guard {
 	default String renderPredicate() {
-		return "{" + render() + "}?=>";
+		if (isTrivial()) {
+			return "";
+		} else {
+			return "{" + render() + "}?=>";
+		}
+	}
+	
+	default String renderDescription() {
+		if (isTrivial()) {
+			return "trivial";
+		} else {
+			return render();
+		}
 	}
 	
 	boolean hasTerminal();

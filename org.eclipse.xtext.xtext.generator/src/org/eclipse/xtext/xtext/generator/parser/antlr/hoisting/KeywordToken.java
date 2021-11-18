@@ -26,4 +26,9 @@ public class KeywordToken implements Token {
 	public String negatedCondition() {
 		return "!\"" + keyword.getValue().replace("\"", "\\\"") + "\".equals(input.LT(" + position + ").getText()";
 	}
+	
+	@Override
+	public String toString() {
+		return "keyword " + keyword.getValue();
+	}
 }

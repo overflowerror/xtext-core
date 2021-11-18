@@ -10,6 +10,7 @@ package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.xtext.AbstractElement;
 
@@ -56,5 +57,12 @@ public class TokenAnalysisPath {
 	
 	public List<Token> getTokenPath() {
 		return path;
+	}
+	
+	@Override
+	public String toString() {
+		return "(" + position + ", " + isDone() + ",\n    (" + 
+				path.stream().map(Token::toString).collect(Collectors.joining(", ")) + "),\n    (" +
+				remainingIndexes.stream().map(Object::toString).collect(Collectors.joining(", ")) + ")\n  )";
 	}
 }

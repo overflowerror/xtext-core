@@ -11,6 +11,7 @@ package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.eclipse.xtext.AbstractElement;
@@ -62,5 +63,16 @@ public class TokenAnalysisPaths {
 		TokenAnalysisPaths empty = new TokenAnalysisPaths();
 		empty.isEmpty = true;
 		return empty;
+	}
+	
+	@Override
+	public String toString() {
+		if (isEmpty) {
+			return "TokenAnalysisPaths(empty)";
+		} else {
+			return "TokenAnalysisPaths(" + isDone() + ", \n  "
+					+ tokenPaths.stream().map(TokenAnalysisPath::toString).collect(Collectors.joining(",\n  "))
+					+ "\n)";
+		}
 	}
 }

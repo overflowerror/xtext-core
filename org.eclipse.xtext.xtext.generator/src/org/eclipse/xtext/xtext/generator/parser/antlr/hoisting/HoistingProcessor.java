@@ -14,10 +14,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.apache.log4j.Logger;
 import org.eclipse.xtext.AbstractElement;
 import org.eclipse.xtext.AbstractRule;
 import org.eclipse.xtext.AbstractSemanticPredicate;
@@ -38,8 +40,10 @@ import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.StreamUtils
  * @author overflow - Initial contribution and API
  */
 public class HoistingProcessor {
-	private Map<String, HoistingGuard> ruleCache = new HashMap<>();
-	private Map<Group, HoistingGuard> groupCache = new HashMap<>();
+	private Map<String, HoistingGuard> ruleCache = new ConcurrentHashMap<>();
+	private Map<Group, HoistingGuard> groupCache = new ConcurrentHashMap<>();
+	
+	private Logger log = Logger.getLogger(this.getClass());
 	
 	private static final int TOKEN_ANALYSIS_LIMIT = 10;
 	
@@ -49,15 +53,15 @@ public class HoistingProcessor {
 	
 	private boolean cardinalityAllowsEmpty(AbstractElement element) {
 		String cardinality = element.getCardinality();
-		return cardinality.equals("?") || cardinality.equals("*");
+		return cardinality != null && (cardinality.equals("?") || cardinality.equals("*"));
 	}
 	
 	private boolean cardinalityAllowsRepetition(AbstractElement element) {
 		String cardinality = element.getCardinality();
-		return cardinality.equals("+") || cardinality.equals("*");
+		return cardinality != null && (cardinality.equals("+") || cardinality.equals("*"));
 	}
 	
-	private TokenAnalysisPaths getTokenForIndexes(Alternatives path, TokenAnalysisPaths prefix, boolean needsLength) throws TokenAnalysisAbortedException {
+	private TokenAnalysisPaths getTokenForIndexesAlternatives(Alternatives path, TokenAnalysisPaths prefix, boolean needsLength) throws TokenAnalysisAbortedException {
 		if (prefix.isDone()) {
 			return prefix;
 		}
@@ -101,7 +105,7 @@ public class HoistingProcessor {
 		return result;
 	}
 	
-	private TokenAnalysisPaths getTokenForIndexes(Group path, TokenAnalysisPaths prefix, boolean needsLength) throws TokenAnalysisAbortedException {
+	private TokenAnalysisPaths getTokenForIndexesGroup(Group path, TokenAnalysisPaths prefix, boolean needsLength) throws TokenAnalysisAbortedException {
 		if (prefix.isDone()) {
 			return prefix;
 		}
@@ -120,6 +124,8 @@ public class HoistingProcessor {
 		}
 		
 		boolean loop = cardinalityAllowsRepetition(path);
+		
+		log.info(prefix);
 		
 		do {
 			for (AbstractElement element : path.getElements()) {
@@ -144,7 +150,7 @@ public class HoistingProcessor {
 		return result;
 	}
 	
-	private TokenAnalysisPaths getTokenForIndexes(AbstractElement path, TokenAnalysisPaths prefix, boolean needsLength) throws TokenAnalysisAbortedException {
+	private TokenAnalysisPaths getTokenForIndexesDefault(AbstractElement path, TokenAnalysisPaths prefix, boolean needsLength) throws TokenAnalysisAbortedException {
 		if (prefix.isDone()) {
 			return prefix;
 		}
@@ -167,7 +173,10 @@ public class HoistingProcessor {
 			if (Token.isToken(path)) {
 				current.add(path);
 			} else if (isParserRule(path)) {
+				// path doesn't need length, because we're going to check that anyway in this function
 				current = getTokenForIndexes(((RuleCall) path).getRule().getAlternatives(), current, false);
+			} else if (path instanceof Assignment) {
+				current = getTokenForIndexes(((Assignment) path).getTerminal(), current, false);
 			} else {
 				throw new IllegalArgumentException("unknown element: " + path.eClass().getName());
 			}
@@ -186,6 +195,19 @@ public class HoistingProcessor {
 		return result;
 	}
 	
+	private TokenAnalysisPaths getTokenForIndexes(AbstractElement path, TokenAnalysisPaths prefix, boolean needsLength) throws TokenAnalysisAbortedException {
+		if (path instanceof Alternatives) {
+			return getTokenForIndexesAlternatives((Alternatives) path, prefix, needsLength);
+		} else if (path instanceof Group) {
+			return getTokenForIndexesGroup((Group) path, prefix, needsLength);
+		} else if (path instanceof Action) {
+			// TODO: make sure empty token analysis paths don't cause problems down the line
+			return TokenAnalysisPaths.empty();
+		} else {
+			return getTokenForIndexesDefault(path, prefix, needsLength);
+		}
+	}
+	
 	private Set<List<Token>> getTokenForIndexes(AbstractElement path, List<Integer> indexes) throws TokenAnalysisAbortedException {
 		return getTokenForIndexes(path, new TokenAnalysisPaths(indexes), true).getTokenPaths();
 	}
@@ -201,11 +223,11 @@ public class HoistingProcessor {
 	}
 	
 	private boolean arePathsIdenticalFallback(AbstractElement path1, AbstractElement path2) {
-		for (int i = 1; i < TOKEN_ANALYSIS_LIMIT; i++) {
+		for (int i = 0; i < TOKEN_ANALYSIS_LIMIT; i++) {
 			Set<List<Token>> tokenListSet1;
 			Set<List<Token>> tokenListSet2;
 			
-			List<Integer> range = range(1,  i);
+			List<Integer> range = range(0,  i);
 			
 			try {
 				tokenListSet1 = getTokenForIndexes(path1, range);
@@ -259,7 +281,7 @@ public class HoistingProcessor {
 			List<Integer> indexes = new ArrayList<>(TOKEN_ANALYSIS_LIMIT);
 			for (int i = 0; i < TOKEN_ANALYSIS_LIMIT; i++) {
 				if ((prefix & (1 << i)) > 0) {
-					indexes.add(i + 1);
+					indexes.add(i);
 				}
 			}
 			return callback.apply(indexes);
@@ -283,6 +305,8 @@ public class HoistingProcessor {
 				.collect(Collectors.toList());
 		
 		tokenCombinations(indexList -> {
+			log.info("current index list: " + indexList);
+			
 			// will throw TokenAnalysisAborted if any path is too short
 			List<Set<List<Token>>> tokenListSets = paths.stream()
 					.map(p -> getTokenForIndexes(p, indexList))
@@ -290,7 +314,7 @@ public class HoistingProcessor {
 			
 			int size = result.size();
 			for (int i = 0; i < size; i++) {
-				if (result.get(i) == null) {
+				if (result.get(i) != null) {
 					continue;
 				}
 				
@@ -307,6 +331,8 @@ public class HoistingProcessor {
 				
 			}
 			
+			log.info(result);
+			
 			return result.stream()
 					.allMatch(Objects::nonNull);
 		});
@@ -315,13 +341,17 @@ public class HoistingProcessor {
 	}
 	
 	// TODO: handling for TokenAnalysisAbortedException
+	// TODO: skip if all guards are trivial
 	private HoistingGuard findGuardForAlternatives(Alternatives alternatives) {
+		log.info("find guard for alternative");
+		
 		List<AbstractElement> paths = alternatives.getElements();
 		List<MergedPathGuard> guards = paths.stream()
 				.map(this::findGuardForElement)
 				.map(MergedPathGuard::new)
 				.collect(Collectors.toList());
 		
+		log.info("path identity check");
 		int size = paths.size();
 		for (int i = 0; i < size; i++) {
 			for (int j = i + 1; j < size; j++) {
@@ -335,6 +365,8 @@ public class HoistingProcessor {
 				}
 			}
 		}
+		
+		log.info("minimal path difference");
 		
 		// if all paths are empty the above step will eliminate all paths
 		// -> size = 1
@@ -360,6 +392,8 @@ public class HoistingProcessor {
 	}
 	
 	private HoistingGuard findGuardForGroup(Group group) {
+		log.info("find guard for group");
+		
 		GroupGuard groupGuard = new GroupGuard();
 		
 		for (AbstractElement element : group.getElements()) {
@@ -376,7 +410,13 @@ public class HoistingProcessor {
 		return groupGuard;
 	}
 	
+	public HoistingGuard findGuardForRule(ParserRule rule) {
+		return ruleCache.computeIfAbsent(rule.getName(), s -> findGuardForElement(rule.getAlternatives()));
+	}
+	
 	public HoistingGuard findGuardForElement(AbstractElement element) {
+		log.info("finding guard for element: " + element.toString());
+		
 		if (element instanceof Alternatives) {
 			return findGuardForAlternatives((Alternatives) element);
 		} else if (element instanceof Group) {
@@ -391,8 +431,10 @@ public class HoistingProcessor {
 			if (rule instanceof TerminalRule || rule instanceof EnumRule) {
 				return HoistingGuard.terminal();
 			} else {
+				// rule is parser rule
+				// TODO: check for enum rules
 				// TODO: findGuardForElement can't deal with cardinalities
-				return ruleCache.computeIfAbsent(rule.getName(), s -> findGuardForElement(rule.getAlternatives()));
+				return findGuardForRule((ParserRule) rule);
 			}
 		} else if (element instanceof Action) {
 			// TODO: Maybe find better indicator for "we don't care about this element"
