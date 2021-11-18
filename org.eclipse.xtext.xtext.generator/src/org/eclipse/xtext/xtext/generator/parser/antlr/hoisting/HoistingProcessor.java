@@ -200,7 +200,9 @@ public class HoistingProcessor {
 			return getTokenForIndexesAlternatives((Alternatives) path, prefix, needsLength);
 		} else if (path instanceof Group) {
 			return getTokenForIndexesGroup((Group) path, prefix, needsLength);
-		} else if (path instanceof Action) {
+		} else if (path instanceof Action ||
+		           path instanceof AbstractSemanticPredicate
+				) {
 			// TODO: make sure empty token analysis paths don't cause problems down the line
 			return TokenAnalysisPaths.empty();
 		} else {

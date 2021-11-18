@@ -50,6 +50,7 @@ import org.eclipse.xtext.xtext.generator.parser.antlr.AntlrGrammarGenUtil;
 import org.eclipse.xtext.xtext.generator.parser.antlr.AntlrOptions;
 import org.eclipse.xtext.xtext.generator.parser.antlr.CombinedGrammarMarker;
 import org.eclipse.xtext.xtext.generator.parser.antlr.GrammarNaming;
+import org.eclipse.xtext.xtext.generator.parser.antlr.JavaCodeUtils;
 import org.eclipse.xtext.xtext.generator.parser.antlr.KeywordHelper;
 import org.eclipse.xtext.xtext.generator.parser.antlr.TerminalRuleToLexerBody;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.HoistingProcessor;
@@ -806,10 +807,6 @@ public abstract class AbstractAntlrGrammarGenerator {
   
   protected String _dataTypeEbnf2(final Alternatives it, final boolean supportActions) {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("// ");
-    int _size = it.getElements().size();
-    _builder.append(_size);
-    _builder.newLineIfNotEmpty();
     {
       EList<AbstractElement> _elements = it.getElements();
       boolean _hasElements = false;
@@ -819,10 +816,6 @@ public abstract class AbstractAntlrGrammarGenerator {
         } else {
           _builder.appendImmediate("\n    |", "");
         }
-        _builder.append("// ");
-        String _string = e.toString();
-        _builder.append(_string);
-        _builder.newLineIfNotEmpty();
         String _renderPredicate = this._hoistingProcessor.findGuardForElement(e).renderPredicate();
         _builder.append(_renderPredicate);
         String _dataTypeEbnf = this.dataTypeEbnf(e, supportActions);
@@ -886,10 +879,6 @@ public abstract class AbstractAntlrGrammarGenerator {
   
   protected String _ebnf2(final Alternatives it, final AntlrOptions options, final boolean supportActions) {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("// ");
-    int _size = it.getElements().size();
-    _builder.append(_size);
-    _builder.newLineIfNotEmpty();
     {
       EList<AbstractElement> _elements = it.getElements();
       boolean _hasElements = false;
@@ -899,10 +888,6 @@ public abstract class AbstractAntlrGrammarGenerator {
         } else {
           _builder.appendImmediate("\n    |", "");
         }
-        _builder.append("// ");
-        String _string = element.toString();
-        _builder.append(_string);
-        _builder.newLineIfNotEmpty();
         String _renderPredicate = this._hoistingProcessor.findGuardForElement(element).renderPredicate();
         _builder.append(_renderPredicate);
         String _ebnf = this.ebnf(element, options, supportActions);
@@ -962,7 +947,7 @@ public abstract class AbstractAntlrGrammarGenerator {
   protected String _ebnf2(final AbstractSemanticPredicate it, final AntlrOptions options, final boolean supportActions) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("{");
-    String _source = it.getCode().getSource();
+    String _source = JavaCodeUtils.getSource(it.getCode());
     _builder.append(_source);
     _builder.append("}?=>");
     _builder.newLineIfNotEmpty();

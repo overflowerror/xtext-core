@@ -335,10 +335,7 @@ abstract class AbstractAntlrGrammarGenerator {
 	protected dispatch def String dataTypeEbnf2(AbstractElement it, boolean supportActions) '''ERROR «eClass.name» not matched'''
 
 	protected dispatch def String dataTypeEbnf2(Alternatives it, boolean supportActions) '''
-		// «elements.size»
-		«FOR e:elements SEPARATOR '\n    |'»
-		// «e.toString»
-		«e.findGuardForElement.renderPredicate»«e.dataTypeEbnf(supportActions)»«ENDFOR»
+		«FOR e:elements SEPARATOR '\n    |'»«e.findGuardForElement.renderPredicate»«e.dataTypeEbnf(supportActions)»«ENDFOR»
 	'''
 
 	protected dispatch def String dataTypeEbnf2(Group it, boolean supportActions) '''
@@ -360,10 +357,7 @@ abstract class AbstractAntlrGrammarGenerator {
 	protected dispatch def String ebnf2(AbstractElement it, AntlrOptions options, boolean supportActions) '''ERROR «eClass.name» not matched'''
 	
 	protected dispatch def String ebnf2(Alternatives it, AntlrOptions options, boolean supportActions) '''
-		// «elements.size»
-		«FOR element:elements SEPARATOR '\n    |'»
-		// «element.toString»
-		«element.findGuardForElement.renderPredicate»«element.ebnf(options, supportActions)»«ENDFOR»
+		«FOR element:elements SEPARATOR '\n    |'»«element.findGuardForElement.renderPredicate»«element.ebnf(options, supportActions)»«ENDFOR»
 	'''
 	
 	protected dispatch def String ebnf2(Group it, AntlrOptions options, boolean supportActions) '''
@@ -383,7 +377,7 @@ abstract class AbstractAntlrGrammarGenerator {
 	}
 	
 	protected dispatch def String ebnf2(AbstractSemanticPredicate it, AntlrOptions options, boolean supportActions) '''
-		{«it.code.source»}?=>
+		{«JavaCodeUtils.getSource(it.code)»}?=>
 	'''
 	
 	protected def String ebnf(Keyword it) {

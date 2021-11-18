@@ -9,6 +9,7 @@
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
 
 import org.eclipse.xtext.AbstractSemanticPredicate;
+import org.eclipse.xtext.xtext.generator.parser.antlr.JavaCodeUtils;
 
 /**
  * @author overflow - Initial contribution and API
@@ -28,7 +29,7 @@ public class PredicateGuard implements HoistingGuard {
 
 	@Override
 	public String render() {
-		return element.getCode().getSource();
+		return JavaCodeUtils.getSource(element.getCode());
 	}
 
 	@Override
