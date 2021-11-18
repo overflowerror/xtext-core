@@ -280,6 +280,9 @@ public class HoistingProcessor {
 				return;
 			}
 		}
+		// we tried all possible combinations
+		// -> abort
+		throw new TokenAnalysisAbortedException();
 	}
 	private boolean tokenCombinations(long prefix, int prefixLength, int ones, Function<List<Integer>, Boolean> callback) {
 		if (ones == 0) {
@@ -296,8 +299,15 @@ public class HoistingProcessor {
 		} else {
 			for (int i = prefixLength; i < TOKEN_ANALYSIS_LIMIT - ones + 1; i++) {
 				long current = prefix | (1 << i);
-				if (tokenCombinations(current, i + 1, ones - 1, callback)) {
-					return true;
+				try {
+					if (tokenCombinations(current, i + 1, ones - 1, callback)) {
+						return true;
+					}
+				} catch (TokenAnalysisAbortedException e) {
+					// tokens exhausted; abort current prefix
+					// TODO: add cache for current position in tokenCombinations-call
+					//       we don't need to check this index in the future
+					return false;
 				}
 			}
 			return false;
@@ -313,7 +323,6 @@ public class HoistingProcessor {
 			log.info("current index list: " + indexList);
 			
 			// will throw TokenAnalysisAborted if any path is too short
-			// TODO: when TokenAnalysisAborted, add new index
 			List<Set<List<Token>>> tokenListSets = paths.stream()
 					.peek(p -> log.info("next path: " + p))
 					.map(p -> getTokenForIndexes(p, indexList))
