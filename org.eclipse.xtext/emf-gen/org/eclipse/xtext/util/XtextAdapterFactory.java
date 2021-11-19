@@ -224,6 +224,10 @@ public class XtextAdapterFactory extends AdapterFactoryImpl {
 				return createJavaCodeAdapter();
 			}
 			@Override
+			public Adapter caseJavaAction(JavaAction object) {
+				return createJavaActionAdapter();
+			}
+			@Override
 			public Adapter defaultCase(EObject object) {
 				return createEObjectAdapter();
 			}
@@ -795,6 +799,20 @@ public class XtextAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createJavaCodeAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link org.eclipse.xtext.JavaAction <em>Java Action</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see org.eclipse.xtext.JavaAction
+	 * @generated
+	 */
+	public Adapter createJavaActionAdapter() {
 		return null;
 	}
 

@@ -87,6 +87,7 @@ Group returns AbstractElement:
 AbstractToken returns AbstractElement:
 	AbstractTokenWithCardinality |
 	Action |
+	JavaAction |
 	SemanticPredicate
 ;
 
@@ -96,6 +97,10 @@ SemanticPredicate returns AbstractSemanticPredicate:
 
 GatedSemanticPredicate returns GatedSemanticPredicate:
 	code=JavaCode '?=>'
+;
+
+JavaAction returns JavaAction:
+	code=JavaCode
 ;
 
 JavaCode returns JavaCode:

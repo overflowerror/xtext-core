@@ -809,13 +809,14 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 		private final Alternatives cAlternatives = (Alternatives)rule.eContents().get(1);
 		private final RuleCall cAbstractTokenWithCardinalityParserRuleCall_0 = (RuleCall)cAlternatives.eContents().get(0);
 		private final RuleCall cActionParserRuleCall_1 = (RuleCall)cAlternatives.eContents().get(1);
-		private final RuleCall cSemanticPredicateParserRuleCall_2 = (RuleCall)cAlternatives.eContents().get(2);
+		private final RuleCall cJavaActionParserRuleCall_2 = (RuleCall)cAlternatives.eContents().get(2);
+		private final RuleCall cSemanticPredicateParserRuleCall_3 = (RuleCall)cAlternatives.eContents().get(3);
 		
 		//AbstractToken AbstractElement:
-		//	AbstractTokenWithCardinality | Action | SemanticPredicate;
+		//	AbstractTokenWithCardinality | Action | JavaAction | SemanticPredicate;
 		@Override public ParserRule getRule() { return rule; }
 		
-		//AbstractTokenWithCardinality | Action | SemanticPredicate
+		//AbstractTokenWithCardinality | Action | JavaAction | SemanticPredicate
 		public Alternatives getAlternatives() { return cAlternatives; }
 		
 		//AbstractTokenWithCardinality
@@ -824,8 +825,11 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 		//Action
 		public RuleCall getActionParserRuleCall_1() { return cActionParserRuleCall_1; }
 		
+		//JavaAction
+		public RuleCall getJavaActionParserRuleCall_2() { return cJavaActionParserRuleCall_2; }
+		
 		//SemanticPredicate
-		public RuleCall getSemanticPredicateParserRuleCall_2() { return cSemanticPredicateParserRuleCall_2; }
+		public RuleCall getSemanticPredicateParserRuleCall_3() { return cSemanticPredicateParserRuleCall_3; }
 	}
 	public class SemanticPredicateElements extends AbstractParserRuleElementFinder {
 		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "org.eclipse.xtext.Xtext.SemanticPredicate");
@@ -860,6 +864,21 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 		
 		//'?=>'
 		public Keyword getQuestionMarkEqualsSignGreaterThanSignKeyword_1() { return cQuestionMarkEqualsSignGreaterThanSignKeyword_1; }
+	}
+	public class JavaActionElements extends AbstractParserRuleElementFinder {
+		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "org.eclipse.xtext.Xtext.JavaAction");
+		private final Assignment cCodeAssignment = (Assignment)rule.eContents().get(1);
+		private final RuleCall cCodeJavaCodeParserRuleCall_0 = (RuleCall)cCodeAssignment.eContents().get(0);
+		
+		//JavaAction:
+		//	code=JavaCode;
+		@Override public ParserRule getRule() { return rule; }
+		
+		//code=JavaCode
+		public Assignment getCodeAssignment() { return cCodeAssignment; }
+		
+		//JavaCode
+		public RuleCall getCodeJavaCodeParserRuleCall_0() { return cCodeJavaCodeParserRuleCall_0; }
 	}
 	public class JavaCodeElements extends AbstractParserRuleElementFinder {
 		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "org.eclipse.xtext.Xtext.JavaCode");
@@ -2380,6 +2399,7 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 	private final AbstractTokenElements pAbstractToken;
 	private final SemanticPredicateElements pSemanticPredicate;
 	private final GatedSemanticPredicateElements pGatedSemanticPredicate;
+	private final JavaActionElements pJavaAction;
 	private final JavaCodeElements pJavaCode;
 	private final TerminalRule tJAVACODESTRING;
 	private final AbstractTokenWithCardinalityElements pAbstractTokenWithCardinality;
@@ -2451,6 +2471,7 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 		this.pAbstractToken = new AbstractTokenElements();
 		this.pSemanticPredicate = new SemanticPredicateElements();
 		this.pGatedSemanticPredicate = new GatedSemanticPredicateElements();
+		this.pJavaAction = new JavaActionElements();
 		this.pJavaCode = new JavaCodeElements();
 		this.tJAVACODESTRING = (TerminalRule) GrammarUtil.findRuleForName(getGrammar(), "org.eclipse.xtext.Xtext.JAVACODESTRING");
 		this.pAbstractTokenWithCardinality = new AbstractTokenWithCardinalityElements();
@@ -2690,7 +2711,7 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 	}
 	
 	//AbstractToken AbstractElement:
-	//	AbstractTokenWithCardinality | Action | SemanticPredicate;
+	//	AbstractTokenWithCardinality | Action | JavaAction | SemanticPredicate;
 	public AbstractTokenElements getAbstractTokenAccess() {
 		return pAbstractToken;
 	}
@@ -2717,6 +2738,16 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 	
 	public ParserRule getGatedSemanticPredicateRule() {
 		return getGatedSemanticPredicateAccess().getRule();
+	}
+	
+	//JavaAction:
+	//	code=JavaCode;
+	public JavaActionElements getJavaActionAccess() {
+		return pJavaAction;
+	}
+	
+	public ParserRule getJavaActionRule() {
+		return getJavaActionAccess().getRule();
 	}
 	
 	//JavaCode:

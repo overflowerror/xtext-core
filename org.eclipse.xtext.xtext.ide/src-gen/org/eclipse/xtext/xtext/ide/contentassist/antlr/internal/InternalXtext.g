@@ -491,6 +491,31 @@ finally {
 	restoreStackSize(stackSize);
 }
 
+// Entry rule entryRuleJavaAction
+entryRuleJavaAction
+:
+{ before(grammarAccess.getJavaActionRule()); }
+	 ruleJavaAction
+{ after(grammarAccess.getJavaActionRule()); } 
+	 EOF 
+;
+
+// Rule JavaAction
+ruleJavaAction 
+	@init {
+		int stackSize = keepStackSize();
+	}
+	:
+	(
+		{ before(grammarAccess.getJavaActionAccess().getCodeAssignment()); }
+		(rule__JavaAction__CodeAssignment)
+		{ after(grammarAccess.getJavaActionAccess().getCodeAssignment()); }
+	)
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
 // Entry rule entryRuleJavaCode
 entryRuleJavaCode
 :
@@ -1670,9 +1695,15 @@ rule__AbstractToken__Alternatives
 	)
 	|
 	(
-		{ before(grammarAccess.getAbstractTokenAccess().getSemanticPredicateParserRuleCall_2()); }
+		{ before(grammarAccess.getAbstractTokenAccess().getJavaActionParserRuleCall_2()); }
+		ruleJavaAction
+		{ after(grammarAccess.getAbstractTokenAccess().getJavaActionParserRuleCall_2()); }
+	)
+	|
+	(
+		{ before(grammarAccess.getAbstractTokenAccess().getSemanticPredicateParserRuleCall_3()); }
 		ruleSemanticPredicate
-		{ after(grammarAccess.getAbstractTokenAccess().getSemanticPredicateParserRuleCall_2()); }
+		{ after(grammarAccess.getAbstractTokenAccess().getSemanticPredicateParserRuleCall_3()); }
 	)
 ;
 finally {
@@ -9151,6 +9182,21 @@ rule__GatedSemanticPredicate__CodeAssignment_0
 		{ before(grammarAccess.getGatedSemanticPredicateAccess().getCodeJavaCodeParserRuleCall_0_0()); }
 		ruleJavaCode
 		{ after(grammarAccess.getGatedSemanticPredicateAccess().getCodeJavaCodeParserRuleCall_0_0()); }
+	)
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+rule__JavaAction__CodeAssignment
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+	(
+		{ before(grammarAccess.getJavaActionAccess().getCodeJavaCodeParserRuleCall_0()); }
+		ruleJavaCode
+		{ after(grammarAccess.getJavaActionAccess().getCodeJavaCodeParserRuleCall_0()); }
 	)
 ;
 finally {

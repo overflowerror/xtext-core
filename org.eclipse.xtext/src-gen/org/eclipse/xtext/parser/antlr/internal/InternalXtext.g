@@ -1265,11 +1265,20 @@ ruleAbstractToken returns [EObject current=null]
 		}
 		    |
 		{
-			newCompositeNode(grammarAccess.getAbstractTokenAccess().getSemanticPredicateParserRuleCall_2());
+			newCompositeNode(grammarAccess.getAbstractTokenAccess().getJavaActionParserRuleCall_2());
 		}
-		this_SemanticPredicate_2=ruleSemanticPredicate
+		this_JavaAction_2=ruleJavaAction
 		{
-			$current = $this_SemanticPredicate_2.current;
+			$current = $this_JavaAction_2.current;
+			afterParserOrEnumRuleCall();
+		}
+		    |
+		{
+			newCompositeNode(grammarAccess.getAbstractTokenAccess().getSemanticPredicateParserRuleCall_3());
+		}
+		this_SemanticPredicate_3=ruleSemanticPredicate
+		{
+			$current = $this_SemanticPredicate_3.current;
 			afterParserOrEnumRuleCall();
 		}
 	)
@@ -1339,6 +1348,42 @@ ruleGatedSemanticPredicate returns [EObject current=null]
 		{
 			newLeafNode(otherlv_1, grammarAccess.getGatedSemanticPredicateAccess().getQuestionMarkEqualsSignGreaterThanSignKeyword_1());
 		}
+	)
+;
+
+// Entry rule entryRuleJavaAction
+entryRuleJavaAction returns [EObject current=null]:
+	{ newCompositeNode(grammarAccess.getJavaActionRule()); }
+	iv_ruleJavaAction=ruleJavaAction
+	{ $current=$iv_ruleJavaAction.current; }
+	EOF;
+
+// Rule JavaAction
+ruleJavaAction returns [EObject current=null]
+@init {
+	enterRule();
+}
+@after {
+	leaveRule();
+}:
+	(
+		(
+			{
+				newCompositeNode(grammarAccess.getJavaActionAccess().getCodeJavaCodeParserRuleCall_0());
+			}
+			lv_code_0_0=ruleJavaCode
+			{
+				if ($current==null) {
+					$current = createModelElementForParent(grammarAccess.getJavaActionRule());
+				}
+				set(
+					$current,
+					"code",
+					lv_code_0_0,
+					"org.eclipse.xtext.Xtext.JavaCode");
+				afterParserOrEnumRuleCall();
+			}
+		)
 	)
 ;
 

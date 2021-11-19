@@ -28,6 +28,7 @@ import org.eclipse.xtext.EnumRule;
 import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.GrammarUtil;
 import org.eclipse.xtext.Group;
+import org.eclipse.xtext.JavaAction;
 import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.ParserRule;
 import org.eclipse.xtext.RuleCall;
@@ -1399,6 +1400,8 @@ public class AntlrContentAssistGrammarGenerator extends AbstractAntlrGrammarWith
       return _ebnf2((Assignment)it, options, supportActions);
     } else if (it instanceof EnumLiteralDeclaration) {
       return _ebnf2((EnumLiteralDeclaration)it, options, supportActions);
+    } else if (it instanceof JavaAction) {
+      return _ebnf2((JavaAction)it, options, supportActions);
     } else if (it instanceof Keyword) {
       return _ebnf2((Keyword)it, options, supportActions);
     } else if (it instanceof RuleCall) {

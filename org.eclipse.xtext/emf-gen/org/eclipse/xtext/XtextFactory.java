@@ -373,6 +373,15 @@ public interface XtextFactory extends EFactory {
 	JavaCode createJavaCode();
 
 	/**
+	 * Returns a new object of class '<em>Java Action</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Java Action</em>'.
+	 * @generated
+	 */
+	JavaAction createJavaAction();
+
+	/**
 	 * Returns the package supported by this factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

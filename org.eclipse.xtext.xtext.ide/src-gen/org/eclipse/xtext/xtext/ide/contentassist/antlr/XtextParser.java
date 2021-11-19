@@ -182,6 +182,7 @@ public class XtextParser extends AbstractContentAssistParser {
 			builder.put(grammarAccess.getUnorderedGroupAccess().getElementsAssignment_1_1_1(), "rule__UnorderedGroup__ElementsAssignment_1_1_1");
 			builder.put(grammarAccess.getGroupAccess().getElementsAssignment_1_1(), "rule__Group__ElementsAssignment_1_1");
 			builder.put(grammarAccess.getGatedSemanticPredicateAccess().getCodeAssignment_0(), "rule__GatedSemanticPredicate__CodeAssignment_0");
+			builder.put(grammarAccess.getJavaActionAccess().getCodeAssignment(), "rule__JavaAction__CodeAssignment");
 			builder.put(grammarAccess.getJavaCodeAccess().getSourceAssignment(), "rule__JavaCode__SourceAssignment");
 			builder.put(grammarAccess.getAbstractTokenWithCardinalityAccess().getCardinalityAssignment_1(), "rule__AbstractTokenWithCardinality__CardinalityAssignment_1");
 			builder.put(grammarAccess.getActionAccess().getTypeAssignment_1(), "rule__Action__TypeAssignment_1");

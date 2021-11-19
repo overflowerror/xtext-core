@@ -2072,6 +2072,61 @@ public interface XtextPackage extends EPackage {
 	int JAVA_CODE_FEATURE_COUNT = 1;
 
 	/**
+	 * The meta object id for the '{@link org.eclipse.xtext.impl.JavaActionImpl <em>Java Action</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.xtext.impl.JavaActionImpl
+	 * @see org.eclipse.xtext.impl.XtextPackageImpl#getJavaAction()
+	 * @generated
+	 */
+	int JAVA_ACTION = 39;
+
+	/**
+	 * The feature id for the '<em><b>Cardinality</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int JAVA_ACTION__CARDINALITY = ABSTRACT_ELEMENT__CARDINALITY;
+
+	/**
+	 * The feature id for the '<em><b>Predicated</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int JAVA_ACTION__PREDICATED = ABSTRACT_ELEMENT__PREDICATED;
+
+	/**
+	 * The feature id for the '<em><b>First Set Predicated</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int JAVA_ACTION__FIRST_SET_PREDICATED = ABSTRACT_ELEMENT__FIRST_SET_PREDICATED;
+
+	/**
+	 * The feature id for the '<em><b>Code</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int JAVA_ACTION__CODE = ABSTRACT_ELEMENT_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Java Action</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int JAVA_ACTION_FEATURE_COUNT = ABSTRACT_ELEMENT_FEATURE_COUNT + 1;
+
+	/**
 	 * Returns the meta object for class '{@link org.eclipse.xtext.Grammar <em>Grammar</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3092,6 +3147,27 @@ public interface XtextPackage extends EPackage {
 	EAttribute getJavaCode_Source();
 
 	/**
+	 * Returns the meta object for class '{@link org.eclipse.xtext.JavaAction <em>Java Action</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Java Action</em>'.
+	 * @see org.eclipse.xtext.JavaAction
+	 * @generated
+	 */
+	EClass getJavaAction();
+
+	/**
+	 * Returns the meta object for the containment reference '{@link org.eclipse.xtext.JavaAction#getCode <em>Code</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Code</em>'.
+	 * @see org.eclipse.xtext.JavaAction#getCode()
+	 * @see #getJavaAction()
+	 * @generated
+	 */
+	EReference getJavaAction_Code();
+
+	/**
 	 * Returns the factory that creates the instances of the model.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3967,6 +4043,24 @@ public interface XtextPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute JAVA_CODE__SOURCE = eINSTANCE.getJavaCode_Source();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.xtext.impl.JavaActionImpl <em>Java Action</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.xtext.impl.JavaActionImpl
+		 * @see org.eclipse.xtext.impl.XtextPackageImpl#getJavaAction()
+		 * @generated
+		 */
+		EClass JAVA_ACTION = eINSTANCE.getJavaAction();
+
+		/**
+		 * The meta object literal for the '<em><b>Code</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference JAVA_ACTION__CODE = eINSTANCE.getJavaAction_Code();
 
 	}
 

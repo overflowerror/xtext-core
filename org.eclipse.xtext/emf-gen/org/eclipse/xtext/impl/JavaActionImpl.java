@@ -9,39 +9,41 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.xtext.Condition;
-import org.eclipse.xtext.Group;
+
+import org.eclipse.xtext.JavaAction;
+import org.eclipse.xtext.JavaCode;
 import org.eclipse.xtext.XtextPackage;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Group</b></em>'.
+ * An implementation of the model object '<em><b>Java Action</b></em>'.
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * </p>
  * <ul>
- *   <li>{@link org.eclipse.xtext.impl.GroupImpl#getGuardCondition <em>Guard Condition</em>}</li>
+ *   <li>{@link org.eclipse.xtext.impl.JavaActionImpl#getCode <em>Code</em>}</li>
  * </ul>
  *
  * @generated
  */
-public class GroupImpl extends CompoundElementImpl implements Group {
+public class JavaActionImpl extends AbstractElementImpl implements JavaAction {
 	/**
-	 * The cached value of the '{@link #getGuardCondition() <em>Guard Condition</em>}' containment reference.
+	 * The cached value of the '{@link #getCode() <em>Code</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getGuardCondition()
+	 * @see #getCode()
 	 * @generated
 	 * @ordered
 	 */
-	protected Condition guardCondition;
+	protected JavaCode code;
+
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected GroupImpl() {
+	protected JavaActionImpl() {
 		super();
 	}
 
@@ -52,7 +54,7 @@ public class GroupImpl extends CompoundElementImpl implements Group {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return XtextPackage.Literals.GROUP;
+		return XtextPackage.Literals.JAVA_ACTION;
 	}
 
 	/**
@@ -61,8 +63,8 @@ public class GroupImpl extends CompoundElementImpl implements Group {
 	 * @generated
 	 */
 	@Override
-	public Condition getGuardCondition() {
-		return guardCondition;
+	public JavaCode getCode() {
+		return code;
 	}
 
 	/**
@@ -70,11 +72,11 @@ public class GroupImpl extends CompoundElementImpl implements Group {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetGuardCondition(Condition newGuardCondition, NotificationChain msgs) {
-		Condition oldGuardCondition = guardCondition;
-		guardCondition = newGuardCondition;
+	public NotificationChain basicSetCode(JavaCode newCode, NotificationChain msgs) {
+		JavaCode oldCode = code;
+		code = newCode;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, XtextPackage.GROUP__GUARD_CONDITION, oldGuardCondition, newGuardCondition);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, XtextPackage.JAVA_ACTION__CODE, oldCode, newCode);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -86,18 +88,18 @@ public class GroupImpl extends CompoundElementImpl implements Group {
 	 * @generated
 	 */
 	@Override
-	public void setGuardCondition(Condition newGuardCondition) {
-		if (newGuardCondition != guardCondition) {
+	public void setCode(JavaCode newCode) {
+		if (newCode != code) {
 			NotificationChain msgs = null;
-			if (guardCondition != null)
-				msgs = ((InternalEObject)guardCondition).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - XtextPackage.GROUP__GUARD_CONDITION, null, msgs);
-			if (newGuardCondition != null)
-				msgs = ((InternalEObject)newGuardCondition).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - XtextPackage.GROUP__GUARD_CONDITION, null, msgs);
-			msgs = basicSetGuardCondition(newGuardCondition, msgs);
+			if (code != null)
+				msgs = ((InternalEObject)code).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - XtextPackage.JAVA_ACTION__CODE, null, msgs);
+			if (newCode != null)
+				msgs = ((InternalEObject)newCode).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - XtextPackage.JAVA_ACTION__CODE, null, msgs);
+			msgs = basicSetCode(newCode, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, XtextPackage.GROUP__GUARD_CONDITION, newGuardCondition, newGuardCondition));
+			eNotify(new ENotificationImpl(this, Notification.SET, XtextPackage.JAVA_ACTION__CODE, newCode, newCode));
 	}
 
 	/**
@@ -108,8 +110,8 @@ public class GroupImpl extends CompoundElementImpl implements Group {
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case XtextPackage.GROUP__GUARD_CONDITION:
-				return basicSetGuardCondition(null, msgs);
+			case XtextPackage.JAVA_ACTION__CODE:
+				return basicSetCode(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -122,8 +124,8 @@ public class GroupImpl extends CompoundElementImpl implements Group {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case XtextPackage.GROUP__GUARD_CONDITION:
-				return getGuardCondition();
+			case XtextPackage.JAVA_ACTION__CODE:
+				return getCode();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -133,12 +135,11 @@ public class GroupImpl extends CompoundElementImpl implements Group {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case XtextPackage.GROUP__GUARD_CONDITION:
-				setGuardCondition((Condition)newValue);
+			case XtextPackage.JAVA_ACTION__CODE:
+				setCode((JavaCode)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -152,8 +153,8 @@ public class GroupImpl extends CompoundElementImpl implements Group {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case XtextPackage.GROUP__GUARD_CONDITION:
-				setGuardCondition((Condition)null);
+			case XtextPackage.JAVA_ACTION__CODE:
+				setCode((JavaCode)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -167,10 +168,10 @@ public class GroupImpl extends CompoundElementImpl implements Group {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case XtextPackage.GROUP__GUARD_CONDITION:
-				return guardCondition != null;
+			case XtextPackage.JAVA_ACTION__CODE:
+				return code != null;
 		}
 		return super.eIsSet(featureID);
 	}
 
-} //GroupImpl
+} //JavaActionImpl

@@ -32,6 +32,7 @@ import org.eclipse.xtext.GatedSemanticPredicate;
 import org.eclipse.xtext.GeneratedMetamodel;
 import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.Group;
+import org.eclipse.xtext.JavaAction;
 import org.eclipse.xtext.JavaCode;
 import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.LiteralCondition;
@@ -330,6 +331,13 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * @generated
 	 */
 	private EClass javaCodeEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass javaActionEClass = null;
 
 	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
@@ -1352,6 +1360,26 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * @generated
 	 */
 	@Override
+	public EClass getJavaAction() {
+		return javaActionEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public EReference getJavaAction_Code() {
+		return (EReference)javaActionEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public XtextFactory getXtextFactory() {
 		return (XtextFactory)getEFactoryInstance();
 	}
@@ -1507,6 +1535,9 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 
 		javaCodeEClass = createEClass(JAVA_CODE);
 		createEAttribute(javaCodeEClass, JAVA_CODE__SOURCE);
+
+		javaActionEClass = createEClass(JAVA_ACTION);
+		createEReference(javaActionEClass, JAVA_ACTION__CODE);
 	}
 
 	/**
@@ -1569,6 +1600,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 		literalConditionEClass.getESuperTypes().add(this.getCondition());
 		abstractSemanticPredicateEClass.getESuperTypes().add(this.getAbstractElement());
 		gatedSemanticPredicateEClass.getESuperTypes().add(this.getAbstractSemanticPredicate());
+		javaActionEClass.getESuperTypes().add(this.getAbstractElement());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(grammarEClass, Grammar.class, "Grammar", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1703,6 +1735,9 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 
 		initEClass(javaCodeEClass, JavaCode.class, "JavaCode", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getJavaCode_Source(), theEcorePackage.getEString(), "source", "source", 0, 1, JavaCode.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(javaActionEClass, JavaAction.class, "JavaAction", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getJavaAction_Code(), this.getJavaCode(), null, "code", null, 0, 1, JavaAction.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Create resource
 		createResource(eNS_URI);

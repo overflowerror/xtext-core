@@ -2,9 +2,6 @@
  */
 package org.eclipse.xtext;
 
-import org.eclipse.emf.common.util.EList;
-
-
 /**
  * <!-- begin-user-doc -->
  * A representation of the model object '<em><b>Group</b></em>'.
