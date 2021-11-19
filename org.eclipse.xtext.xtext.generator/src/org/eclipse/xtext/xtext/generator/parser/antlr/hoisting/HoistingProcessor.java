@@ -9,11 +9,11 @@
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -36,8 +36,8 @@ import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.StreamUtils
  * @author overflow - Initial contribution and API
  */
 public class HoistingProcessor {
-	private Map<String, HoistingGuard> ruleCache = new ConcurrentHashMap<>();
-	private Map<Group, HoistingGuard> groupCache = new ConcurrentHashMap<>();
+	private Map<String, HoistingGuard> ruleCache = new HashMap<>();
+	private Map<Group, HoistingGuard> groupCache = new HashMap<>();
 	
 	private Logger log = Logger.getLogger(this.getClass());
 	
@@ -428,8 +428,15 @@ public class HoistingProcessor {
 		return groupGuard;
 	}
 	
-	public HoistingGuard findGuardForRule(ParserRule rule) {
-		return ruleCache.computeIfAbsent(rule.getName(), s -> findGuardForElement(rule.getAlternatives()));
+	// issue: groupCache can't be Concurrent because of possible recursive calls to computeIfAbent
+	// solution: atomic section
+	public synchronized HoistingGuard findGuardForRule(ParserRule rule) {
+		HoistingGuard guard = ruleCache.get(rule.getName());
+		if (guard == null) {
+			guard = findGuardForElement(rule.getAlternatives());
+			ruleCache.put(rule.getName(), guard);
+		}
+		return guard;
 	}
 	
 	public HoistingGuard findGuardForElement(AbstractElement element) {
@@ -438,7 +445,16 @@ public class HoistingProcessor {
 		if (element instanceof Alternatives) {
 			return findGuardForAlternatives((Alternatives) element);
 		} else if (element instanceof Group) {
-			return groupCache.computeIfAbsent((Group) element, this::findGuardForGroup);
+			// issue: groupCache can't be Concurrent because of possible recursive calls to computeIfAbent
+			// solution: atomic section
+			synchronized (groupCache) {
+				HoistingGuard guard = groupCache.get(element);
+				if (guard == null) {
+					guard = findGuardForGroup((Group) element);
+					groupCache.put((Group) element, guard);
+				}
+				return guard;
+			}
 		} else if (element instanceof AbstractSemanticPredicate) {
 			return new PredicateGuard((AbstractSemanticPredicate) element);
 		} else if (Token.isToken(element)) {
