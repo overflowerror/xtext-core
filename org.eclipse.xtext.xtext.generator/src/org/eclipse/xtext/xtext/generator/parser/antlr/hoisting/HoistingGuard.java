@@ -67,4 +67,9 @@ public interface HoistingGuard extends Guard {
 			}
 		};
 	}
+
+	static HoistingGuard action() {
+		// technically not a terminal, but it behaves the same
+		return terminal();
+	}
 }

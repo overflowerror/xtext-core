@@ -9,7 +9,6 @@
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.List;
@@ -21,17 +20,14 @@ import java.util.stream.IntStream;
 
 import org.apache.log4j.Logger;
 import org.eclipse.xtext.AbstractElement;
-import org.eclipse.xtext.AbstractRule;
 import org.eclipse.xtext.AbstractSemanticPredicate;
 import org.eclipse.xtext.Action;
 import org.eclipse.xtext.Alternatives;
 import org.eclipse.xtext.Assignment;
-import org.eclipse.xtext.EnumRule;
 import org.eclipse.xtext.Group;
-import org.eclipse.xtext.Keyword;
+import org.eclipse.xtext.JavaAction;
 import org.eclipse.xtext.ParserRule;
 import org.eclipse.xtext.RuleCall;
-import org.eclipse.xtext.TerminalRule;
 import org.eclipse.xtext.UnorderedGroup;
 import org.eclipse.xtext.util.Tuples;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.StreamUtils;
@@ -204,7 +200,8 @@ public class HoistingProcessor {
 		} else if (path instanceof Group) {
 			return getTokenForIndexesGroup((Group) path, prefix, needsLength);
 		} else if (path instanceof Action ||
-		           path instanceof AbstractSemanticPredicate
+		           path instanceof AbstractSemanticPredicate ||
+		           path instanceof JavaAction
 				) {
 			// TODO: make sure empty token analysis paths don't cause problems down the line
 			return TokenAnalysisPaths.empty(prefix);
@@ -444,22 +441,16 @@ public class HoistingProcessor {
 			return groupCache.computeIfAbsent((Group) element, this::findGuardForGroup);
 		} else if (element instanceof AbstractSemanticPredicate) {
 			return new PredicateGuard((AbstractSemanticPredicate) element);
-		} else if (element instanceof Keyword) {
+		} else if (Token.isToken(element)) {
 			return HoistingGuard.terminal();
-		} else if (element instanceof RuleCall) {
+		} else if (isParserRule(element)) {
 			RuleCall call = (RuleCall) element;
-			AbstractRule rule = call.getRule();
-			if (rule instanceof TerminalRule || rule instanceof EnumRule) {
-				return HoistingGuard.terminal();
-			} else {
-				// rule is parser rule
-				// TODO: check for enum rules
-				// TODO: findGuardForElement can't deal with cardinalities
-				return findGuardForRule((ParserRule) rule);
-			}
+			// TODO: findGuardForElement can't deal with cardinalities
+			return findGuardForRule((ParserRule) call.getRule());
 		} else if (element instanceof Action) {
-			// TODO: Maybe find better indicator for "we don't care about this element"
 			return HoistingGuard.unguarded();
+		} else if (element instanceof JavaAction) {
+			return HoistingGuard.action();
 		} else if (element instanceof UnorderedGroup) {
 			// TODO: No support for Unordered Groups yet.
 			throw new UnsupportedOperationException("unordered groups are not yet supported");
