@@ -15,6 +15,8 @@ import java.util.function.BiFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import com.google.common.base.Splitter;
+
 /**
  * @author overflow - Initial contribution and API
  */
@@ -36,5 +38,9 @@ public class StreamUtils {
 		}, Spliterator.NONNULL);
 		
 		return StreamSupport.stream(spliterator, false);
+	}
+	
+	public static <A> Stream<A> fromIterator(Iterator<A> iterator) {
+		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator, Spliterator.NONNULL), false);
 	}
 }

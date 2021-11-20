@@ -9,7 +9,9 @@
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.List;
@@ -17,9 +19,13 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.xtext.AbstractElement;
+import org.eclipse.xtext.AbstractRule;
 import org.eclipse.xtext.AbstractSemanticPredicate;
 import org.eclipse.xtext.Action;
 import org.eclipse.xtext.Alternatives;
@@ -29,8 +35,14 @@ import org.eclipse.xtext.JavaAction;
 import org.eclipse.xtext.ParserRule;
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.UnorderedGroup;
+import org.eclipse.xtext.XtextFactory;
+import org.eclipse.xtext.XtextPackage;
 import org.eclipse.xtext.util.Tuples;
+import org.eclipse.xtext.util.XtextSwitch;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.StreamUtils;
+
+import com.google.common.base.Strings;
+import com.google.common.collect.Streams;
 
 /**
  * @author overflow - Initial contribution and API
@@ -41,7 +53,7 @@ public class HoistingProcessor {
 	
 	private Logger log = Logger.getLogger(this.getClass());
 	
-	private static final int TOKEN_ANALYSIS_LIMIT = 10;
+	private static final int TOKEN_ANALYSIS_LIMIT = 5;
 	
 	private boolean isParserRule(AbstractElement element) {
 		return (element instanceof RuleCall) && (((RuleCall) element).getRule() instanceof ParserRule);
@@ -121,16 +133,12 @@ public class HoistingProcessor {
 		
 		boolean loop = cardinalityAllowsRepetition(path);
 		
-		log.info("group: " + prefix);
-		
 		do {
 			for (AbstractElement element : path.getElements()) {
 				current = getTokenForIndexes(element, current, false);
 				
 				if (current.isDone()) {
 					// no need to look further
-					
-					log.info("done: " + current);
 					
 					return result.merge(current);
 				}
@@ -180,8 +188,13 @@ public class HoistingProcessor {
 				throw new IllegalArgumentException("unknown element: " + path.eClass().getName());
 			}
 			
+			// add path to result
 			result = result.merge(current);
 			
+			// if current path is done return result
+			// precondition: either !needsLength or result empty
+			//               result is only non-empty if ? cardinality
+			//               but then needsLength can't be true.
 			if (current.isDone()) {
 				return result;
 			}
@@ -203,8 +216,7 @@ public class HoistingProcessor {
 		           path instanceof AbstractSemanticPredicate ||
 		           path instanceof JavaAction
 				) {
-			// TODO: make sure empty token analysis paths don't cause problems down the line
-			return TokenAnalysisPaths.empty(prefix);
+			return prefix;
 		} else {
 			return getTokenForIndexesDefault(path, prefix, needsLength);
 		}
@@ -304,6 +316,7 @@ public class HoistingProcessor {
 					// tokens exhausted; abort current prefix
 					// TODO: add cache for current position in tokenCombinations-call
 					//       we don't need to check this index in the future
+					log.info("tokens exhausted");
 					return false;
 				}
 			}
@@ -311,17 +324,111 @@ public class HoistingProcessor {
 		}
 	}
 	
+	private void abstractElementToString(AbstractElement element, StringBuilder builder, int indentation) {
+		String indentationString = Strings.repeat(" ", indentation);
+		
+		if (element == null) {
+			builder.append(indentationString).append("null");
+			return;
+		}
+		
+		new XtextSwitch<Boolean>(){
+			@Override
+			public Boolean caseKeyword(org.eclipse.xtext.Keyword object) {
+				builder.append(indentationString);
+				builder.append("Keyword (").append(object.getValue()).append(")");
+				return true;
+			};
+			@Override
+			public Boolean caseGroup(Group object) {
+				builder.append(indentationString);
+				builder.append("Group (\n");
+				object.getElements().forEach(e -> {
+					abstractElementToString(e, builder, indentation + 1);
+				});
+				builder.append(indentationString);
+				builder.append(")");
+				return true;
+			};
+			@Override
+			public Boolean caseAlternatives(Alternatives object) {
+				builder.append(indentationString);
+				builder.append("Alternatives (\n");
+				object.getElements().forEach(e -> {
+					abstractElementToString(e, builder, indentation + 1);
+				});
+				builder.append(indentationString);
+				builder.append(")");
+				return true;
+			};
+			@Override
+			public Boolean caseRuleCall(RuleCall object) {
+				AbstractRule rule = object.getRule();
+				if (rule instanceof ParserRule) {
+					builder.append(indentationString);
+					builder.append("ParserRule ").append(rule.getName()).append(" (\n");
+					abstractElementToString(rule.getAlternatives(), builder, indentation + 1);
+					builder.append(indentationString);
+					builder.append(")");
+				} else {
+					builder.append(indentationString);
+					builder.append(rule.eClass().getName()).append(" ").append(rule.getName());
+				}
+				return true;
+			};
+			@Override
+			public Boolean caseJavaAction(JavaAction object) {
+				builder.append(indentationString);
+				builder.append("JavaAction (").append(object.getCode().getSource()).append(")");
+				return true;
+			};
+			@Override
+			public Boolean caseGatedSemanticPredicate(org.eclipse.xtext.GatedSemanticPredicate object) {
+				builder.append(indentationString);
+				builder.append("GatedSemanticPredicate (").append(object.getCode().getSource()).append(")");
+				return true;
+			};
+			@Override
+			public Boolean caseAssignment(Assignment object) {
+				builder.append(indentationString);
+				builder.append("Assignment (\n");
+				abstractElementToString(object.getTerminal(), builder, indentation + 1);
+				builder.append(indentationString);
+				builder.append(")");
+				return true;
+			};
+			@Override
+			public Boolean defaultCase(EObject object) {
+				builder.append("unknown element: ").append(object.eClass().getName());
+				return false;
+			};
+		}.doSwitch(element);
+		
+		builder.append(Objects.toString(element.getCardinality(), ""));
+		builder.append("\n");
+	}
+	
+	private String abstractElementToString(AbstractElement element) {
+		StringBuilder builder = new StringBuilder();
+		abstractElementToString(element, builder, 0);
+		return builder.toString();
+	}
+	
 	private List<Set<List<Token>>> findMinimalPathDifference(List<AbstractElement> paths) throws TokenAnalysisAbortedException {
 		List<Set<List<Token>>> result = paths.stream()
 				.map(p -> (Set<List<Token>>) null)
 				.collect(Collectors.toList());
+		
+		paths.forEach(p -> {
+			log.info("\n" + abstractElementToString(p));
+		});
 		
 		tokenCombinations(indexList -> {
 			log.info("current index list: " + indexList);
 			
 			// will throw TokenAnalysisAborted if any path is too short
 			List<Set<List<Token>>> tokenListSets = paths.stream()
-					.peek(p -> log.info("next path: " + p))
+					//.peek(p -> log.info("next path: " + p))
 					.map(p -> getTokenForIndexes(p, indexList))
 					.collect(Collectors.toList());
 
@@ -340,14 +447,11 @@ public class HoistingProcessor {
 							.anyMatch(s -> s.contains(tokenList))
 					)
 				) {
-					log.info("set:  " + tokenListSet);
 					// token list set is unique for path i
 					result.set(i, tokenListSet);
 				}
 				
 			}
-			
-			log.info(result);
 			
 			return result.stream()
 					.allMatch(Objects::nonNull);
@@ -409,19 +513,102 @@ public class HoistingProcessor {
 		}
 	}
 	
+	private AbstractElement cloneAbstractElement(AbstractElement element) {
+		AbstractElement clone = (AbstractElement) XtextFactory.eINSTANCE.create(element.eClass());
+		for (EStructuralFeature feature : element.eClass().getEAllStructuralFeatures()) {
+			Object value = element.eGet(feature);
+			if (value instanceof AbstractElement) {
+				// if value is AbstractElement a deep copy is needed since an EObject can only be 
+				// referenced by one other EObject.
+				// Note: technically not correct, since this behavior relates to all EObjects,  not 
+				//       just AbstractElement, but I'm lazy.
+				
+				value = cloneAbstractElement((AbstractElement) value);
+			}
+			clone.eSet(feature, value);
+		}
+		return clone;
+	}
+	
 	private HoistingGuard findGuardForGroup(Group group) {
 		log.info("find guard for group");
 		
 		GroupGuard groupGuard = new GroupGuard();
 		
-		for (AbstractElement element : group.getElements()) {
-			// TODO: findGuardForElement doesn's support non-trivial cardinalities
-			HoistingGuard guard = findGuardForElement(element);
-			groupGuard.add(guard);
+		Iterator<AbstractElement> iterator = new ArrayList<>(group.getElements()).iterator();
+		while (iterator.hasNext()) {
+			AbstractElement element = iterator.next();
 			
-			if (guard.hasTerminal()) {
-				groupGuard.setHasTerminal();
+			String cardinality = element.getCardinality();
+			if (cardinality == null ||
+			    cardinality.equals("") ||
+			    cardinality.equals("+")) {
+				
+				HoistingGuard guard = findGuardForElementWithTrivialCardinality(element);
+				groupGuard.add(guard);
+				
+				// if cardinality is + and there is a terminal we don't need to consider
+				// the following elements
+				// if cardinality is + and there is no token the guard won't change even if the
+				// element could be repeated
+				if (guard.hasTerminal()) {
+					groupGuard.setHasTerminal();
+					break;
+				}
+			} else if (cardinality.equals("?") ||
+			           cardinality.equals("*")) {
+				// rewrite cardinality to alternatives
+				// A? B -> A B | B
+				// A* B -> A+ B | B
+				
+				// we need a deep clone of all elements because otherwise we would destroy the original tree
+				// the reason is that by default ecore doesn't allow an EObject to used used twice as a reference
+				
+				AbstractElement clonedElement = cloneAbstractElement(element);
+				if (cardinality.equals("?")) {
+					clonedElement.setCardinality(null);
+				} else {
+					// for the * cardinality the empty case is covered by the alternative
+					clonedElement.setCardinality("+");
+				}
+				
+				// make copy of every element because we can't use any element twice
+				List<AbstractElement> remainingElementsInGroup = StreamUtils.fromIterator(iterator)
+						.map(this::cloneAbstractElement)
+						.collect(Collectors.toList());
+				
+				// make copy of first branch and add the cloned element
+				List<AbstractElement> remainingElementsInGroupIncludingCurrent = Streams.concat(
+						Stream.of(clonedElement),
+						remainingElementsInGroup.stream()
+							.map(this::cloneAbstractElement)
+					).collect(Collectors.toList());
+				
+				// construct alternatives
+				
+				EStructuralFeature compoundElementElementsFeature = XtextPackage.Literals.COMPOUND_ELEMENT.getEStructuralFeature(XtextPackage.COMPOUND_ELEMENT__ELEMENTS);
+				
+				Group virtualPathRemaining = XtextFactory.eINSTANCE.createGroup();
+				virtualPathRemaining.eSet(compoundElementElementsFeature, remainingElementsInGroup);
+				
+				Group virtualPathRemainingPlusCurrent = XtextFactory.eINSTANCE.createGroup();
+				virtualPathRemainingPlusCurrent.eSet(compoundElementElementsFeature, remainingElementsInGroupIncludingCurrent);
+				
+				Alternatives virtualAlternatives = XtextFactory.eINSTANCE.createAlternatives();
+				virtualAlternatives.eSet(compoundElementElementsFeature, Arrays.asList(virtualPathRemaining, virtualPathRemainingPlusCurrent));
+				
+				// get Guard for virtual alternatives
+				HoistingGuard guard = findGuardForElementWithTrivialCardinality(virtualAlternatives);
+				groupGuard.add(guard);
+				
+				if (guard.hasTerminal()) {
+					groupGuard.setHasTerminal();
+				}
+				
+				// following elements are included in alternative, no need to check further
 				break;
+			} else {
+				throw new IllegalArgumentException("unknown cardinality: " + cardinality);
 			}
 		}
 		
@@ -439,7 +626,52 @@ public class HoistingProcessor {
 		return guard;
 	}
 	
+	private boolean pathHasToken(AbstractElement path) {
+		// we are only interested in whether or not there could be any tokens on this path
+		// -> ignore cardinality
+		
+		if (Token.isToken(path)) {
+			return true;
+		} else if (isParserRule(path)) {
+			return pathHasToken(((RuleCall) path).getRule().getAlternatives());
+		} else if (path instanceof Assignment) {
+			return pathHasToken(((Assignment) path).getTerminal());
+		} else if (path instanceof Group) {
+			return ((Group) path).getElements().stream().anyMatch(this::pathHasToken);
+		} else if (path instanceof Alternatives) {
+			return ((Alternatives) path).getElements().stream().anyMatch(this::pathHasToken);
+		} else {
+			// Actions, JavaActions, Predicates, ...
+			return false;
+		}
+	}
+	
 	public HoistingGuard findGuardForElement(AbstractElement element) {
+		String cardinality = element.getCardinality();
+		if (cardinality == null || cardinality.equals("")) {
+			return findGuardForElementWithTrivialCardinality(element);
+		} else if (cardinality.equals("+")) {
+			return findGuardForElementWithTrivialCardinality(element);
+		} else if (cardinality.equals("?") ||
+		           cardinality.equals("*")) {
+			if (pathHasToken(element)) {
+				// there might be a token in this element
+				// no context accessible to construct guard
+				// this does only work when analyzing group
+				// TODO: generate warning
+				// this is not a terminal, but there is no point constructing guards past this point
+				return HoistingGuard.terminal();
+			} else {
+				// element with cardinality ? or * has no token
+				// -> we can assume it is unguarded
+				return HoistingGuard.unguarded();
+			}
+		} else {
+			throw new IllegalArgumentException("unknown cardinality: " + cardinality);
+		}
+	}
+	
+	private HoistingGuard findGuardForElementWithTrivialCardinality(AbstractElement element) {
 		log.info("finding guard for element: " + element.toString());
 		
 		if (element instanceof Alternatives) {
@@ -461,7 +693,6 @@ public class HoistingProcessor {
 			return HoistingGuard.terminal();
 		} else if (isParserRule(element)) {
 			RuleCall call = (RuleCall) element;
-			// TODO: findGuardForElement can't deal with cardinalities
 			return findGuardForRule((ParserRule) call.getRule());
 		} else if (element instanceof Action) {
 			return HoistingGuard.unguarded();
@@ -471,7 +702,6 @@ public class HoistingProcessor {
 			// TODO: No support for Unordered Groups yet.
 			throw new UnsupportedOperationException("unordered groups are not yet supported");
 		} else if (element instanceof Assignment) {
-			// TODO: findGuardForElement can't deal with cardinalities
 			return findGuardForElement(((Assignment) element).getTerminal());
 		} else {
 			throw new UnsupportedOperationException("element not supported: " + element.toString());
