@@ -25,6 +25,7 @@ import org.eclipse.xtext.Assignment;
 import org.eclipse.xtext.CrossReference;
 import org.eclipse.xtext.EnumLiteralDeclaration;
 import org.eclipse.xtext.EnumRule;
+import org.eclipse.xtext.GatedSemanticPredicate;
 import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.GrammarUtil;
 import org.eclipse.xtext.Group;
@@ -1388,6 +1389,8 @@ public class AntlrContentAssistGrammarGenerator extends AbstractAntlrGrammarWith
   protected String ebnf2(final AbstractElement it, final AntlrOptions options, final boolean supportActions) {
     if (it instanceof Alternatives) {
       return _ebnf2((Alternatives)it, options, supportActions);
+    } else if (it instanceof GatedSemanticPredicate) {
+      return _ebnf2((GatedSemanticPredicate)it, options, supportActions);
     } else if (it instanceof Group) {
       return _ebnf2((Group)it, options, supportActions);
     } else if (it instanceof UnorderedGroup) {

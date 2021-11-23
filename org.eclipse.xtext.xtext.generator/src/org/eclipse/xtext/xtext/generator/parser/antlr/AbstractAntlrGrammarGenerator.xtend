@@ -40,6 +40,7 @@ import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.HoistingProcessor
 import java.lang.reflect.Parameter
 import org.eclipse.xtext.AbstractSemanticPredicate
 import org.eclipse.xtext.JavaAction
+import org.eclipse.xtext.GatedSemanticPredicate
 
 abstract class AbstractAntlrGrammarGenerator {
 	
@@ -377,8 +378,12 @@ abstract class AbstractAntlrGrammarGenerator {
 		''
 	}
 	
-	protected dispatch def String ebnf2(AbstractSemanticPredicate it, AntlrOptions options, boolean supportActions) '''
+	protected dispatch def String ebnf2(GatedSemanticPredicate it, AntlrOptions options, boolean supportActions) '''
 		{«JavaCodeUtils.getSource(code)»}?=>
+	'''
+	
+	protected dispatch def String ebnf2(AbstractSemanticPredicate it, AntlrOptions options, boolean supportActions) '''
+		{«JavaCodeUtils.getSource(code)»}?
 	'''
 	
 	protected dispatch def String ebnf2(JavaAction it, AntlrOptions options, boolean supportActions) '''

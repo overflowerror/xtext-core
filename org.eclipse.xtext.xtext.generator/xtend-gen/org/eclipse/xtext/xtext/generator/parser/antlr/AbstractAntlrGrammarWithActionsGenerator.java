@@ -22,6 +22,7 @@ import org.eclipse.xtext.Condition;
 import org.eclipse.xtext.CrossReference;
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.EnumLiteralDeclaration;
+import org.eclipse.xtext.GatedSemanticPredicate;
 import org.eclipse.xtext.GrammarUtil;
 import org.eclipse.xtext.Group;
 import org.eclipse.xtext.JavaAction;
@@ -667,6 +668,8 @@ public abstract class AbstractAntlrGrammarWithActionsGenerator extends AbstractA
   protected String ebnf2(final AbstractElement it, final AntlrOptions options, final boolean supportActions) {
     if (it instanceof Alternatives) {
       return _ebnf2((Alternatives)it, options, supportActions);
+    } else if (it instanceof GatedSemanticPredicate) {
+      return _ebnf2((GatedSemanticPredicate)it, options, supportActions);
     } else if (it instanceof Group) {
       return _ebnf2((Group)it, options, supportActions);
     } else if (it instanceof UnorderedGroup) {

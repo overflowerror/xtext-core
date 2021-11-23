@@ -30,8 +30,11 @@ import org.eclipse.xtext.AbstractSemanticPredicate;
 import org.eclipse.xtext.Action;
 import org.eclipse.xtext.Alternatives;
 import org.eclipse.xtext.Assignment;
+import org.eclipse.xtext.DisambiguatingSemanticPredicate;
+import org.eclipse.xtext.GatedSemanticPredicate;
 import org.eclipse.xtext.Group;
 import org.eclipse.xtext.JavaAction;
+import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.ParserRule;
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.UnorderedGroup;
@@ -334,7 +337,7 @@ public class HoistingProcessor {
 		
 		new XtextSwitch<Boolean>(){
 			@Override
-			public Boolean caseKeyword(org.eclipse.xtext.Keyword object) {
+			public Boolean caseKeyword(Keyword object) {
 				builder.append(indentationString);
 				builder.append("Keyword (").append(object.getValue()).append(")");
 				return true;
@@ -383,9 +386,15 @@ public class HoistingProcessor {
 				return true;
 			};
 			@Override
-			public Boolean caseGatedSemanticPredicate(org.eclipse.xtext.GatedSemanticPredicate object) {
+			public Boolean caseGatedSemanticPredicate(GatedSemanticPredicate object) {
 				builder.append(indentationString);
 				builder.append("GatedSemanticPredicate (").append(object.getCode().getSource()).append(")");
+				return true;
+			};
+			@Override
+			public Boolean caseDisambiguatingSemanticPredicate(DisambiguatingSemanticPredicate object) {
+				builder.append(indentationString);
+				builder.append("DisambiguatingSemanticPredicate (").append(object.getCode().getSource()).append(")");
 				return true;
 			};
 			@Override

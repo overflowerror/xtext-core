@@ -25,6 +25,7 @@ import org.eclipse.xtext.Assignment;
 import org.eclipse.xtext.CrossReference;
 import org.eclipse.xtext.EnumLiteralDeclaration;
 import org.eclipse.xtext.EnumRule;
+import org.eclipse.xtext.GatedSemanticPredicate;
 import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.GrammarUtil;
 import org.eclipse.xtext.Group;
@@ -945,12 +946,22 @@ public abstract class AbstractAntlrGrammarGenerator {
     return "";
   }
   
-  protected String _ebnf2(final AbstractSemanticPredicate it, final AntlrOptions options, final boolean supportActions) {
+  protected String _ebnf2(final GatedSemanticPredicate it, final AntlrOptions options, final boolean supportActions) {
     StringConcatenation _builder = new StringConcatenation();
     _builder.append("{");
     String _source = JavaCodeUtils.getSource(it.getCode());
     _builder.append(_source);
     _builder.append("}?=>");
+    _builder.newLineIfNotEmpty();
+    return _builder.toString();
+  }
+  
+  protected String _ebnf2(final AbstractSemanticPredicate it, final AntlrOptions options, final boolean supportActions) {
+    StringConcatenation _builder = new StringConcatenation();
+    _builder.append("{");
+    String _source = JavaCodeUtils.getSource(it.getCode());
+    _builder.append(_source);
+    _builder.append("}?");
     _builder.newLineIfNotEmpty();
     return _builder.toString();
   }
@@ -1187,6 +1198,8 @@ public abstract class AbstractAntlrGrammarGenerator {
   protected String ebnf2(final AbstractElement it, final AntlrOptions options, final boolean supportActions) {
     if (it instanceof Alternatives) {
       return _ebnf2((Alternatives)it, options, supportActions);
+    } else if (it instanceof GatedSemanticPredicate) {
+      return _ebnf2((GatedSemanticPredicate)it, options, supportActions);
     } else if (it instanceof Group) {
       return _ebnf2((Group)it, options, supportActions);
     } else if (it instanceof UnorderedGroup) {
