@@ -95,6 +95,7 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 			case XtextPackage.GATED_SEMANTIC_PREDICATE: return createGatedSemanticPredicate();
 			case XtextPackage.JAVA_CODE: return createJavaCode();
 			case XtextPackage.JAVA_ACTION: return createJavaAction();
+			case XtextPackage.INIT_BLOCK: return createInitBlock();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -529,6 +530,17 @@ public class XtextFactoryImpl extends EFactoryImpl implements XtextFactory {
 	public JavaAction createJavaAction() {
 		JavaActionImpl javaAction = new JavaActionImpl();
 		return javaAction;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public InitBlock createInitBlock() {
+		InitBlockImpl initBlock = new InitBlockImpl();
+		return initBlock;
 	}
 
 	/**

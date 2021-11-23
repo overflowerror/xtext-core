@@ -228,6 +228,10 @@ public class XtextAdapterFactory extends AdapterFactoryImpl {
 				return createJavaActionAdapter();
 			}
 			@Override
+			public Adapter caseInitBlock(InitBlock object) {
+				return createInitBlockAdapter();
+			}
+			@Override
 			public Adapter defaultCase(EObject object) {
 				return createEObjectAdapter();
 			}
@@ -813,6 +817,20 @@ public class XtextAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createJavaActionAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link org.eclipse.xtext.InitBlock <em>Init Block</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see org.eclipse.xtext.InitBlock
+	 * @generated
+	 */
+	public Adapter createInitBlockAdapter() {
 		return null;
 	}
 

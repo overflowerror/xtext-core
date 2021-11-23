@@ -21,6 +21,7 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link org.eclipse.xtext.Grammar#getHiddenTokens <em>Hidden Tokens</em>}</li>
  *   <li>{@link org.eclipse.xtext.Grammar#getMetamodelDeclarations <em>Metamodel Declarations</em>}</li>
  *   <li>{@link org.eclipse.xtext.Grammar#getRules <em>Rules</em>}</li>
+ *   <li>{@link org.eclipse.xtext.Grammar#getInitBlock <em>Init Block</em>}</li>
  * </ul>
  *
  * @see org.eclipse.xtext.XtextPackage#getGrammar()
@@ -143,5 +144,27 @@ public interface Grammar extends EObject {
 	 * @generated
 	 */
 	EList<AbstractRule> getRules();
+
+	/**
+	 * Returns the value of the '<em><b>Init Block</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Init Block</em>' containment reference.
+	 * @see #setInitBlock(InitBlock)
+	 * @see org.eclipse.xtext.XtextPackage#getGrammar_InitBlock()
+	 * @model containment="true"
+	 * @generated
+	 */
+	InitBlock getInitBlock();
+
+	/**
+	 * Sets the value of the '{@link org.eclipse.xtext.Grammar#getInitBlock <em>Init Block</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Init Block</em>' containment reference.
+	 * @see #getInitBlock()
+	 * @generated
+	 */
+	void setInitBlock(InitBlock value);
 
 } // Grammar

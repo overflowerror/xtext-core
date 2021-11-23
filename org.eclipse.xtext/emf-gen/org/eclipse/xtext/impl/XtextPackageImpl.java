@@ -32,6 +32,7 @@ import org.eclipse.xtext.GatedSemanticPredicate;
 import org.eclipse.xtext.GeneratedMetamodel;
 import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.Group;
+import org.eclipse.xtext.InitBlock;
 import org.eclipse.xtext.JavaAction;
 import org.eclipse.xtext.JavaCode;
 import org.eclipse.xtext.Keyword;
@@ -340,6 +341,13 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	private EClass javaActionEClass = null;
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass initBlockEClass = null;
+
+	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
 	 * {@link org.eclipse.emf.ecore.EPackage.Registry EPackage.Registry} by the package
 	 * package URI value.
@@ -471,6 +479,16 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	@Override
 	public EReference getGrammar_Rules() {
 		return (EReference)grammarEClass.getEStructuralFeatures().get(5);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public EReference getGrammar_InitBlock() {
+		return (EReference)grammarEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
@@ -1380,6 +1398,26 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * @generated
 	 */
 	@Override
+	public EClass getInitBlock() {
+		return initBlockEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public EReference getInitBlock_Code() {
+		return (EReference)initBlockEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public XtextFactory getXtextFactory() {
 		return (XtextFactory)getEFactoryInstance();
 	}
@@ -1410,6 +1448,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 		createEReference(grammarEClass, GRAMMAR__HIDDEN_TOKENS);
 		createEReference(grammarEClass, GRAMMAR__METAMODEL_DECLARATIONS);
 		createEReference(grammarEClass, GRAMMAR__RULES);
+		createEReference(grammarEClass, GRAMMAR__INIT_BLOCK);
 
 		abstractRuleEClass = createEClass(ABSTRACT_RULE);
 		createEAttribute(abstractRuleEClass, ABSTRACT_RULE__NAME);
@@ -1538,6 +1577,9 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 
 		javaActionEClass = createEClass(JAVA_ACTION);
 		createEReference(javaActionEClass, JAVA_ACTION__CODE);
+
+		initBlockEClass = createEClass(INIT_BLOCK);
+		createEReference(initBlockEClass, INIT_BLOCK__CODE);
 	}
 
 	/**
@@ -1610,6 +1652,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 		initEReference(getGrammar_HiddenTokens(), this.getAbstractRule(), null, "hiddenTokens", null, 0, -1, Grammar.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getGrammar_MetamodelDeclarations(), this.getAbstractMetamodelDeclaration(), null, "metamodelDeclarations", null, 0, -1, Grammar.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getGrammar_Rules(), this.getAbstractRule(), null, "rules", null, 0, -1, Grammar.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getGrammar_InitBlock(), this.getInitBlock(), null, "initBlock", null, 0, 1, Grammar.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(abstractRuleEClass, AbstractRule.class, "AbstractRule", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getAbstractRule_Name(), theEcorePackage.getEString(), "name", null, 0, 1, AbstractRule.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1738,6 +1781,9 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 
 		initEClass(javaActionEClass, JavaAction.class, "JavaAction", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getJavaAction_Code(), this.getJavaCode(), null, "code", null, 0, 1, JavaAction.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(initBlockEClass, InitBlock.class, "InitBlock", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getInitBlock_Code(), this.getJavaCode(), null, "code", null, 0, 1, InitBlock.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Create resource
 		createResource(eNS_URI);

@@ -122,13 +122,22 @@ public interface XtextPackage extends EPackage {
 	int GRAMMAR__RULES = 5;
 
 	/**
+	 * The feature id for the '<em><b>Init Block</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int GRAMMAR__INIT_BLOCK = 6;
+
+	/**
 	 * The number of structural features of the '<em>Grammar</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int GRAMMAR_FEATURE_COUNT = 6;
+	int GRAMMAR_FEATURE_COUNT = 7;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.xtext.impl.AbstractRuleImpl <em>Abstract Rule</em>}' class.
@@ -2127,6 +2136,34 @@ public interface XtextPackage extends EPackage {
 	int JAVA_ACTION_FEATURE_COUNT = ABSTRACT_ELEMENT_FEATURE_COUNT + 1;
 
 	/**
+	 * The meta object id for the '{@link org.eclipse.xtext.impl.InitBlockImpl <em>Init Block</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.xtext.impl.InitBlockImpl
+	 * @see org.eclipse.xtext.impl.XtextPackageImpl#getInitBlock()
+	 * @generated
+	 */
+	int INIT_BLOCK = 40;
+
+	/**
+	 * The feature id for the '<em><b>Code</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INIT_BLOCK__CODE = 0;
+
+	/**
+	 * The number of structural features of the '<em>Init Block</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INIT_BLOCK_FEATURE_COUNT = 1;
+
+	/**
 	 * Returns the meta object for class '{@link org.eclipse.xtext.Grammar <em>Grammar</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2201,6 +2238,17 @@ public interface XtextPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getGrammar_Rules();
+
+	/**
+	 * Returns the meta object for the containment reference '{@link org.eclipse.xtext.Grammar#getInitBlock <em>Init Block</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Init Block</em>'.
+	 * @see org.eclipse.xtext.Grammar#getInitBlock()
+	 * @see #getGrammar()
+	 * @generated
+	 */
+	EReference getGrammar_InitBlock();
 
 	/**
 	 * Returns the meta object for class '{@link org.eclipse.xtext.AbstractRule <em>Abstract Rule</em>}'.
@@ -3168,6 +3216,27 @@ public interface XtextPackage extends EPackage {
 	EReference getJavaAction_Code();
 
 	/**
+	 * Returns the meta object for class '{@link org.eclipse.xtext.InitBlock <em>Init Block</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Init Block</em>'.
+	 * @see org.eclipse.xtext.InitBlock
+	 * @generated
+	 */
+	EClass getInitBlock();
+
+	/**
+	 * Returns the meta object for the containment reference '{@link org.eclipse.xtext.InitBlock#getCode <em>Code</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Code</em>'.
+	 * @see org.eclipse.xtext.InitBlock#getCode()
+	 * @see #getInitBlock()
+	 * @generated
+	 */
+	EReference getInitBlock_Code();
+
+	/**
 	 * Returns the factory that creates the instances of the model.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3246,6 +3315,14 @@ public interface XtextPackage extends EPackage {
 		 * @generated
 		 */
 		EReference GRAMMAR__RULES = eINSTANCE.getGrammar_Rules();
+
+		/**
+		 * The meta object literal for the '<em><b>Init Block</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference GRAMMAR__INIT_BLOCK = eINSTANCE.getGrammar_InitBlock();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.xtext.impl.AbstractRuleImpl <em>Abstract Rule</em>}' class.
@@ -4061,6 +4138,24 @@ public interface XtextPackage extends EPackage {
 		 * @generated
 		 */
 		EReference JAVA_ACTION__CODE = eINSTANCE.getJavaAction_Code();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.xtext.impl.InitBlockImpl <em>Init Block</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.xtext.impl.InitBlockImpl
+		 * @see org.eclipse.xtext.impl.XtextPackageImpl#getInitBlock()
+		 * @generated
+		 */
+		EClass INIT_BLOCK = eINSTANCE.getInitBlock();
+
+		/**
+		 * The meta object literal for the '<em><b>Code</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference INIT_BLOCK__CODE = eINSTANCE.getInitBlock_Code();
 
 	}
 

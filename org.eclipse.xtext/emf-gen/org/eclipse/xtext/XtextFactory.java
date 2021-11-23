@@ -382,6 +382,15 @@ public interface XtextFactory extends EFactory {
 	JavaAction createJavaAction();
 
 	/**
+	 * Returns a new object of class '<em>Init Block</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Init Block</em>'.
+	 * @generated
+	 */
+	InitBlock createInitBlock();
+
+	/**
 	 * Returns the package supported by this factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

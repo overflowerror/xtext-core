@@ -22,6 +22,7 @@ import org.eclipse.xtext.GatedSemanticPredicate;
 import org.eclipse.xtext.GeneratedMetamodel;
 import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.Group;
+import org.eclipse.xtext.InitBlock;
 import org.eclipse.xtext.JavaAction;
 import org.eclipse.xtext.JavaCode;
 import org.eclipse.xtext.Keyword;
@@ -243,6 +244,9 @@ public class XtextSemanticSequencer extends AbstractDelegatingSemanticSequencer 
 					return; 
 				}
 				else break;
+			case XtextPackage.INIT_BLOCK:
+				sequence_InitBlock(context, (InitBlock) semanticObject); 
+				return; 
 			case XtextPackage.JAVA_ACTION:
 				if (rule == grammarAccess.getAlternativesRule()
 						|| action == grammarAccess.getAlternativesAccess().getAlternativesElementsAction_1_0()
@@ -929,11 +933,30 @@ public class XtextSemanticSequencer extends AbstractDelegatingSemanticSequencer 
 	 *         (usedGrammars+=[Grammar|GrammarID] usedGrammars+=[Grammar|GrammarID]*)? 
 	 *         (definesHiddenTokens?='hidden' (hiddenTokens+=[AbstractRule|RuleID] hiddenTokens+=[AbstractRule|RuleID]*)?)? 
 	 *         metamodelDeclarations+=AbstractMetamodelDeclaration* 
+	 *         initBlock=InitBlock? 
 	 *         rules+=AbstractRule+
 	 *     )
 	 */
 	protected void sequence_Grammar(ISerializationContext context, Grammar semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
+	}
+	
+	
+	/**
+	 * Contexts:
+	 *     InitBlock returns InitBlock
+	 *
+	 * Constraint:
+	 *     code=JavaCode
+	 */
+	protected void sequence_InitBlock(ISerializationContext context, InitBlock semanticObject) {
+		if (errorAcceptor != null) {
+			if (transientValues.isValueTransient(semanticObject, XtextPackage.Literals.INIT_BLOCK__CODE) == ValueTransient.YES)
+				errorAcceptor.accept(diagnosticProvider.createFeatureValueMissing(semanticObject, XtextPackage.Literals.INIT_BLOCK__CODE));
+		}
+		SequenceFeeder feeder = createSequencerFeeder(context, semanticObject);
+		feeder.accept(grammarAccess.getInitBlockAccess().getCodeJavaCodeParserRuleCall_1_0(), semanticObject.getCode());
+		feeder.finish();
 	}
 	
 	

@@ -229,9 +229,28 @@ ruleGrammar returns [EObject current=null]
 		(
 			(
 				{
-					newCompositeNode(grammarAccess.getGrammarAccess().getRulesAbstractRuleParserRuleCall_5_0());
+					newCompositeNode(grammarAccess.getGrammarAccess().getInitBlockInitBlockParserRuleCall_5_0());
 				}
-				lv_rules_13_0=ruleAbstractRule
+				lv_initBlock_13_0=ruleInitBlock
+				{
+					if ($current==null) {
+						$current = createModelElementForParent(grammarAccess.getGrammarRule());
+					}
+					set(
+						$current,
+						"initBlock",
+						lv_initBlock_13_0,
+						"org.eclipse.xtext.Xtext.InitBlock");
+					afterParserOrEnumRuleCall();
+				}
+			)
+		)?
+		(
+			(
+				{
+					newCompositeNode(grammarAccess.getGrammarAccess().getRulesAbstractRuleParserRuleCall_6_0());
+				}
+				lv_rules_14_0=ruleAbstractRule
 				{
 					if ($current==null) {
 						$current = createModelElementForParent(grammarAccess.getGrammarRule());
@@ -239,12 +258,54 @@ ruleGrammar returns [EObject current=null]
 					add(
 						$current,
 						"rules",
-						lv_rules_13_0,
+						lv_rules_14_0,
 						"org.eclipse.xtext.Xtext.AbstractRule");
 					afterParserOrEnumRuleCall();
 				}
 			)
 		)+
+	)
+;
+
+// Entry rule entryRuleInitBlock
+entryRuleInitBlock returns [EObject current=null]:
+	{ newCompositeNode(grammarAccess.getInitBlockRule()); }
+	iv_ruleInitBlock=ruleInitBlock
+	{ $current=$iv_ruleInitBlock.current; }
+	EOF;
+
+// Rule InitBlock
+ruleInitBlock returns [EObject current=null]
+@init {
+	enterRule();
+}
+@after {
+	leaveRule();
+}:
+	(
+		otherlv_0='@init'
+		{
+			newLeafNode(otherlv_0, grammarAccess.getInitBlockAccess().getInitKeyword_0());
+		}
+		(
+			(
+				{
+					newCompositeNode(grammarAccess.getInitBlockAccess().getCodeJavaCodeParserRuleCall_1_0());
+				}
+				lv_code_1_0=ruleJavaCode
+				{
+					if ($current==null) {
+						$current = createModelElementForParent(grammarAccess.getInitBlockRule());
+					}
+					set(
+						$current,
+						"code",
+						lv_code_1_0,
+						"org.eclipse.xtext.Xtext.JavaCode");
+					afterParserOrEnumRuleCall();
+				}
+			)
+		)
 	)
 ;
 

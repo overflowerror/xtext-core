@@ -15,7 +15,12 @@ Grammar:
 	'grammar' name=GrammarID ('with' usedGrammars+=[Grammar|GrammarID] (',' usedGrammars+=[Grammar|GrammarID])*)?
 	(definesHiddenTokens?='hidden' '(' (hiddenTokens+=[AbstractRule|RuleID] (',' hiddenTokens+=[AbstractRule|RuleID])*)? ')')?
 	metamodelDeclarations+=AbstractMetamodelDeclaration*
+	(initBlock=InitBlock)?
 	(rules+=AbstractRule)+
+;
+
+InitBlock returns InitBlock:
+	'@init' code=JavaCode
 ;
 
 GrammarID returns ecore::EString:

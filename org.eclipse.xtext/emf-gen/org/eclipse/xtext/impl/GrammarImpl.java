@@ -22,6 +22,8 @@ import org.eclipse.emf.ecore.util.InternalEList;
 import org.eclipse.xtext.AbstractMetamodelDeclaration;
 import org.eclipse.xtext.AbstractRule;
 import org.eclipse.xtext.Grammar;
+import org.eclipse.xtext.InitBlock;
+import org.eclipse.xtext.JavaCode;
 import org.eclipse.xtext.XtextPackage;
 
 /**
@@ -38,6 +40,7 @@ import org.eclipse.xtext.XtextPackage;
  *   <li>{@link org.eclipse.xtext.impl.GrammarImpl#getHiddenTokens <em>Hidden Tokens</em>}</li>
  *   <li>{@link org.eclipse.xtext.impl.GrammarImpl#getMetamodelDeclarations <em>Metamodel Declarations</em>}</li>
  *   <li>{@link org.eclipse.xtext.impl.GrammarImpl#getRules <em>Rules</em>}</li>
+ *   <li>{@link org.eclipse.xtext.impl.GrammarImpl#getInitBlock <em>Init Block</em>}</li>
  * </ul>
  *
  * @generated
@@ -122,6 +125,16 @@ public class GrammarImpl extends MinimalEObjectImpl.Container implements Grammar
 	 * @ordered
 	 */
 	protected EList<AbstractRule> rules;
+
+	/**
+	 * The cached value of the '{@link #getInitBlock() <em>Init Block</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getInitBlock()
+	 * @generated
+	 * @ordered
+	 */
+	protected InitBlock initBlock;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -246,12 +259,59 @@ public class GrammarImpl extends MinimalEObjectImpl.Container implements Grammar
 	 * @generated
 	 */
 	@Override
+	public InitBlock getInitBlock() {
+		return initBlock;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetInitBlock(InitBlock newInitBlock, NotificationChain msgs) {
+		InitBlock oldInitBlock = initBlock;
+		initBlock = newInitBlock;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, XtextPackage.GRAMMAR__INIT_BLOCK, oldInitBlock, newInitBlock);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void setInitBlock(InitBlock newInitBlock) {
+		if (newInitBlock != initBlock) {
+			NotificationChain msgs = null;
+			if (initBlock != null)
+				msgs = ((InternalEObject)initBlock).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - XtextPackage.GRAMMAR__INIT_BLOCK, null, msgs);
+			if (newInitBlock != null)
+				msgs = ((InternalEObject)newInitBlock).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - XtextPackage.GRAMMAR__INIT_BLOCK, null, msgs);
+			msgs = basicSetInitBlock(newInitBlock, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, XtextPackage.GRAMMAR__INIT_BLOCK, newInitBlock, newInitBlock));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case XtextPackage.GRAMMAR__METAMODEL_DECLARATIONS:
 				return ((InternalEList<?>)getMetamodelDeclarations()).basicRemove(otherEnd, msgs);
 			case XtextPackage.GRAMMAR__RULES:
 				return ((InternalEList<?>)getRules()).basicRemove(otherEnd, msgs);
+			case XtextPackage.GRAMMAR__INIT_BLOCK:
+				return basicSetInitBlock(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -276,6 +336,8 @@ public class GrammarImpl extends MinimalEObjectImpl.Container implements Grammar
 				return getMetamodelDeclarations();
 			case XtextPackage.GRAMMAR__RULES:
 				return getRules();
+			case XtextPackage.GRAMMAR__INIT_BLOCK:
+				return getInitBlock();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -311,6 +373,9 @@ public class GrammarImpl extends MinimalEObjectImpl.Container implements Grammar
 				getRules().clear();
 				getRules().addAll((Collection<? extends AbstractRule>)newValue);
 				return;
+			case XtextPackage.GRAMMAR__INIT_BLOCK:
+				setInitBlock((InitBlock)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -341,6 +406,9 @@ public class GrammarImpl extends MinimalEObjectImpl.Container implements Grammar
 			case XtextPackage.GRAMMAR__RULES:
 				getRules().clear();
 				return;
+			case XtextPackage.GRAMMAR__INIT_BLOCK:
+				setInitBlock((InitBlock)null);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -365,6 +433,8 @@ public class GrammarImpl extends MinimalEObjectImpl.Container implements Grammar
 				return metamodelDeclarations != null && !metamodelDeclarations.isEmpty();
 			case XtextPackage.GRAMMAR__RULES:
 				return rules != null && !rules.isEmpty();
+			case XtextPackage.GRAMMAR__INIT_BLOCK:
+				return initBlock != null;
 		}
 		return super.eIsSet(featureID);
 	}

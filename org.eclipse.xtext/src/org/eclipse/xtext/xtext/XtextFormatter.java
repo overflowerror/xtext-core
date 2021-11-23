@@ -80,8 +80,8 @@ public class XtextFormatter extends AbstractDeclarativeFormatter {
 		cfg.setLinewrap(2).between(gr.getGroup_2(), gr.getMetamodelDeclarationsAssignment_4());
 		cfg.setLinewrap(2).between(gr.getGroup_3(), gr.getMetamodelDeclarationsAssignment_4());
 		cfg.setLinewrap().after(gr.getMetamodelDeclarationsAssignment_4());
-		cfg.setLinewrap(2).between(gr.getMetamodelDeclarationsAssignment_4(), gr.getRulesAssignment_5());
-		cfg.setLinewrap(2).before(gr.getRulesAssignment_5());
+		cfg.setLinewrap(2).between(gr.getMetamodelDeclarationsAssignment_4(), gr.getRulesAssignment_6());
+		cfg.setLinewrap(2).before(gr.getRulesAssignment_6());
 
 		// ParserRule
 		ParserRuleElements pr = g.getParserRuleAccess();

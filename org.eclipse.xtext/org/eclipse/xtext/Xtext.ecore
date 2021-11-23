@@ -12,6 +12,8 @@
         upperBound="-1" eType="#//AbstractMetamodelDeclaration" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="rules" upperBound="-1"
         eType="#//AbstractRule" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="initBlock" eType="#//InitBlock"
+        containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="AbstractRule">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType ../../../../org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
@@ -150,6 +152,10 @@
         defaultValueLiteral="source"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="JavaAction" eSuperTypes="#//AbstractElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="code" eType="#//JavaCode"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="InitBlock">
     <eStructuralFeatures xsi:type="ecore:EReference" name="code" eType="#//JavaCode"
         containment="true"/>
   </eClassifiers>

@@ -56,20 +56,23 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 		private final Keyword cRightParenthesisKeyword_3_3 = (Keyword)cGroup_3.eContents().get(3);
 		private final Assignment cMetamodelDeclarationsAssignment_4 = (Assignment)cGroup.eContents().get(4);
 		private final RuleCall cMetamodelDeclarationsAbstractMetamodelDeclarationParserRuleCall_4_0 = (RuleCall)cMetamodelDeclarationsAssignment_4.eContents().get(0);
-		private final Assignment cRulesAssignment_5 = (Assignment)cGroup.eContents().get(5);
-		private final RuleCall cRulesAbstractRuleParserRuleCall_5_0 = (RuleCall)cRulesAssignment_5.eContents().get(0);
+		private final Assignment cInitBlockAssignment_5 = (Assignment)cGroup.eContents().get(5);
+		private final RuleCall cInitBlockInitBlockParserRuleCall_5_0 = (RuleCall)cInitBlockAssignment_5.eContents().get(0);
+		private final Assignment cRulesAssignment_6 = (Assignment)cGroup.eContents().get(6);
+		private final RuleCall cRulesAbstractRuleParserRuleCall_6_0 = (RuleCall)cRulesAssignment_6.eContents().get(0);
 		
 		//Grammar:
 		//	'grammar' name=GrammarID ('with' usedGrammars+=[Grammar|GrammarID] (',' usedGrammars+=[Grammar|GrammarID])*)?
 		//	(definesHiddenTokens?='hidden' '(' (hiddenTokens+=[AbstractRule|RuleID] (',' hiddenTokens+=[AbstractRule|RuleID])*)?
 		//	')')?
 		//	metamodelDeclarations+=AbstractMetamodelDeclaration*
+		//	initBlock=InitBlock?
 		//	rules+=AbstractRule+;
 		@Override public ParserRule getRule() { return rule; }
 		
 		//'grammar' name=GrammarID ('with' usedGrammars+=[Grammar|GrammarID] (',' usedGrammars+=[Grammar|GrammarID])*)?
 		//(definesHiddenTokens?='hidden' '(' (hiddenTokens+=[AbstractRule|RuleID] (',' hiddenTokens+=[AbstractRule|RuleID])*)?
-		//')')? metamodelDeclarations+=AbstractMetamodelDeclaration* rules+=AbstractRule+
+		//')')? metamodelDeclarations+=AbstractMetamodelDeclaration* initBlock=InitBlock? rules+=AbstractRule+
 		public Group getGroup() { return cGroup; }
 		
 		//'grammar'
@@ -160,11 +163,40 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 		//AbstractMetamodelDeclaration
 		public RuleCall getMetamodelDeclarationsAbstractMetamodelDeclarationParserRuleCall_4_0() { return cMetamodelDeclarationsAbstractMetamodelDeclarationParserRuleCall_4_0; }
 		
+		//initBlock=InitBlock?
+		public Assignment getInitBlockAssignment_5() { return cInitBlockAssignment_5; }
+		
+		//InitBlock
+		public RuleCall getInitBlockInitBlockParserRuleCall_5_0() { return cInitBlockInitBlockParserRuleCall_5_0; }
+		
 		//rules+=AbstractRule+
-		public Assignment getRulesAssignment_5() { return cRulesAssignment_5; }
+		public Assignment getRulesAssignment_6() { return cRulesAssignment_6; }
 		
 		//AbstractRule
-		public RuleCall getRulesAbstractRuleParserRuleCall_5_0() { return cRulesAbstractRuleParserRuleCall_5_0; }
+		public RuleCall getRulesAbstractRuleParserRuleCall_6_0() { return cRulesAbstractRuleParserRuleCall_6_0; }
+	}
+	public class InitBlockElements extends AbstractParserRuleElementFinder {
+		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "org.eclipse.xtext.Xtext.InitBlock");
+		private final Group cGroup = (Group)rule.eContents().get(1);
+		private final Keyword cInitKeyword_0 = (Keyword)cGroup.eContents().get(0);
+		private final Assignment cCodeAssignment_1 = (Assignment)cGroup.eContents().get(1);
+		private final RuleCall cCodeJavaCodeParserRuleCall_1_0 = (RuleCall)cCodeAssignment_1.eContents().get(0);
+		
+		//InitBlock:
+		//	'@init' code=JavaCode;
+		@Override public ParserRule getRule() { return rule; }
+		
+		//'@init' code=JavaCode
+		public Group getGroup() { return cGroup; }
+		
+		//'@init'
+		public Keyword getInitKeyword_0() { return cInitKeyword_0; }
+		
+		//code=JavaCode
+		public Assignment getCodeAssignment_1() { return cCodeAssignment_1; }
+		
+		//JavaCode
+		public RuleCall getCodeJavaCodeParserRuleCall_1_0() { return cCodeJavaCodeParserRuleCall_1_0; }
 	}
 	public class GrammarIDElements extends AbstractParserRuleElementFinder {
 		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "org.eclipse.xtext.Xtext.GrammarID");
@@ -2382,6 +2414,7 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 	
 	
 	private final GrammarElements pGrammar;
+	private final InitBlockElements pInitBlock;
 	private final GrammarIDElements pGrammarID;
 	private final AbstractRuleElements pAbstractRule;
 	private final AbstractMetamodelDeclarationElements pAbstractMetamodelDeclaration;
@@ -2454,6 +2487,7 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 		this.grammar = internalFindGrammar(grammarProvider);
 		this.gaTerminals = gaTerminals;
 		this.pGrammar = new GrammarElements();
+		this.pInitBlock = new InitBlockElements();
 		this.pGrammarID = new GrammarIDElements();
 		this.pAbstractRule = new AbstractRuleElements();
 		this.pAbstractMetamodelDeclaration = new AbstractMetamodelDeclarationElements();
@@ -2549,6 +2583,7 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 	//	(definesHiddenTokens?='hidden' '(' (hiddenTokens+=[AbstractRule|RuleID] (',' hiddenTokens+=[AbstractRule|RuleID])*)?
 	//	')')?
 	//	metamodelDeclarations+=AbstractMetamodelDeclaration*
+	//	initBlock=InitBlock?
 	//	rules+=AbstractRule+;
 	public GrammarElements getGrammarAccess() {
 		return pGrammar;
@@ -2556,6 +2591,16 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 	
 	public ParserRule getGrammarRule() {
 		return getGrammarAccess().getRule();
+	}
+	
+	//InitBlock:
+	//	'@init' code=JavaCode;
+	public InitBlockElements getInitBlockAccess() {
+		return pInitBlock;
+	}
+	
+	public ParserRule getInitBlockRule() {
+		return getInitBlockAccess().getRule();
 	}
 	
 	//GrammarID:

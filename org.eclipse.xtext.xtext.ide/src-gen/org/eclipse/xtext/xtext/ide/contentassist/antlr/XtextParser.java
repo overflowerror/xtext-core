@@ -62,6 +62,7 @@ public class XtextParser extends AbstractContentAssistParser {
 			builder.put(grammarAccess.getGrammarAccess().getGroup_3(), "rule__Grammar__Group_3__0");
 			builder.put(grammarAccess.getGrammarAccess().getGroup_3_2(), "rule__Grammar__Group_3_2__0");
 			builder.put(grammarAccess.getGrammarAccess().getGroup_3_2_1(), "rule__Grammar__Group_3_2_1__0");
+			builder.put(grammarAccess.getInitBlockAccess().getGroup(), "rule__InitBlock__Group__0");
 			builder.put(grammarAccess.getGrammarIDAccess().getGroup(), "rule__GrammarID__Group__0");
 			builder.put(grammarAccess.getGrammarIDAccess().getGroup_1(), "rule__GrammarID__Group_1__0");
 			builder.put(grammarAccess.getGeneratedMetamodelAccess().getGroup(), "rule__GeneratedMetamodel__Group__0");
@@ -154,7 +155,9 @@ public class XtextParser extends AbstractContentAssistParser {
 			builder.put(grammarAccess.getGrammarAccess().getHiddenTokensAssignment_3_2_0(), "rule__Grammar__HiddenTokensAssignment_3_2_0");
 			builder.put(grammarAccess.getGrammarAccess().getHiddenTokensAssignment_3_2_1_1(), "rule__Grammar__HiddenTokensAssignment_3_2_1_1");
 			builder.put(grammarAccess.getGrammarAccess().getMetamodelDeclarationsAssignment_4(), "rule__Grammar__MetamodelDeclarationsAssignment_4");
-			builder.put(grammarAccess.getGrammarAccess().getRulesAssignment_5(), "rule__Grammar__RulesAssignment_5");
+			builder.put(grammarAccess.getGrammarAccess().getInitBlockAssignment_5(), "rule__Grammar__InitBlockAssignment_5");
+			builder.put(grammarAccess.getGrammarAccess().getRulesAssignment_6(), "rule__Grammar__RulesAssignment_6");
+			builder.put(grammarAccess.getInitBlockAccess().getCodeAssignment_1(), "rule__InitBlock__CodeAssignment_1");
 			builder.put(grammarAccess.getGeneratedMetamodelAccess().getNameAssignment_1(), "rule__GeneratedMetamodel__NameAssignment_1");
 			builder.put(grammarAccess.getGeneratedMetamodelAccess().getEPackageAssignment_2(), "rule__GeneratedMetamodel__EPackageAssignment_2");
 			builder.put(grammarAccess.getGeneratedMetamodelAccess().getAliasAssignment_3_1(), "rule__GeneratedMetamodel__AliasAssignment_3_1");
