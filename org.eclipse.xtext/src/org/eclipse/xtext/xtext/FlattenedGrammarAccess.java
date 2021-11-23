@@ -35,6 +35,8 @@ import org.eclipse.xtext.EnumRule;
 import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.GrammarUtil;
 import org.eclipse.xtext.Group;
+import org.eclipse.xtext.InitBlock;
+import org.eclipse.xtext.JavaCode;
 import org.eclipse.xtext.Parameter;
 import org.eclipse.xtext.ParserRule;
 import org.eclipse.xtext.RuleCall;
@@ -59,6 +61,15 @@ public class FlattenedGrammarAccess {
 		Grammar grammar = names.getContextGrammar();
 		Grammar flattenedGrammar = copy(grammar);
 		flattenedGrammar.setName(grammar.getName());
+		
+		if (grammar.getInitBlock() != null) {
+			InitBlock copiedBlock = copy(grammar.getInitBlock());
+			JavaCode copiedCode = copy(grammar.getInitBlock().getCode());
+			copiedCode.setSource(grammar.getInitBlock().getCode().getSource());
+			copiedBlock.setCode(copiedCode);
+			flattenedGrammar.setInitBlock(copiedBlock);
+		}
+		
 		Map<RuleWithParameterValues, AbstractRule> origToCopy = new LinkedHashMap<>();
 		List<AbstractRule> copies = copyRuleStubs(names, origToCopy, filter.getRules(grammar),
 				filter.isDiscardRuleTypeRef());

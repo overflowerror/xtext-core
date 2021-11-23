@@ -87,6 +87,13 @@ class AntlrGrammarGenerator extends AbstractAntlrGrammarWithActionsGenerator {
 		   	protected «grammarAccess.simpleName» getGrammarAccess() {
 		   		return grammarAccess;
 		   	}
+		   	
+		   	«IF it.initBlock === null»
+		   		// no init block
+		   	«ELSE»
+		   		// init block
+		   		«JavaCodeUtils.getSource(it.initBlock.code)»
+		   	«ENDIF»
 		
 		}
 	'''

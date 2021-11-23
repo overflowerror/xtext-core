@@ -25,6 +25,7 @@ import org.eclipse.xtext.EnumLiteralDeclaration;
 import org.eclipse.xtext.EnumRule;
 import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.GrammarUtil;
+import org.eclipse.xtext.InitBlock;
 import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.ParserRule;
 import org.eclipse.xtext.RuleCall;
@@ -39,6 +40,7 @@ import org.eclipse.xtext.xtext.generator.parser.antlr.AbstractAntlrGrammarWithAc
 import org.eclipse.xtext.xtext.generator.parser.antlr.AntlrGrammarGenUtil;
 import org.eclipse.xtext.xtext.generator.parser.antlr.AntlrOptions;
 import org.eclipse.xtext.xtext.generator.parser.antlr.GrammarNaming;
+import org.eclipse.xtext.xtext.generator.parser.antlr.JavaCodeUtils;
 
 @Singleton
 @SuppressWarnings("all")
@@ -192,6 +194,25 @@ public class AntlrGrammarGenerator extends AbstractAntlrGrammarWithActionsGenera
     _builder.append("   \t");
     _builder.append("}");
     _builder.newLine();
+    _builder.append("   \t");
+    _builder.newLine();
+    {
+      InitBlock _initBlock = it.getInitBlock();
+      boolean _tripleEquals = (_initBlock == null);
+      if (_tripleEquals) {
+        _builder.append("   \t");
+        _builder.append("// no init block");
+        _builder.newLine();
+      } else {
+        _builder.append("   \t");
+        _builder.append("// init block");
+        _builder.newLine();
+        _builder.append("   \t");
+        String _source = JavaCodeUtils.getSource(it.getInitBlock().getCode());
+        _builder.append(_source, "   \t");
+        _builder.newLineIfNotEmpty();
+      }
+    }
     _builder.newLine();
     _builder.append("}");
     _builder.newLine();
