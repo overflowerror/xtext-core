@@ -232,6 +232,10 @@ public class XtextAdapterFactory extends AdapterFactoryImpl {
 				return createInitBlockAdapter();
 			}
 			@Override
+			public Adapter caseDisambiguatingSemanticPredicate(DisambiguatingSemanticPredicate object) {
+				return createDisambiguatingSemanticPredicateAdapter();
+			}
+			@Override
 			public Adapter defaultCase(EObject object) {
 				return createEObjectAdapter();
 			}
@@ -831,6 +835,20 @@ public class XtextAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createInitBlockAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link org.eclipse.xtext.DisambiguatingSemanticPredicate <em>Disambiguating Semantic Predicate</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see org.eclipse.xtext.DisambiguatingSemanticPredicate
+	 * @generated
+	 */
+	public Adapter createDisambiguatingSemanticPredicateAdapter() {
 		return null;
 	}
 

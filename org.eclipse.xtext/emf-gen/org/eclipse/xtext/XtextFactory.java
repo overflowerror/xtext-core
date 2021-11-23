@@ -391,6 +391,15 @@ public interface XtextFactory extends EFactory {
 	InitBlock createInitBlock();
 
 	/**
+	 * Returns a new object of class '<em>Disambiguating Semantic Predicate</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Disambiguating Semantic Predicate</em>'.
+	 * @generated
+	 */
+	DisambiguatingSemanticPredicate createDisambiguatingSemanticPredicate();
+
+	/**
 	 * Returns the package supported by this factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

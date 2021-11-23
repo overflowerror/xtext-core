@@ -137,5 +137,6 @@
     <genClasses ecoreClass="Xtext.ecore#//InitBlock">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Xtext.ecore#//InitBlock/code"/>
     </genClasses>
+    <genClasses ecoreClass="Xtext.ecore#//DisambiguatingSemanticPredicate"/>
   </genPackages>
 </genmodel:GenModel>

@@ -97,11 +97,16 @@ AbstractToken returns AbstractElement:
 ;
 
 SemanticPredicate returns AbstractSemanticPredicate:
+	DisambiguatingSemanticPredicate |
 	GatedSemanticPredicate
 ;
 
 GatedSemanticPredicate returns GatedSemanticPredicate:
 	code=JavaCode '?=>'
+;
+
+DisambiguatingSemanticPredicate returns DisambiguatingSemanticPredicate:
+	code=JavaCode '?'
 ;
 
 JavaAction returns JavaAction:

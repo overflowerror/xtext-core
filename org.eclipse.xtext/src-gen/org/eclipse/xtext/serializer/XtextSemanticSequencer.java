@@ -14,6 +14,7 @@ import org.eclipse.xtext.Assignment;
 import org.eclipse.xtext.CharacterRange;
 import org.eclipse.xtext.Conjunction;
 import org.eclipse.xtext.CrossReference;
+import org.eclipse.xtext.DisambiguatingSemanticPredicate;
 import org.eclipse.xtext.Disjunction;
 import org.eclipse.xtext.EOF;
 import org.eclipse.xtext.EnumLiteralDeclaration;
@@ -162,6 +163,27 @@ public class XtextSemanticSequencer extends AbstractDelegatingSemanticSequencer 
 			case XtextPackage.CROSS_REFERENCE:
 				sequence_CrossReference(context, (CrossReference) semanticObject); 
 				return; 
+			case XtextPackage.DISAMBIGUATING_SEMANTIC_PREDICATE:
+				if (rule == grammarAccess.getAlternativesRule()
+						|| action == grammarAccess.getAlternativesAccess().getAlternativesElementsAction_1_0()
+						|| rule == grammarAccess.getConditionalBranchRule()
+						|| rule == grammarAccess.getUnorderedGroupRule()
+						|| action == grammarAccess.getUnorderedGroupAccess().getUnorderedGroupElementsAction_1_0()
+						|| rule == grammarAccess.getGroupRule()
+						|| action == grammarAccess.getGroupAccess().getGroupElementsAction_1_0()
+						|| rule == grammarAccess.getAbstractTokenRule()
+						|| rule == grammarAccess.getAbstractTokenWithCardinalityRule()
+						|| rule == grammarAccess.getAbstractTerminalRule()
+						|| rule == grammarAccess.getParenthesizedElementRule()) {
+					sequence_AbstractTokenWithCardinality_DisambiguatingSemanticPredicate(context, (DisambiguatingSemanticPredicate) semanticObject); 
+					return; 
+				}
+				else if (rule == grammarAccess.getSemanticPredicateRule()
+						|| rule == grammarAccess.getDisambiguatingSemanticPredicateRule()) {
+					sequence_DisambiguatingSemanticPredicate(context, (DisambiguatingSemanticPredicate) semanticObject); 
+					return; 
+				}
+				else break;
 			case XtextPackage.DISJUNCTION:
 				sequence_Disjunction(context, (Disjunction) semanticObject); 
 				return; 
@@ -542,6 +564,28 @@ public class XtextSemanticSequencer extends AbstractDelegatingSemanticSequencer 
 	
 	/**
 	 * Contexts:
+	 *     Alternatives returns DisambiguatingSemanticPredicate
+	 *     Alternatives.Alternatives_1_0 returns DisambiguatingSemanticPredicate
+	 *     ConditionalBranch returns DisambiguatingSemanticPredicate
+	 *     UnorderedGroup returns DisambiguatingSemanticPredicate
+	 *     UnorderedGroup.UnorderedGroup_1_0 returns DisambiguatingSemanticPredicate
+	 *     Group returns DisambiguatingSemanticPredicate
+	 *     Group.Group_1_0 returns DisambiguatingSemanticPredicate
+	 *     AbstractToken returns DisambiguatingSemanticPredicate
+	 *     AbstractTokenWithCardinality returns DisambiguatingSemanticPredicate
+	 *     AbstractTerminal returns DisambiguatingSemanticPredicate
+	 *     ParenthesizedElement returns DisambiguatingSemanticPredicate
+	 *
+	 * Constraint:
+	 *     (code=JavaCode (cardinality='?' | cardinality='*' | cardinality='+')*)
+	 */
+	protected void sequence_AbstractTokenWithCardinality_DisambiguatingSemanticPredicate(ISerializationContext context, DisambiguatingSemanticPredicate semanticObject) {
+		genericSequencer.createSequence(context, semanticObject);
+	}
+	
+	
+	/**
+	 * Contexts:
 	 *     Alternatives returns GatedSemanticPredicate
 	 *     Alternatives.Alternatives_1_0 returns GatedSemanticPredicate
 	 *     ConditionalBranch returns GatedSemanticPredicate
@@ -792,6 +836,25 @@ public class XtextSemanticSequencer extends AbstractDelegatingSemanticSequencer 
 	 */
 	protected void sequence_CrossReference(ISerializationContext context, CrossReference semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
+	}
+	
+	
+	/**
+	 * Contexts:
+	 *     SemanticPredicate returns DisambiguatingSemanticPredicate
+	 *     DisambiguatingSemanticPredicate returns DisambiguatingSemanticPredicate
+	 *
+	 * Constraint:
+	 *     code=JavaCode
+	 */
+	protected void sequence_DisambiguatingSemanticPredicate(ISerializationContext context, DisambiguatingSemanticPredicate semanticObject) {
+		if (errorAcceptor != null) {
+			if (transientValues.isValueTransient(semanticObject, XtextPackage.Literals.ABSTRACT_SEMANTIC_PREDICATE__CODE) == ValueTransient.YES)
+				errorAcceptor.accept(diagnosticProvider.createFeatureValueMissing(semanticObject, XtextPackage.Literals.ABSTRACT_SEMANTIC_PREDICATE__CODE));
+		}
+		SequenceFeeder feeder = createSequencerFeeder(context, semanticObject);
+		feeder.accept(grammarAccess.getDisambiguatingSemanticPredicateAccess().getCodeJavaCodeParserRuleCall_0_0(), semanticObject.getCode());
+		feeder.finish();
 	}
 	
 	

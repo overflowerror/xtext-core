@@ -25,6 +25,7 @@ import org.eclipse.xtext.CompoundElement;
 import org.eclipse.xtext.Condition;
 import org.eclipse.xtext.Conjunction;
 import org.eclipse.xtext.CrossReference;
+import org.eclipse.xtext.DisambiguatingSemanticPredicate;
 import org.eclipse.xtext.Disjunction;
 import org.eclipse.xtext.EnumLiteralDeclaration;
 import org.eclipse.xtext.EnumRule;
@@ -346,6 +347,13 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * @generated
 	 */
 	private EClass initBlockEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass disambiguatingSemanticPredicateEClass = null;
 
 	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
@@ -1418,6 +1426,16 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * @generated
 	 */
 	@Override
+	public EClass getDisambiguatingSemanticPredicate() {
+		return disambiguatingSemanticPredicateEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public XtextFactory getXtextFactory() {
 		return (XtextFactory)getEFactoryInstance();
 	}
@@ -1580,6 +1598,8 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 
 		initBlockEClass = createEClass(INIT_BLOCK);
 		createEReference(initBlockEClass, INIT_BLOCK__CODE);
+
+		disambiguatingSemanticPredicateEClass = createEClass(DISAMBIGUATING_SEMANTIC_PREDICATE);
 	}
 
 	/**
@@ -1643,6 +1663,7 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 		abstractSemanticPredicateEClass.getESuperTypes().add(this.getAbstractElement());
 		gatedSemanticPredicateEClass.getESuperTypes().add(this.getAbstractSemanticPredicate());
 		javaActionEClass.getESuperTypes().add(this.getAbstractElement());
+		disambiguatingSemanticPredicateEClass.getESuperTypes().add(this.getAbstractSemanticPredicate());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(grammarEClass, Grammar.class, "Grammar", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1784,6 +1805,8 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 
 		initEClass(initBlockEClass, InitBlock.class, "InitBlock", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getInitBlock_Code(), this.getJavaCode(), null, "code", null, 0, 1, InitBlock.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(disambiguatingSemanticPredicateEClass, DisambiguatingSemanticPredicate.class, "DisambiguatingSemanticPredicate", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		// Create resource
 		createResource(eNS_URI);

@@ -159,4 +159,5 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="code" eType="#//JavaCode"
         containment="true"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DisambiguatingSemanticPredicate" eSuperTypes="#//AbstractSemanticPredicate"/>
 </ecore:EPackage>

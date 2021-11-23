@@ -351,6 +351,14 @@ public class XtextSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
+			case XtextPackage.DISAMBIGUATING_SEMANTIC_PREDICATE: {
+				DisambiguatingSemanticPredicate disambiguatingSemanticPredicate = (DisambiguatingSemanticPredicate)theEObject;
+				T result = caseDisambiguatingSemanticPredicate(disambiguatingSemanticPredicate);
+				if (result == null) result = caseAbstractSemanticPredicate(disambiguatingSemanticPredicate);
+				if (result == null) result = caseAbstractElement(disambiguatingSemanticPredicate);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
 			default: return defaultCase(theEObject);
 		}
 	}
@@ -976,6 +984,21 @@ public class XtextSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseInitBlock(InitBlock object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Disambiguating Semantic Predicate</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Disambiguating Semantic Predicate</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseDisambiguatingSemanticPredicate(DisambiguatingSemanticPredicate object) {
 		return null;
 	}
 

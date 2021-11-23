@@ -2164,6 +2164,61 @@ public interface XtextPackage extends EPackage {
 	int INIT_BLOCK_FEATURE_COUNT = 1;
 
 	/**
+	 * The meta object id for the '{@link org.eclipse.xtext.impl.DisambiguatingSemanticPredicateImpl <em>Disambiguating Semantic Predicate</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.xtext.impl.DisambiguatingSemanticPredicateImpl
+	 * @see org.eclipse.xtext.impl.XtextPackageImpl#getDisambiguatingSemanticPredicate()
+	 * @generated
+	 */
+	int DISAMBIGUATING_SEMANTIC_PREDICATE = 41;
+
+	/**
+	 * The feature id for the '<em><b>Cardinality</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DISAMBIGUATING_SEMANTIC_PREDICATE__CARDINALITY = ABSTRACT_SEMANTIC_PREDICATE__CARDINALITY;
+
+	/**
+	 * The feature id for the '<em><b>Predicated</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DISAMBIGUATING_SEMANTIC_PREDICATE__PREDICATED = ABSTRACT_SEMANTIC_PREDICATE__PREDICATED;
+
+	/**
+	 * The feature id for the '<em><b>First Set Predicated</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DISAMBIGUATING_SEMANTIC_PREDICATE__FIRST_SET_PREDICATED = ABSTRACT_SEMANTIC_PREDICATE__FIRST_SET_PREDICATED;
+
+	/**
+	 * The feature id for the '<em><b>Code</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DISAMBIGUATING_SEMANTIC_PREDICATE__CODE = ABSTRACT_SEMANTIC_PREDICATE__CODE;
+
+	/**
+	 * The number of structural features of the '<em>Disambiguating Semantic Predicate</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DISAMBIGUATING_SEMANTIC_PREDICATE_FEATURE_COUNT = ABSTRACT_SEMANTIC_PREDICATE_FEATURE_COUNT + 0;
+
+	/**
 	 * Returns the meta object for class '{@link org.eclipse.xtext.Grammar <em>Grammar</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3237,6 +3292,16 @@ public interface XtextPackage extends EPackage {
 	EReference getInitBlock_Code();
 
 	/**
+	 * Returns the meta object for class '{@link org.eclipse.xtext.DisambiguatingSemanticPredicate <em>Disambiguating Semantic Predicate</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Disambiguating Semantic Predicate</em>'.
+	 * @see org.eclipse.xtext.DisambiguatingSemanticPredicate
+	 * @generated
+	 */
+	EClass getDisambiguatingSemanticPredicate();
+
+	/**
 	 * Returns the factory that creates the instances of the model.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -4156,6 +4221,16 @@ public interface XtextPackage extends EPackage {
 		 * @generated
 		 */
 		EReference INIT_BLOCK__CODE = eINSTANCE.getInitBlock_Code();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.xtext.impl.DisambiguatingSemanticPredicateImpl <em>Disambiguating Semantic Predicate</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.xtext.impl.DisambiguatingSemanticPredicateImpl
+		 * @see org.eclipse.xtext.impl.XtextPackageImpl#getDisambiguatingSemanticPredicate()
+		 * @generated
+		 */
+		EClass DISAMBIGUATING_SEMANTIC_PREDICATE = eINSTANCE.getDisambiguatingSemanticPredicate();
 
 	}
 

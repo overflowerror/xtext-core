@@ -482,9 +482,9 @@ ruleSemanticPredicate
 	}
 	:
 	(
-		{ before(grammarAccess.getSemanticPredicateAccess().getGatedSemanticPredicateParserRuleCall()); }
-		ruleGatedSemanticPredicate
-		{ after(grammarAccess.getSemanticPredicateAccess().getGatedSemanticPredicateParserRuleCall()); }
+		{ before(grammarAccess.getSemanticPredicateAccess().getAlternatives()); }
+		(rule__SemanticPredicate__Alternatives)
+		{ after(grammarAccess.getSemanticPredicateAccess().getAlternatives()); }
 	)
 ;
 finally {
@@ -510,6 +510,31 @@ ruleGatedSemanticPredicate
 		{ before(grammarAccess.getGatedSemanticPredicateAccess().getGroup()); }
 		(rule__GatedSemanticPredicate__Group__0)
 		{ after(grammarAccess.getGatedSemanticPredicateAccess().getGroup()); }
+	)
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+// Entry rule entryRuleDisambiguatingSemanticPredicate
+entryRuleDisambiguatingSemanticPredicate
+:
+{ before(grammarAccess.getDisambiguatingSemanticPredicateRule()); }
+	 ruleDisambiguatingSemanticPredicate
+{ after(grammarAccess.getDisambiguatingSemanticPredicateRule()); } 
+	 EOF 
+;
+
+// Rule DisambiguatingSemanticPredicate
+ruleDisambiguatingSemanticPredicate 
+	@init {
+		int stackSize = keepStackSize();
+	}
+	:
+	(
+		{ before(grammarAccess.getDisambiguatingSemanticPredicateAccess().getGroup()); }
+		(rule__DisambiguatingSemanticPredicate__Group__0)
+		{ after(grammarAccess.getDisambiguatingSemanticPredicateAccess().getGroup()); }
 	)
 ;
 finally {
@@ -1729,6 +1754,27 @@ rule__AbstractToken__Alternatives
 		{ before(grammarAccess.getAbstractTokenAccess().getSemanticPredicateParserRuleCall_3()); }
 		ruleSemanticPredicate
 		{ after(grammarAccess.getAbstractTokenAccess().getSemanticPredicateParserRuleCall_3()); }
+	)
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+rule__SemanticPredicate__Alternatives
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+	(
+		{ before(grammarAccess.getSemanticPredicateAccess().getDisambiguatingSemanticPredicateParserRuleCall_0()); }
+		ruleDisambiguatingSemanticPredicate
+		{ after(grammarAccess.getSemanticPredicateAccess().getDisambiguatingSemanticPredicateParserRuleCall_0()); }
+	)
+	|
+	(
+		{ before(grammarAccess.getSemanticPredicateAccess().getGatedSemanticPredicateParserRuleCall_1()); }
+		ruleGatedSemanticPredicate
+		{ after(grammarAccess.getSemanticPredicateAccess().getGatedSemanticPredicateParserRuleCall_1()); }
 	)
 ;
 finally {
@@ -4898,6 +4944,60 @@ rule__GatedSemanticPredicate__Group__1__Impl
 	{ before(grammarAccess.getGatedSemanticPredicateAccess().getQuestionMarkEqualsSignGreaterThanSignKeyword_1()); }
 	'?=>'
 	{ after(grammarAccess.getGatedSemanticPredicateAccess().getQuestionMarkEqualsSignGreaterThanSignKeyword_1()); }
+)
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+
+rule__DisambiguatingSemanticPredicate__Group__0
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+	rule__DisambiguatingSemanticPredicate__Group__0__Impl
+	rule__DisambiguatingSemanticPredicate__Group__1
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+rule__DisambiguatingSemanticPredicate__Group__0__Impl
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+(
+	{ before(grammarAccess.getDisambiguatingSemanticPredicateAccess().getCodeAssignment_0()); }
+	(rule__DisambiguatingSemanticPredicate__CodeAssignment_0)
+	{ after(grammarAccess.getDisambiguatingSemanticPredicateAccess().getCodeAssignment_0()); }
+)
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+rule__DisambiguatingSemanticPredicate__Group__1
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+	rule__DisambiguatingSemanticPredicate__Group__1__Impl
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+rule__DisambiguatingSemanticPredicate__Group__1__Impl
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+(
+	{ before(grammarAccess.getDisambiguatingSemanticPredicateAccess().getQuestionMarkKeyword_1()); }
+	'?'
+	{ after(grammarAccess.getDisambiguatingSemanticPredicateAccess().getQuestionMarkKeyword_1()); }
 )
 ;
 finally {
@@ -9318,6 +9418,21 @@ rule__GatedSemanticPredicate__CodeAssignment_0
 		{ before(grammarAccess.getGatedSemanticPredicateAccess().getCodeJavaCodeParserRuleCall_0_0()); }
 		ruleJavaCode
 		{ after(grammarAccess.getGatedSemanticPredicateAccess().getCodeJavaCodeParserRuleCall_0_0()); }
+	)
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+rule__DisambiguatingSemanticPredicate__CodeAssignment_0
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+	(
+		{ before(grammarAccess.getDisambiguatingSemanticPredicateAccess().getCodeJavaCodeParserRuleCall_0_0()); }
+		ruleJavaCode
+		{ after(grammarAccess.getDisambiguatingSemanticPredicateAccess().getCodeJavaCodeParserRuleCall_0_0()); }
 	)
 ;
 finally {

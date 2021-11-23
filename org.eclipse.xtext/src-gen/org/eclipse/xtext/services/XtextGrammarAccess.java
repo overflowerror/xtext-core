@@ -865,14 +865,22 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 	}
 	public class SemanticPredicateElements extends AbstractParserRuleElementFinder {
 		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "org.eclipse.xtext.Xtext.SemanticPredicate");
-		private final RuleCall cGatedSemanticPredicateParserRuleCall = (RuleCall)rule.eContents().get(1);
+		private final Alternatives cAlternatives = (Alternatives)rule.eContents().get(1);
+		private final RuleCall cDisambiguatingSemanticPredicateParserRuleCall_0 = (RuleCall)cAlternatives.eContents().get(0);
+		private final RuleCall cGatedSemanticPredicateParserRuleCall_1 = (RuleCall)cAlternatives.eContents().get(1);
 		
 		//SemanticPredicate AbstractSemanticPredicate:
-		//	GatedSemanticPredicate;
+		//	DisambiguatingSemanticPredicate | GatedSemanticPredicate;
 		@Override public ParserRule getRule() { return rule; }
 		
+		//DisambiguatingSemanticPredicate | GatedSemanticPredicate
+		public Alternatives getAlternatives() { return cAlternatives; }
+		
+		//DisambiguatingSemanticPredicate
+		public RuleCall getDisambiguatingSemanticPredicateParserRuleCall_0() { return cDisambiguatingSemanticPredicateParserRuleCall_0; }
+		
 		//GatedSemanticPredicate
-		public RuleCall getGatedSemanticPredicateParserRuleCall() { return cGatedSemanticPredicateParserRuleCall; }
+		public RuleCall getGatedSemanticPredicateParserRuleCall_1() { return cGatedSemanticPredicateParserRuleCall_1; }
 	}
 	public class GatedSemanticPredicateElements extends AbstractParserRuleElementFinder {
 		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "org.eclipse.xtext.Xtext.GatedSemanticPredicate");
@@ -896,6 +904,29 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 		
 		//'?=>'
 		public Keyword getQuestionMarkEqualsSignGreaterThanSignKeyword_1() { return cQuestionMarkEqualsSignGreaterThanSignKeyword_1; }
+	}
+	public class DisambiguatingSemanticPredicateElements extends AbstractParserRuleElementFinder {
+		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "org.eclipse.xtext.Xtext.DisambiguatingSemanticPredicate");
+		private final Group cGroup = (Group)rule.eContents().get(1);
+		private final Assignment cCodeAssignment_0 = (Assignment)cGroup.eContents().get(0);
+		private final RuleCall cCodeJavaCodeParserRuleCall_0_0 = (RuleCall)cCodeAssignment_0.eContents().get(0);
+		private final Keyword cQuestionMarkKeyword_1 = (Keyword)cGroup.eContents().get(1);
+		
+		//DisambiguatingSemanticPredicate:
+		//	code=JavaCode '?';
+		@Override public ParserRule getRule() { return rule; }
+		
+		//code=JavaCode '?'
+		public Group getGroup() { return cGroup; }
+		
+		//code=JavaCode
+		public Assignment getCodeAssignment_0() { return cCodeAssignment_0; }
+		
+		//JavaCode
+		public RuleCall getCodeJavaCodeParserRuleCall_0_0() { return cCodeJavaCodeParserRuleCall_0_0; }
+		
+		//'?'
+		public Keyword getQuestionMarkKeyword_1() { return cQuestionMarkKeyword_1; }
 	}
 	public class JavaActionElements extends AbstractParserRuleElementFinder {
 		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "org.eclipse.xtext.Xtext.JavaAction");
@@ -2432,6 +2463,7 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 	private final AbstractTokenElements pAbstractToken;
 	private final SemanticPredicateElements pSemanticPredicate;
 	private final GatedSemanticPredicateElements pGatedSemanticPredicate;
+	private final DisambiguatingSemanticPredicateElements pDisambiguatingSemanticPredicate;
 	private final JavaActionElements pJavaAction;
 	private final JavaCodeElements pJavaCode;
 	private final TerminalRule tJAVACODESTRING;
@@ -2505,6 +2537,7 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 		this.pAbstractToken = new AbstractTokenElements();
 		this.pSemanticPredicate = new SemanticPredicateElements();
 		this.pGatedSemanticPredicate = new GatedSemanticPredicateElements();
+		this.pDisambiguatingSemanticPredicate = new DisambiguatingSemanticPredicateElements();
 		this.pJavaAction = new JavaActionElements();
 		this.pJavaCode = new JavaCodeElements();
 		this.tJAVACODESTRING = (TerminalRule) GrammarUtil.findRuleForName(getGrammar(), "org.eclipse.xtext.Xtext.JAVACODESTRING");
@@ -2766,7 +2799,7 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 	}
 	
 	//SemanticPredicate AbstractSemanticPredicate:
-	//	GatedSemanticPredicate;
+	//	DisambiguatingSemanticPredicate | GatedSemanticPredicate;
 	public SemanticPredicateElements getSemanticPredicateAccess() {
 		return pSemanticPredicate;
 	}
@@ -2783,6 +2816,16 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 	
 	public ParserRule getGatedSemanticPredicateRule() {
 		return getGatedSemanticPredicateAccess().getRule();
+	}
+	
+	//DisambiguatingSemanticPredicate:
+	//	code=JavaCode '?';
+	public DisambiguatingSemanticPredicateElements getDisambiguatingSemanticPredicateAccess() {
+		return pDisambiguatingSemanticPredicate;
+	}
+	
+	public ParserRule getDisambiguatingSemanticPredicateRule() {
+		return getDisambiguatingSemanticPredicateAccess().getRule();
 	}
 	
 	//JavaAction:

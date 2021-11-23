@@ -1360,14 +1360,25 @@ ruleSemanticPredicate returns [EObject current=null]
 @after {
 	leaveRule();
 }:
-	{
-		newCompositeNode(grammarAccess.getSemanticPredicateAccess().getGatedSemanticPredicateParserRuleCall());
-	}
-	this_GatedSemanticPredicate_0=ruleGatedSemanticPredicate
-	{
-		$current = $this_GatedSemanticPredicate_0.current;
-		afterParserOrEnumRuleCall();
-	}
+	(
+		{
+			newCompositeNode(grammarAccess.getSemanticPredicateAccess().getDisambiguatingSemanticPredicateParserRuleCall_0());
+		}
+		this_DisambiguatingSemanticPredicate_0=ruleDisambiguatingSemanticPredicate
+		{
+			$current = $this_DisambiguatingSemanticPredicate_0.current;
+			afterParserOrEnumRuleCall();
+		}
+		    |
+		{
+			newCompositeNode(grammarAccess.getSemanticPredicateAccess().getGatedSemanticPredicateParserRuleCall_1());
+		}
+		this_GatedSemanticPredicate_1=ruleGatedSemanticPredicate
+		{
+			$current = $this_GatedSemanticPredicate_1.current;
+			afterParserOrEnumRuleCall();
+		}
+	)
 ;
 
 // Entry rule entryRuleGatedSemanticPredicate
@@ -1408,6 +1419,48 @@ ruleGatedSemanticPredicate returns [EObject current=null]
 		otherlv_1='?=>'
 		{
 			newLeafNode(otherlv_1, grammarAccess.getGatedSemanticPredicateAccess().getQuestionMarkEqualsSignGreaterThanSignKeyword_1());
+		}
+	)
+;
+
+// Entry rule entryRuleDisambiguatingSemanticPredicate
+entryRuleDisambiguatingSemanticPredicate returns [EObject current=null]:
+	{ newCompositeNode(grammarAccess.getDisambiguatingSemanticPredicateRule()); }
+	iv_ruleDisambiguatingSemanticPredicate=ruleDisambiguatingSemanticPredicate
+	{ $current=$iv_ruleDisambiguatingSemanticPredicate.current; }
+	EOF;
+
+// Rule DisambiguatingSemanticPredicate
+ruleDisambiguatingSemanticPredicate returns [EObject current=null]
+@init {
+	enterRule();
+}
+@after {
+	leaveRule();
+}:
+	(
+		(
+			(
+				{
+					newCompositeNode(grammarAccess.getDisambiguatingSemanticPredicateAccess().getCodeJavaCodeParserRuleCall_0_0());
+				}
+				lv_code_0_0=ruleJavaCode
+				{
+					if ($current==null) {
+						$current = createModelElementForParent(grammarAccess.getDisambiguatingSemanticPredicateRule());
+					}
+					set(
+						$current,
+						"code",
+						lv_code_0_0,
+						"org.eclipse.xtext.Xtext.JavaCode");
+					afterParserOrEnumRuleCall();
+				}
+			)
+		)
+		otherlv_1='?'
+		{
+			newLeafNode(otherlv_1, grammarAccess.getDisambiguatingSemanticPredicateAccess().getQuestionMarkKeyword_1());
 		}
 	)
 ;
