@@ -31,11 +31,18 @@ public class AlternativesGuard implements HoistingGuard {
 
 	@Override
 	public String render() {
-		return "(" + paths.stream()
-					.filter(Predicate.not(Guard::isTrivial))
-					.map(Guard::render)
-					.collect(Collectors.joining(" && ")) +
-				")";
+		List<String> renderedGuards = paths.stream()
+			.filter(Predicate.not(Guard::isTrivial))
+			.map(Guard::render)
+			.collect(Collectors.toList());
+		
+		if (renderedGuards.size() == 1) {
+			return paths.get(0).render();
+		} else {		
+			return "(" + 
+						String.join(" && ", renderedGuards) +
+					")";
+		}
 	}
 
 	@Override

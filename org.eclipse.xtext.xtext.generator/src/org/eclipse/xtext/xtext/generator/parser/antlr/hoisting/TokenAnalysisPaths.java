@@ -8,9 +8,8 @@
  *******************************************************************************/
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
 
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.eclipse.xtext.AbstractElement;
@@ -19,13 +18,14 @@ import org.eclipse.xtext.AbstractElement;
  * @author overflow - Initial contribution and API
  */
 public class TokenAnalysisPaths {
-	private Set<TokenAnalysisPath> tokenPaths = new HashSet<>();
+	private List<TokenAnalysisPath> tokenPaths = new LinkedList<>();
 	private boolean isEmpty = false;
 	
-	public Set<List<Token>> getTokenPaths() {
+	public List<List<Token>> getTokenPaths() {
 		return tokenPaths.stream()
 				.map(TokenAnalysisPath::getTokenPath)
-				.collect(Collectors.toSet());
+				.distinct()
+				.collect(Collectors.toList());
 	}
 	
 	public TokenAnalysisPaths(List<Integer> indexes) {
@@ -35,7 +35,7 @@ public class TokenAnalysisPaths {
 	public TokenAnalysisPaths(TokenAnalysisPaths prefix) {
 		this.tokenPaths = prefix.tokenPaths.stream()
 				.map(TokenAnalysisPath::new)
-				.collect(Collectors.toSet());
+				.collect(Collectors.toList());
 	}
 	
 	public boolean isDone() {
@@ -50,6 +50,7 @@ public class TokenAnalysisPaths {
 		if (isEmpty) {
 			return other;
 		} else {
+			// TODO: implement hashCode and equals to check for duplicates right awaz
 			this.tokenPaths.addAll(other.tokenPaths);
 			return this;
 		}

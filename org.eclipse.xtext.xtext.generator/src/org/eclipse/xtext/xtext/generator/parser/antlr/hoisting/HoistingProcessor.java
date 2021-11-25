@@ -11,6 +11,7 @@ package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -225,7 +226,7 @@ public class HoistingProcessor {
 		}
 	}
 	
-	private Set<List<Token>> getTokenForIndexes(AbstractElement path, List<Integer> indexes) throws TokenAnalysisAbortedException {
+	private List<List<Token>> getTokenForIndexes(AbstractElement path, List<Integer> indexes) throws TokenAnalysisAbortedException {
 		return getTokenForIndexes(path, new TokenAnalysisPaths(indexes), true).getTokenPaths();
 	}
 	
@@ -247,13 +248,13 @@ public class HoistingProcessor {
 			List<Integer> range = range(0,  i);
 			
 			try {
-				tokenListSet1 = getTokenForIndexes(path1, range);
+				tokenListSet1 = new HashSet<>(getTokenForIndexes(path1, range));
 			} catch (TokenAnalysisAbortedException e) {
 				tokenListSet1 = null;
 			}
 			
 			try {
-				tokenListSet2 = getTokenForIndexes(path2, range);
+				tokenListSet2 = new HashSet<>(getTokenForIndexes(path2, range));
 			} catch (TokenAnalysisAbortedException e) {
 				tokenListSet2 = null;
 			}
@@ -266,15 +267,13 @@ public class HoistingProcessor {
 				return false;
 			}
 			if (!tokenListSet1.equals(tokenListSet2)) {
-				// TODO: hashCode method of Token classes
 				return false;
 			}
 		}
 		
 		// we can't analyze the paths any further
-		// we can assume that the paths are identical because the path diff analysis would cause an error anyway.
-		// TODO maybe warning?
-		return true;
+		// TODO maybe assume paths are equal and show warning instead of exception
+		throw new TokenAnalysisAbortedException();
 	}
 	
 	private boolean arePathsIdentical(AbstractElement path1, AbstractElement path2) {
@@ -423,9 +422,13 @@ public class HoistingProcessor {
 		return builder.toString();
 	}
 	
-	private List<Set<List<Token>>> findMinimalPathDifference(List<AbstractElement> paths) throws TokenAnalysisAbortedException {
-		List<Set<List<Token>>> result = paths.stream()
-				.map(p -> (Set<List<Token>>) null)
+	private List<List<List<Token>>> findMinimalPathDifference(List<AbstractElement> paths) throws TokenAnalysisAbortedException {
+		// first dimension of result corresponds to the paths
+		// the second dimension are the alternatives of the path
+		// the third dimension are tokens of the alternative of the path
+		
+		List<List<List<Token>>> result = paths.stream()
+				.map(p -> (List<List<Token>>) null)
 				.collect(Collectors.toList());
 		
 		paths.forEach(p -> {
@@ -436,12 +439,12 @@ public class HoistingProcessor {
 			log.info("current index list: " + indexList);
 			
 			// will throw TokenAnalysisAborted if any path is too short
-			List<Set<List<Token>>> tokenListSets = paths.stream()
+			List<List<List<Token>>> tokenListsForPaths = paths.stream()
 					//.peek(p -> log.info("next path: " + p))
 					.map(p -> getTokenForIndexes(p, indexList))
 					.collect(Collectors.toList());
 
-			log.info("sets: " + tokenListSets);
+			log.info("token lists: " + tokenListsForPaths);
 			
 			int size = result.size();
 			for (int i = 0; i < size; i++) {
@@ -449,15 +452,16 @@ public class HoistingProcessor {
 					continue;
 				}
 				
-				Set<List<Token>> tokenListSet = tokenListSets.get(i);
-				if (!tokenListSet.stream()
-					.anyMatch(tokenList -> tokenListSets.stream()
-							.filter(s -> s != tokenListSet)
+				List<List<Token>> tokenListOfCurrentPath = tokenListsForPaths.get(i);
+				if (!tokenListOfCurrentPath.stream()
+					.anyMatch(tokenList -> tokenListsForPaths.stream()
+							.filter(s -> s != tokenListOfCurrentPath)
+							// does any other path contain a similar token list (= alternative)
 							.anyMatch(s -> s.contains(tokenList))
 					)
 				) {
 					// token list set is unique for path i
-					result.set(i, tokenListSet);
+					result.set(i, tokenListOfCurrentPath);
 				}
 				
 			}
@@ -510,7 +514,7 @@ public class HoistingProcessor {
 								.collect(Collectors.toList())
 						)
 						.map(TokenSequenceGuard::new)
-						.collect(Collectors.toSet())
+						.collect(Collectors.toList())
 					)
 					.map(AlternativeTokenSequenceGuard::new),
 				guards.stream(),
@@ -522,21 +526,23 @@ public class HoistingProcessor {
 		}
 	}
 	
-	private AbstractElement cloneAbstractElement(AbstractElement element) {
-		AbstractElement clone = (AbstractElement) XtextFactory.eINSTANCE.create(element.eClass());
+	private EObject cloneEObject(EObject element) {
+		EObject clone = XtextFactory.eINSTANCE.create(element.eClass());
 		for (EStructuralFeature feature : element.eClass().getEAllStructuralFeatures()) {
 			Object value = element.eGet(feature);
-			if (value instanceof AbstractElement) {
-				// if value is AbstractElement a deep copy is needed since an EObject can only be 
+			if (value instanceof EObject) {
+				// if value is EObject a deep copy is needed since an EObject can only be 
 				// referenced by one other EObject.
-				// Note: technically not correct, since this behavior relates to all EObjects,  not 
-				//       just AbstractElement, but I'm lazy.
-				
-				value = cloneAbstractElement((AbstractElement) value);
+
+				value = cloneEObject((EObject) value);
 			}
 			clone.eSet(feature, value);
 		}
 		return clone;
+	}
+	
+	private AbstractElement cloneAbstractElement(AbstractElement element) {
+		return (AbstractElement) cloneEObject(element);
 	}
 	
 	private HoistingGuard findGuardForGroup(Group group) {

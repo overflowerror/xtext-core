@@ -29,7 +29,7 @@ public class PredicateGuard implements HoistingGuard {
 
 	@Override
 	public String render() {
-		return "(" + JavaCodeUtils.getSource(element.getCode()) + ")";
+		return "(" + JavaCodeUtils.getSource(element.getCode()).trim() + ")";
 	}
 
 	@Override
