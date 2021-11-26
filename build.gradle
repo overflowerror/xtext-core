@@ -8,9 +8,13 @@ import java.time.LocalDateTime
 buildscript {
 	apply from: "${rootDir}/gradle/versions.gradle"
 	repositories.mavenCentral()
+	 repositories.maven { url 'https://jitpack.io' } // for this plugin
 	dependencies {
 		classpath "org.xtext:xtext-gradle-plugin:$versions.xtext_gradle_plugin"
 	}
+	dependencies {
+    classpath 'com.github.johni0702:gradle-ecj-plugin:master-SNAPSHOT'
+  }
 }
 
 plugins {
@@ -23,11 +27,21 @@ apply from: "${rootDir}/gradle/bootstrap-setup.gradle"
 ext.buildTime = DateTimeFormatter.ofPattern('yyyyMMdd-HHmm').format(LocalDateTime.now())
 
 subprojects {
+
+configurations {
+	ecj
+}
+
+dependencies {
+	ecj 'org.eclipse.jdt:ecj:3.27.0'
+}
+
 	group = 'org.eclipse.xtext'
 	version = rootProject.version
 	
 	apply plugin: 'maven-publish'
 	apply plugin: 'java-library'
+	//apply plugin: 'de.johni0702.ecj'
 	dependencies {
 		api platform("org.eclipse.xtext:xtext-dev-bom:$project.version")
 	}
@@ -46,4 +60,16 @@ subprojects {
 	}
 	apply from: "${rootDir}/gradle/manifest-gen.gradle"
 	apply from: "${rootDir}/gradle/validation.gradle"
+	compileJava {
+	options.fork = true
+	options.encoding = 'ISO-8859-1'
+	options.compilerArgs = ['-properties', "${rootDir}/.settings/org.eclipse.jdt.core.prefs", '-encoding', 'ISO-8859-1']
+	options.forkOptions.with {
+		executable = 'java'
+		jvmArgs = ['-classpath', project.configurations.ecj.asPath, 'org.eclipse.jdt.internal.compiler.batch.Main']
+	}
+}
+	tasks.withType(JavaCompile) {
+    options.headerOutputDirectory.convention(null)
+	}
 }
