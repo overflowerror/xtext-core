@@ -239,8 +239,8 @@ public abstract class AbstractLanguageServerTest implements Endpoint {
   
   protected static final String TEST_PROJECT_PATH = "/test-data/test-project";
   
-  @Before
   @BeforeEach
+  @Before
   public void setup() {
     final Injector injector = Guice.createInjector(this.getServerModule());
     injector.injectMembers(this);
@@ -255,8 +255,8 @@ public abstract class AbstractLanguageServerTest implements Endpoint {
     this.root = _file;
   }
   
-  @After
   @AfterEach
+  @After
   public void cleanup() {
     try {
       boolean _exists = this.root.exists();

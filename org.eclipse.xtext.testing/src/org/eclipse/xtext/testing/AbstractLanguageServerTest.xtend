@@ -104,7 +104,7 @@ abstract class AbstractLanguageServerTest implements Endpoint {
 
 	protected static val TEST_PROJECT_PATH = "/test-data/test-project"
 
-	@Before @BeforeEach
+	@BeforeEach @Before
 	def void setup() {
 		val injector = Guice.createInjector(getServerModule())
 		injector.injectMembers(this)
@@ -122,7 +122,7 @@ abstract class AbstractLanguageServerTest implements Endpoint {
 		root = new File(new File("").absoluteFile, TEST_PROJECT_PATH)
 	}
 
-	@After @AfterEach
+	@AfterEach @After
 	def void cleanup() {
 		if (root.exists) {
 			Files.cleanFolder(root, null, true, true)
