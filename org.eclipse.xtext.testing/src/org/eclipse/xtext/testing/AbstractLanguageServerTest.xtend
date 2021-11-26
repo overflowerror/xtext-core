@@ -92,6 +92,7 @@ import org.junit.jupiter.api.BeforeEach
 
 import static extension org.eclipse.lsp4j.util.Ranges.containsRange
 import static extension org.eclipse.xtext.util.Strings.*
+import com.google.common.annotations.Beta
 
 /**
  * @author Sven Efftinge - Initial contribution and API
@@ -104,7 +105,7 @@ abstract class AbstractLanguageServerTest implements Endpoint {
 
 	protected static val TEST_PROJECT_PATH = "/test-data/test-project"
 
-	@BeforeEach @Before
+	@BeforeEach @Before @Beta
 	def void setup() {
 		val injector = Guice.createInjector(getServerModule())
 		injector.injectMembers(this)

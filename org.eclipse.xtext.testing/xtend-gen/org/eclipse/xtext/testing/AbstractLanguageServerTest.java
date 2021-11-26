@@ -8,6 +8,7 @@
  */
 package org.eclipse.xtext.testing;
 
+import com.google.common.annotations.Beta;
 import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 import com.google.inject.Binder;
@@ -241,6 +242,7 @@ public abstract class AbstractLanguageServerTest implements Endpoint {
   
   @BeforeEach
   @Before
+  @Beta
   public void setup() {
     final Injector injector = Guice.createInjector(this.getServerModule());
     injector.injectMembers(this);
