@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 import org.apache.log4j.Logger;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.xtend.lib.macro.declaration.MutableInterfaceDeclaration;
 import org.eclipse.xtext.AbstractElement;
 import org.eclipse.xtext.AbstractRule;
 import org.eclipse.xtext.AbstractSemanticPredicate;
@@ -43,6 +44,7 @@ import org.eclipse.xtext.XtextFactory;
 import org.eclipse.xtext.XtextPackage;
 import org.eclipse.xtext.util.Tuples;
 import org.eclipse.xtext.util.XtextSwitch;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.MutablePrimitiveWrapper;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.StreamUtils;
 
 import com.google.common.base.Strings;
@@ -287,8 +289,10 @@ public class HoistingProcessor {
 	
 	
 	private void tokenCombinations(Function<List<Integer>, Boolean> callback) {
-		for (int i = 1; i <= TOKEN_ANALYSIS_LIMIT; i++) {
-			if (tokenCombinations(0, 0, i, callback)) {
+		MutablePrimitiveWrapper<Integer> limit = new MutablePrimitiveWrapper<>(TOKEN_ANALYSIS_LIMIT);
+		
+		for (int i = 1; i <= limit.get(); i++) {
+			if (tokenCombinations(0, 0, i, callback, limit)) {
 				return;
 			}
 		}
@@ -296,29 +300,29 @@ public class HoistingProcessor {
 		// -> abort
 		throw new TokenAnalysisAbortedException();
 	}
-	private boolean tokenCombinations(long prefix, int prefixLength, int ones, Function<List<Integer>, Boolean> callback) {
+	private boolean tokenCombinations(long prefix, int prefixLength, int ones, Function<List<Integer>, Boolean> callback, MutablePrimitiveWrapper<Integer> limit) {
 		if (ones == 0) {
 			List<Integer> indexes = new ArrayList<>(TOKEN_ANALYSIS_LIMIT);
-			for (int i = 0; i < TOKEN_ANALYSIS_LIMIT; i++) {
+			for (int i = 0; i < limit.get(); i++) {
 				if ((prefix & (1 << i)) > 0) {
 					indexes.add(i);
 				}
 			}
 			return callback.apply(indexes);
-		} else if (prefixLength + ones > TOKEN_ANALYSIS_LIMIT) {
+		} else if (prefixLength + ones > limit.get()) {
 			// prefix is too long
 			return false;
 		} else {
-			for (int i = prefixLength; i < TOKEN_ANALYSIS_LIMIT - ones + 1; i++) {
+			for (int i = prefixLength; i < limit.get() - ones + 1; i++) {
 				long current = prefix | (1 << i);
 				try {
-					if (tokenCombinations(current, i + 1, ones - 1, callback)) {
+					if (tokenCombinations(current, i + 1, ones - 1, callback, limit)) {
 						return true;
 					}
 				} catch (TokenAnalysisAbortedException e) {
 					// tokens exhausted; abort current prefix
-					// TODO: add cache for current position in tokenCombinations-call
-					//       we don't need to check this index in the future
+					// set limit for calling functions so this index is not checked again
+					limit.set(i);
 					log.info("tokens exhausted");
 					return false;
 				}
