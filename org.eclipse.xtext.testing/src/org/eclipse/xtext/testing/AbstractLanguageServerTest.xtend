@@ -92,7 +92,6 @@ import org.junit.jupiter.api.BeforeEach
 
 import static extension org.eclipse.lsp4j.util.Ranges.containsRange
 import static extension org.eclipse.xtext.util.Strings.*
-import com.google.common.annotations.Beta
 
 /**
  * @author Sven Efftinge - Initial contribution and API
@@ -105,7 +104,12 @@ abstract class AbstractLanguageServerTest implements Endpoint {
 
 	protected static val TEST_PROJECT_PATH = "/test-data/test-project"
 
-	@BeforeEach @Before @Beta
+	@BeforeEach
+	def void setupJUnit5() {
+		setup
+	}
+
+	@Before
 	def void setup() {
 		val injector = Guice.createInjector(getServerModule())
 		injector.injectMembers(this)
@@ -123,7 +127,12 @@ abstract class AbstractLanguageServerTest implements Endpoint {
 		root = new File(new File("").absoluteFile, TEST_PROJECT_PATH)
 	}
 
-	@AfterEach @After
+	@AfterEach
+	def void cleanupJUnit5() {
+		cleanup
+	}
+
+	@After
 	def void cleanup() {
 		if (root.exists) {
 			Files.cleanFolder(root, null, true, true)
