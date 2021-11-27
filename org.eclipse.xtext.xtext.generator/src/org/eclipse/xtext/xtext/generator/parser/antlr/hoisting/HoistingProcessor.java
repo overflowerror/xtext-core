@@ -57,7 +57,7 @@ public class HoistingProcessor {
 	
 	private Logger log = Logger.getLogger(this.getClass());
 	
-	private static final int TOKEN_ANALYSIS_LIMIT = 5;
+	private static final int TOKEN_ANALYSIS_LIMIT = 10;
 	
 	private boolean isParserRule(AbstractElement element) {
 		return (element instanceof RuleCall) && (((RuleCall) element).getRule() instanceof ParserRule);
@@ -241,7 +241,8 @@ public class HoistingProcessor {
 	}
 	
 	private boolean arePathsIdenticalFallback(AbstractElement path1, AbstractElement path2) {
-		for (int i = 0; i < TOKEN_ANALYSIS_LIMIT; i++) {
+		// + 1, because otherwise identical paths of length TOKEN_ANALYSIS_LIMIT can't be checked
+		for (int i = 0; i < TOKEN_ANALYSIS_LIMIT + 1; i++) {
 			Set<List<Token>> tokenListSet1;
 			Set<List<Token>> tokenListSet2;
 			

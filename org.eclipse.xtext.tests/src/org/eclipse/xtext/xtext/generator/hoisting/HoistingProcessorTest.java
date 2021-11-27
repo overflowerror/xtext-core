@@ -278,10 +278,11 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 	public void testAlternativeIdenticalPaths() throws Exception {
 		// @formatter:off
 		String model =
+			// boundary check: the 10th token should be handled correctly
 			MODEL_PREAMBLE +
-			"S: {S} $$ p0 $$?=> 'a' \n" +
-			" | {S} $$ p1 $$?=> 'a' \n" +
-			" | {S} $$ p2 $$?=> 'b' ;";
+			"S: {S} $$ p0 $$?=> 'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' \n" +
+			" | {S} $$ p1 $$?=> 'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' \n" +
+			" | {S} $$ p2 $$?=> 'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'k' ;";
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
@@ -290,7 +291,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || ((p0) || (p1))) && (" + getSyntaxForKeywordToken("b", 1) + " || (p2)))", guard.render());
+		assertEquals("((" + getSyntaxForKeywordToken("j", 10) + " || ((p0) || (p1))) && (" + getSyntaxForKeywordToken("k", 10) + " || (p2)))", guard.render());
 	}
 	
 	@Test
@@ -355,8 +356,6 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		
-		// order of paths in result depends on Set-order;
-		// TODO: maybe change to List to make testing easier
 		assertEquals("((((" + getSyntaxForKeywordToken("b", 2) + " || " + getSyntaxForKeywordToken("b", 3) + ") && (" + getSyntaxForKeywordToken("c", 2) + " || " + getSyntaxForKeywordToken("c", 3) + ")) || (p0)) && (((" + getSyntaxForKeywordToken("b", 2) + " || " + getSyntaxForKeywordToken("c", 3) + ") && (" + getSyntaxForKeywordToken("c", 2) + " || " + getSyntaxForKeywordToken("b", 3) + ")) || (p1)))", guard.render());
 	}
 	
@@ -404,6 +403,25 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		AbstractRule rule = getRule(grammar, "S");
 		
 		hoistingProcessor.findGuardForElement(rule.getAlternatives());
-
+	}
+	
+	// symbolic analysis not yet implemented
+	//@Test
+	public void testAlternativesIdenticalPathsWithSymbolicAnalysis() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: {S} $$ p0 $$?=> C 'z' 'y' 'x' \n" +
+			" | {S} $$ p1 $$?=> C 'z' 'y' 'x' ;\n" +
+			"C: {C} ('a')* ;";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		AbstractRule rule = getRule(grammar, "S");
+		
+		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		assertEquals("((p0) || (p1))", guard.render());
 	}
 }
