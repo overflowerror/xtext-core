@@ -6,7 +6,7 @@
  * 
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
-package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
+package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -14,25 +14,25 @@ import java.util.stream.Collectors;
 /**
  * @author overflow - Initial contribution and API
  */
-public class AlternativeTokenSequenceGuard implements TokenGuard {
-	private Collection<? extends TokenSequenceGuard> alternatives;
+public class TokenSequenceGuard implements TokenGuard {
+	private Collection<? extends TokenGuard> sequence;
 	
-	public AlternativeTokenSequenceGuard(Collection<? extends TokenSequenceGuard> alternatives) {
-		this.alternatives = alternatives;
+	public TokenSequenceGuard(Collection<? extends TokenGuard> sequence) {
+		this.sequence = sequence;
 	}
-	
+
 	@Override
 	public String render() {
-		boolean addParentheses = alternatives.size() != 1;
+		boolean addParentheses = sequence.size() != 1;
 		String result = "";
 		
 		if (addParentheses) {
 			result += "(";
 		}
 		
-		result += alternatives.stream()
+		result += sequence.stream()
 				.map(TokenGuard::render)
-				.collect(Collectors.joining(" && "));
+				.collect(Collectors.joining(" || "));
 
 		if (addParentheses) {
 			result += ")";
@@ -40,5 +40,4 @@ public class AlternativeTokenSequenceGuard implements TokenGuard {
 		
 		return result;
 	}
-
 }

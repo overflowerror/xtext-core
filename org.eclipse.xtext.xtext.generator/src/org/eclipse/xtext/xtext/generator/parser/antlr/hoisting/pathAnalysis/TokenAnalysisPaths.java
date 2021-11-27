@@ -6,13 +6,14 @@
  * 
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
-package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
+package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.pathAnalysis;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.eclipse.xtext.AbstractElement;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token.Token;
 
 /**
  * @author overflow - Initial contribution and API

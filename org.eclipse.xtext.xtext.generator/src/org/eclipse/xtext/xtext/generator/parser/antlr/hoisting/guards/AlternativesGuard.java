@@ -6,7 +6,7 @@
  * 
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
-package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
+package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards;
 
 import java.util.LinkedList;
 import java.util.List;

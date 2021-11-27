@@ -6,14 +6,12 @@
  * 
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
-package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
+package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards;
 
 /**
  * @author overflow - Initial contribution and API
  */
-public interface TokenGuard extends Guard {
-	@Override
-	default boolean isTrivial() {
-		return false;
-	}
+public interface Guard {
+	boolean isTrivial();
+	String render();
 }

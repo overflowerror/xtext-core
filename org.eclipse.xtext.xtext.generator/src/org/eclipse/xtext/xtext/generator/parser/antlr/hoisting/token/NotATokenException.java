@@ -6,11 +6,12 @@
  * 
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
-package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
+package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token;
 
 /**
  * @author overflow - Initial contribution and API
  */
-public class TokenAnalysisAbortedException extends RuntimeException {
-	private static final long serialVersionUID = 4303267001950479292L;
+public class NotATokenException extends RuntimeException {
+	private static final long serialVersionUID = 643265533068524552L;
+
 }

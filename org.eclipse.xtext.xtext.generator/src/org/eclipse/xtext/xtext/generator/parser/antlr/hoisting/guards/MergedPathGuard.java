@@ -6,7 +6,7 @@
  * 
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
-package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
+package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -15,40 +15,43 @@ import java.util.stream.Collectors;
 /**
  * @author overflow - Initial contribution and API
  */
-public class GroupGuard implements HoistingGuard {
-	private List<Guard> elementGuards = new LinkedList<>();
-	private boolean hasTerminal = false;
+public class MergedPathGuard implements HoistingGuard {
+	private List<HoistingGuard> pathGuards = new LinkedList<>();
 	
-	public void add(Guard guard) {
-		if (!guard.isTrivial())
-			elementGuards.add(guard);
+	public MergedPathGuard(HoistingGuard guard) {
+		add(guard);
 	}
 	
-	public void setHasTerminal() {
-		hasTerminal = true;
+	public void add(HoistingGuard guard) {
+		pathGuards.add(guard);
+	}
+	
+	public void add(MergedPathGuard mergedPathGuard) {
+		pathGuards.addAll(mergedPathGuard.pathGuards);
 	}
 	
 	@Override
 	public boolean isTrivial() {
-		return elementGuards.isEmpty();
+		return pathGuards.stream().anyMatch(Guard::isTrivial);
 	}
 
 	@Override
 	public String render() {
-		if (elementGuards.size() == 1) {
-			return elementGuards.get(0).render();
+		if (pathGuards.size() == 1) {
+			return pathGuards.get(0).render();
 		} else {
 			return "(" + 
-					elementGuards.stream()
+					pathGuards.stream()
 						.map(Guard::render)
-						.collect(Collectors.joining(" && ")) +
+						.collect(Collectors.joining(" || ")) +
 					")";
 		}
 	}
 
 	@Override
 	public boolean hasTerminal() {
-		return hasTerminal;
+		// only need to check first element since all paths should be identical
+		return pathGuards.get(0).hasTerminal();
 	}
 
 }

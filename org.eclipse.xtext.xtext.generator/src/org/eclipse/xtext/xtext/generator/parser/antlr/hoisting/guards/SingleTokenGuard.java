@@ -6,12 +6,22 @@
  * 
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
-package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
+package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards;
+
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token.Token;
 
 /**
  * @author overflow - Initial contribution and API
  */
-public class SymbolicAnalysisFailedException extends Exception {
-	private static final long serialVersionUID = 4185473673062321988L;
+public class SingleTokenGuard implements TokenGuard {
+	private Token token;
+	
+	public SingleTokenGuard(Token token) {
+		this.token = token;
+	}
 
+	@Override
+	public String render() {
+		return token.negatedCondition();
+	}
 }

@@ -20,6 +20,8 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EClass;
@@ -699,5 +701,36 @@ public class GrammarUtil {
 			}
 		}
 		return null;
+	}
+	
+	public static EObject cloneEObject(EObject element) {
+		EObject clone = XtextFactory.eINSTANCE.create(element.eClass());
+		for (EStructuralFeature feature : element.eClass().getEAllStructuralFeatures()) {
+			Object value = element.eGet(feature);
+			if (value instanceof EObject) {
+				// if value is EObject a deep copy is needed since an EObject can only be 
+				// referenced by one other EObject.
+
+				value = cloneEObject((EObject) value);
+			}
+			clone.eSet(feature, value);
+		}
+		return clone;
+	}
+	
+	public static AbstractElement cloneAbstractElement(AbstractElement element) {
+		return (AbstractElement) cloneEObject(element);
+	}
+	
+	public static void addElementsToCompoundElement(CompoundElement element, Stream<? extends AbstractElement> elements) {
+		EStructuralFeature compoundElementElementsFeature = XtextPackage.Literals.COMPOUND_ELEMENT.getEStructuralFeature(XtextPackage.COMPOUND_ELEMENT__ELEMENTS);
+		
+		element.eSet(compoundElementElementsFeature, elements
+				.map(GrammarUtil::cloneAbstractElement)
+				.collect(Collectors.toList()));
+	}
+	
+	public static void addElementsToCompoundElement(CompoundElement element, Collection<? extends AbstractElement> elements) {
+		addElementsToCompoundElement(element, elements.stream());
 	}
 }
