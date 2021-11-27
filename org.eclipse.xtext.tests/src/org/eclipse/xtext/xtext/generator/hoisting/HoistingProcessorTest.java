@@ -12,7 +12,6 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.xml.type.XMLTypePackage;
 import org.eclipse.xtext.AbstractRule;
 import org.eclipse.xtext.Grammar;
-import org.eclipse.xtext.ParserRule;
 import org.eclipse.xtext.XtextStandaloneSetup;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.testing.GlobalRegistries;
@@ -151,6 +150,24 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertTrue(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 	}
+	
+	@Test
+	public void testPredicateTerminal_expectPredicateInGuard() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: {S} $$ p0 $$?=> T ;\n" +
+			"terminal T: 'a';";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		AbstractRule rule = getRule(grammar, "S");
+		
+		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		assertEquals("(p0)", guard.render());
+	}
 
 	@Test
 	public void testConsecutivePredicatesKeyword() throws Exception {
@@ -185,6 +202,23 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		assertEquals("(p0)", guard.render());
+	}
+	
+	@Test
+	public void testEnumRuleCallPredicate_expectPredicateNotInGuard() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: E $$ p0 $$?=> 's';\n" +
+			"enum E: A='a' | B='b';";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		AbstractRule rule = getRule(grammar, "S");
+		
+		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		assertTrue(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
 	}
 
 	@Test
@@ -274,6 +308,45 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))", guard.render());
 	}
 
+	@Test
+	public void testAlternativeWithDifferentEnumRule() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: $$ p0 $$?=> E1 |\n" +
+			" | $$ p1 $$?=> E2 ;\n" +
+			"enum E1: A='a' | B='b'; \n" +
+		    "enum E2: C='c' | D='d';";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		AbstractRule rule = getRule(grammar, "S");
+		
+		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		assertEquals("(((" + getSyntaxForKeywordToken("a", 1) + " && " + getSyntaxForKeywordToken("b", 1) + ") || (p0) && ((" + getSyntaxForKeywordToken("c", 1) + " && " + getSyntaxForKeywordToken("d", 1) + ") || (p1)))", guard.render());
+	}
+	
+	@Test
+	public void testAlternativeWithSameEnumRule() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: $$ p0 $$?=> E 'a' | \n" +
+			" | $$ p1 $$?=> E 'b' ;\n" +
+			"enum E: A='a' | B='b'; ";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		AbstractRule rule = getRule(grammar, "S");
+		
+		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		assertEquals("((" + getSyntaxForKeywordToken("a", 2) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 2) + " || (p1)))", guard.render());
+	}
+	
 	@Test
 	public void testAlternativeIdenticalPaths() throws Exception {
 		// @formatter:off
