@@ -295,6 +295,23 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 	}
 	
 	@Test
+	public void testAlternativeUnguarded() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: {S} 'a' \n" +
+			" | {S} 'b' ;";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		AbstractRule rule = getRule(grammar, "S");
+		
+		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		assertTrue(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+	}
+	
+	@Test
 	public void testAlternativeUnguardedPath() throws Exception {
 		// @formatter:off
 		String model =
