@@ -127,12 +127,33 @@ public class HoistingProcessor {
 		}
 	}
 	
+	private List<AbstractElement> rewriteUnorderedGroupsAndGetElements(Group group) {
+		List<AbstractElement> elements = new ArrayList<>(group.getElements());
+		
+		int size = elements.size();
+		for (int i = 0; i < size; i++) {
+			AbstractElement element = elements.get(i);
+			if (element instanceof UnorderedGroup) {
+				// Unordered group (A & B) is the same as (A | B)*
+				// -> create virtual element
+				
+				Alternatives virtualAlternatives = XtextFactory.eINSTANCE.createAlternatives();
+				addElementsToCompoundElement(virtualAlternatives, ((UnorderedGroup) element).getElements());
+				virtualAlternatives.setCardinality("*");
+				
+				elements.set(i, virtualAlternatives);
+			}
+		}
+		
+		return elements;
+	}
+	
 	private HoistingGuard findGuardForGroup(Group group) {
 		log.info("find guard for group");
 		
 		GroupGuard groupGuard = new GroupGuard();
 		
-		Iterator<AbstractElement> iterator = new ArrayList<>(group.getElements()).iterator();
+		Iterator<AbstractElement> iterator = rewriteUnorderedGroupsAndGetElements(group).iterator();
 		while (iterator.hasNext()) {
 			AbstractElement element = iterator.next();
 			
@@ -157,6 +178,7 @@ public class HoistingProcessor {
 				// rewrite cardinality to alternatives
 				// A? B -> A B | B
 				// A* B -> A+ B | B -> A B (see above)
+				// TODO: what if B is empty?
 				
 				// we need a clone of the element because we need to set the cardinality without changing the
 				// original syntax tree
@@ -216,6 +238,7 @@ public class HoistingProcessor {
 		if (Token.isToken(path)) {
 			return true;
 		} else if (isParserRuleCall(path)) {
+			// can not be self recursive since ANTLR uses LL(*) and therefore does not support left recursion
 			return pathHasToken(((RuleCall) path).getRule().getAlternatives());
 		} else if (path instanceof Assignment) {
 			return pathHasToken(((Assignment) path).getTerminal());
@@ -285,8 +308,8 @@ public class HoistingProcessor {
 		} else if (element instanceof JavaAction) {
 			return HoistingGuard.action();
 		} else if (element instanceof UnorderedGroup) {
-			// TODO: No support for Unordered Groups yet.
-			throw new UnsupportedOperationException("unordered groups are not yet supported");
+			// TODO: maybe add warning and return unguarded
+			throw new UnsupportedOperationException("unordered groups are only supported in groups");
 		} else if (element instanceof Assignment) {
 			return findGuardForElement(((Assignment) element).getTerminal());
 		} else {
