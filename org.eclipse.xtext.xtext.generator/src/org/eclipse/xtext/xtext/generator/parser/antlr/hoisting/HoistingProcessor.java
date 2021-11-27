@@ -19,13 +19,13 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.eclipse.xtext.AbstractElement;
+import org.eclipse.xtext.AbstractRule;
 import org.eclipse.xtext.AbstractSemanticPredicate;
 import org.eclipse.xtext.Action;
 import org.eclipse.xtext.Alternatives;
 import org.eclipse.xtext.Assignment;
 import org.eclipse.xtext.Group;
 import org.eclipse.xtext.JavaAction;
-import org.eclipse.xtext.ParserRule;
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.UnorderedGroup;
 import org.eclipse.xtext.XtextFactory;
@@ -200,7 +200,7 @@ public class HoistingProcessor {
 	
 	// issue: groupCache can't be Concurrent because of possible recursive calls to computeIfAbent
 	// solution: atomic section
-	public synchronized HoistingGuard findGuardForRule(ParserRule rule) {
+	public synchronized HoistingGuard findGuardForRule(AbstractRule rule) {
 		HoistingGuard guard = ruleCache.get(rule.getName());
 		if (guard == null) {
 			guard = findGuardForElement(rule.getAlternatives());
@@ -276,9 +276,10 @@ public class HoistingProcessor {
 			return new PredicateGuard((AbstractSemanticPredicate) element);
 		} else if (Token.isToken(element)) {
 			return HoistingGuard.terminal();
-		} else if (isParserRuleCall(element)) {
+		} else if (isParserRuleCall(element) ||
+		           isEnumRuleCall(element)) {
 			RuleCall call = (RuleCall) element;
-			return findGuardForRule((ParserRule) call.getRule());
+			return findGuardForRule(call.getRule());
 		} else if (element instanceof Action) {
 			return HoistingGuard.unguarded();
 		} else if (element instanceof JavaAction) {

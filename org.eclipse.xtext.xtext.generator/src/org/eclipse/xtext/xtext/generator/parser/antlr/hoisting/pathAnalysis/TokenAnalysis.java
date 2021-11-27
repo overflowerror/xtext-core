@@ -156,7 +156,8 @@ public class TokenAnalysis {
 		do {
 			if (Token.isToken(path)) {
 				current.add(path);
-			} else if (isParserRuleCall(path)) {
+			} else if (isParserRuleCall(path) ||
+			           isEnumRuleCall(path)) {
 				// path doesn't need length, because we're going to check that anyway in this function
 				current = getTokenForIndexes(((RuleCall) path).getRule().getAlternatives(), current, false);
 			} else if (path instanceof Assignment) {

@@ -10,6 +10,7 @@ package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token;
 
 import org.eclipse.xtext.AbstractElement;
 import org.eclipse.xtext.AbstractRule;
+import org.eclipse.xtext.EnumLiteralDeclaration;
 import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.TerminalRule;
@@ -25,6 +26,8 @@ public interface Token {
 			return true;
 		} else if (element instanceof RuleCall) {
 			return (((RuleCall) element).getRule() instanceof TerminalRule);
+		} else if (element instanceof EnumLiteralDeclaration) {
+			return true;
 		} else {
 			return false;
 		}
@@ -38,6 +41,8 @@ public interface Token {
 			if (rule instanceof TerminalRule) {
 				return new TerminalRuleToken((TerminalRule) rule, position);
 			}
+		} else if (element instanceof EnumLiteralDeclaration) {
+			return new KeywordToken(((EnumLiteralDeclaration) element).getLiteral(), position);
 		}
 		
 		throw new NotATokenException();

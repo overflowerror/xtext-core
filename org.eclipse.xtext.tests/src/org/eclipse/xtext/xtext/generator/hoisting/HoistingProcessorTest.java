@@ -209,7 +209,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
-			"S: E $$ p0 $$?=> 's';\n" +
+			"S: e=E $$ p0 $$?=> 's';\n" +
 			"enum E: A='a' | B='b';";
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
@@ -313,8 +313,8 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
-			"S: $$ p0 $$?=> E1 |\n" +
-			" | $$ p1 $$?=> E2 ;\n" +
+			"S: $$ p0 $$?=> e1=E1 \n" +
+			" | $$ p1 $$?=> e2=E2 ;\n" +
 			"enum E1: A='a' | B='b'; \n" +
 		    "enum E2: C='c' | D='d';";
 		// @formatter:off
@@ -325,7 +325,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("(((" + getSyntaxForKeywordToken("a", 1) + " && " + getSyntaxForKeywordToken("b", 1) + ") || (p0) && ((" + getSyntaxForKeywordToken("c", 1) + " && " + getSyntaxForKeywordToken("d", 1) + ") || (p1)))", guard.render());
+		assertEquals("(((" + getSyntaxForKeywordToken("a", 1) + " && " + getSyntaxForKeywordToken("b", 1) + ") || (p0)) && ((" + getSyntaxForKeywordToken("c", 1) + " && " + getSyntaxForKeywordToken("d", 1) + ") || (p1)))", guard.render());
 	}
 	
 	@Test
@@ -333,8 +333,8 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
-			"S: $$ p0 $$?=> E 'a' | \n" +
-			" | $$ p1 $$?=> E 'b' ;\n" +
+			"S: $$ p0 $$?=> e=E 'a' \n" +
+			" | $$ p1 $$?=> e=E 'b' ;\n" +
 			"enum E: A='a' | B='b'; ";
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
