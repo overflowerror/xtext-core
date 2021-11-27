@@ -272,6 +272,24 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertEquals("((" + getSyntaxForKeywordToken("s", 1) + " || (p1)) && (" + getSyntaxForKeywordToken("a", 1) + " || (p0)))", guard.render());
 	}
 	
+
+	@Test
+	public void testUnorderedGroups() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: (($$ p0 $$?=> 'a') & ($$ p1 $$?=> 'b')) $$ p2 $$?=> 's';";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		AbstractRule rule = getRule(grammar, "S");
+		
+		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)) && (" + getSyntaxForKeywordToken("c", 1) + "  || (p2)))", guard.render());
+	}
+	
 	@Test
 	public void testAlternativeNoToken() throws Exception {
 		// @formatter:off
