@@ -16,29 +16,26 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
-import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.xtext.AbstractElement;
 import org.eclipse.xtext.AbstractSemanticPredicate;
 import org.eclipse.xtext.Action;
 import org.eclipse.xtext.Alternatives;
 import org.eclipse.xtext.Assignment;
-import org.eclipse.xtext.GrammarUtil;
 import org.eclipse.xtext.Group;
 import org.eclipse.xtext.JavaAction;
 import org.eclipse.xtext.ParserRule;
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.UnorderedGroup;
 import org.eclipse.xtext.XtextFactory;
-import org.eclipse.xtext.XtextPackage;
 import org.eclipse.xtext.util.Tuples;
 import static org.eclipse.xtext.GrammarUtil.*;
 
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.AlternativeTokenSequenceGuard;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.AlternativesGuard;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.GroupGuard;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.Guard;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.HoistingGuard;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.MergedPathGuard;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.PathGuard;
@@ -49,8 +46,6 @@ import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.TokenSeque
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.pathAnalysis.TokenAnalysis;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token.Token;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.StreamUtils;
-
-import com.google.common.collect.Streams;
 
 /**
  * @author overflow - Initial contribution and API
@@ -77,6 +72,18 @@ public class HoistingProcessor {
 				.map(this::findGuardForElement)
 				.map(MergedPathGuard::new)
 				.collect(Collectors.toList());
+		
+		if (guards.stream().allMatch(Guard::isTrivial)) {
+			// all paths are trivial
+			
+			// if there is a terminal on all branches set has terminal to true
+			// else we need might need to consider the following tokens in the path
+			if (guards.stream().allMatch(HoistingGuard::hasTerminal)) {
+				return HoistingGuard.terminal();
+			} else {
+				return HoistingGuard.unguarded();
+			}
+		}
 		
 		log.info("path identity check");
 		int size = paths.size();
