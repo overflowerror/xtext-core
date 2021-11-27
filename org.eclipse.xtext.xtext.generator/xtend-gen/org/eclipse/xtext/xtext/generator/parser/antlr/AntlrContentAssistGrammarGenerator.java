@@ -432,6 +432,8 @@ public class AntlrContentAssistGrammarGenerator extends AbstractAntlrGrammarWith
         } else {
           _builder.appendImmediate("\n|", "\t");
         }
+        String _renderPredicate = this._hoistingProcessor.findGuardForElement(element).renderPredicate();
+        _builder.append(_renderPredicate, "\t");
         String _ebnf = this.ebnf(element, options, false);
         _builder.append(_ebnf, "\t");
       }
