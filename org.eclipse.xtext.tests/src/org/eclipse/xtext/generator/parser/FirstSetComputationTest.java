@@ -59,7 +59,7 @@ public class FirstSetComputationTest extends AbstractXtextTests {
 		assertFirstSet("'@', 'fragment', 'true', 'false', 'terminal', 'enum', ID", grammarAccess.getAbstractRuleRule());
 	}
 	@Test public void testAlternatives() throws Exception {
-		assertFirstSet("'=>', '->', 'true', 'false', '(', '{', '<', ID, STRING", grammarAccess.getAlternativesRule());
+		assertFirstSet("'=>', '->', 'true', 'false', '(', '{', '<', ID, STRING, JAVACODESTRING", grammarAccess.getAlternativesRule());
 	}
 	@Test public void testTerminalAlternatives() throws Exception {
 		assertFirstSet("'true', 'false', '(', '!', '->', '.', 'EOF', STRING, ID", grammarAccess.getTerminalAlternativesRule());
