@@ -287,9 +287,8 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		// non-optimal version
-		assertEquals("((" + getSyntaxForKeywordToken("s", 1) + " || (p2)) && ((" + getSyntaxForKeywordToken("a", 1) + " && " + getSyntaxForKeywordToken("b", 1) + ") || ((" + getSyntaxForKeywordToken("a", 1)+ " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))))", guard.render());
-		//assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)) && (" + getSyntaxForKeywordToken("c", 1) + "  || (p2)))", guard.render());
+		//assertEquals("((" + getSyntaxForKeywordToken("s", 1) + " || (p2)) && ((" + getSyntaxForKeywordToken("a", 1) + " && " + getSyntaxForKeywordToken("b", 1) + ") || ((" + getSyntaxForKeywordToken("a", 1)+ " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))))", guard.render());
+		assertEquals("((" + getSyntaxForKeywordToken("s", 1) + " || (p2)) && (" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))", guard.render());
 	}
 	
 	@Test
@@ -467,6 +466,28 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertTrue(guard.hasTerminal());
 		
 		assertEquals("((((" + getSyntaxForKeywordToken("b", 2) + " || " + getSyntaxForKeywordToken("b", 3) + ") && (" + getSyntaxForKeywordToken("c", 2) + " || " + getSyntaxForKeywordToken("c", 3) + ")) || (p0)) && (((" + getSyntaxForKeywordToken("b", 2) + " || " + getSyntaxForKeywordToken("c", 3) + ") && (" + getSyntaxForKeywordToken("c", 2) + " || " + getSyntaxForKeywordToken("b", 3) + ")) || (p1)))", guard.render());
+	}
+	
+	@Test
+	public void testNestedAlternativesWithCollapsablePaths() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+				"S: $$ p0 $$?=> a=A \n" +
+				" | $$ p1 $$?=> 'a' 'b' 'd' ;\n" +
+				"A: {A} $$ p2 $$?=> 'a' 'b' 'b' \n" +
+				" | {A} $$ p3 $$?=> 'a' 'b' 'c' ;";
+		
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		AbstractRule rule = getRule(grammar, "S");
+		
+		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		
+		assertEquals("((" + getSyntaxForKeywordToken("b", 3) + " || ((p0) && (p2))) && (" + getSyntaxForKeywordToken("c", 3) + " || ((p0) && (p3))) && (" + getSyntaxForKeywordToken("d", 3) + " || (p1)))", guard.render());
 	}
 	
 	@Test(expected = TokenAnalysisAbortedException.class)
