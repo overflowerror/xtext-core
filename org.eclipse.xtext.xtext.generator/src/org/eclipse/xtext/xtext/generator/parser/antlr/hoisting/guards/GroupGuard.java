@@ -8,9 +8,13 @@
  *******************************************************************************/
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.eclipse.xtext.util.Pair;
+import org.eclipse.xtext.util.Tuples;
 
 /**
  * @author overflow - Initial contribution and API
@@ -19,6 +23,13 @@ public class GroupGuard implements HoistingGuard {
 	private List<Guard> elementGuards = new LinkedList<>();
 	private boolean hasTerminal = false;
 	
+	public GroupGuard() {
+	}
+	
+	GroupGuard(Collection<Guard> guards) {
+		guards.forEach(g -> add(g));
+	}
+	
 	public void add(Guard guard) {
 		if (!guard.isTrivial())
 			elementGuards.add(guard);
@@ -26,6 +37,23 @@ public class GroupGuard implements HoistingGuard {
 	
 	public void setHasTerminal() {
 		hasTerminal = true;
+	}
+	
+	Pair<List<Guard>, AlternativesGuard> deconstructPaths() {
+		// there can be at most 1 AlternativesGuard since they always have tokens
+		// if alternatives don't have token the result will be a MergedPathGuard
+		if (!elementGuards.stream().anyMatch(g -> g instanceof AlternativesGuard)) {
+			return null;
+		} else {
+			return Tuples.pair(
+					elementGuards.stream()
+						.filter(g -> !(g instanceof AlternativesGuard))
+						.collect(Collectors.toList()), 
+					elementGuards.stream()
+						.filter(g -> g instanceof AlternativesGuard)
+						.map(g -> (AlternativesGuard) g)
+						.findAny().get());
+		}
 	}
 	
 	@Override
@@ -50,5 +78,5 @@ public class GroupGuard implements HoistingGuard {
 	public boolean hasTerminal() {
 		return hasTerminal;
 	}
-
+	
 }

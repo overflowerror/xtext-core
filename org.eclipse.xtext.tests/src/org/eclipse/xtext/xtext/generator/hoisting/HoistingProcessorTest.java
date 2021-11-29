@@ -441,7 +441,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("((" + getSyntaxForKeywordToken("c", 3) + " || ((p0) && ((" + getSyntaxForKeywordToken("b", 2) + " || (p2)) && (" + getSyntaxForKeywordToken("c", 2) + " || (p3))))) && (" + getSyntaxForKeywordToken("d", 3) + " || (p1)))", guard.render());
+		assertEquals("((" + getSyntaxForKeywordToken("b", 2) + " || ((p0) && (p2))) && (" + getSyntaxForKeywordToken("c", 2) + " || ((p0) && (p3))) && (" + getSyntaxForKeywordToken("d", 3) + " || (p1)))", guard.render());
 	}
 	
 	@Test

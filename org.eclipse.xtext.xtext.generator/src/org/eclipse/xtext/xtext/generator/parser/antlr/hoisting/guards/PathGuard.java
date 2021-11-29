@@ -8,6 +8,11 @@
  *******************************************************************************/
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import org.eclipse.xtext.util.Pair;
+
 /**
  * @author overflow - Initial contribution and API
  */
@@ -36,5 +41,46 @@ public class PathGuard implements HoistingGuard {
 	public String render() {
 		// parentheses needed since tokenGuard is never empty
 		return "(" + tokenGuard.render() + " || " + hoistngGuard.render() + ")";
+	}
+	
+	public static List<PathGuard> collapse(List<PathGuard> paths) {
+		// we can collapse all paths of alternatives in paths
+		// because the direct paths of this alternatives instance are already token-guarded
+		// against all other paths (otherwise the token guard wouldn't be distinct)
+		
+		List<PathGuard> result = new LinkedList<>();
+		
+		for (PathGuard path : paths) {
+			HoistingGuard guard = path.hoistngGuard;
+			
+			// TODO: allow merged paths
+			if (guard instanceof MergedPathGuard) {
+				guard = ((MergedPathGuard) guard).simplify();
+			}
+			
+			if (guard instanceof AlternativesGuard) {
+				result.addAll(((AlternativesGuard) guard).getPaths());
+			} else if (guard instanceof GroupGuard) {
+				// TODO: maybe allow nested groups?
+				
+				Pair<List<Guard>, AlternativesGuard> destructedPaths = ((GroupGuard) guard).deconstructPaths();
+				if (destructedPaths == null) {
+					result.add(path);
+				} else {
+					destructedPaths.getSecond().getPaths().stream()
+						.forEach(p -> {
+							// combine hoisting guards of current sub path with destructed path guards
+							// construct new path guard and add to result
+							GroupGuard groupGuard = new GroupGuard(destructedPaths.getFirst());
+							groupGuard.add(p.hoistngGuard);
+							result.add(new PathGuard(p.tokenGuard, groupGuard));
+						});
+				}
+			} else {
+				result.add(path);
+			}
+		}
+		
+		return result;
 	}
 }

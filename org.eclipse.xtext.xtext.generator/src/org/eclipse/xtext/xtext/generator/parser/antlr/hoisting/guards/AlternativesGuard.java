@@ -21,7 +21,12 @@ public class AlternativesGuard implements HoistingGuard {
 	private List<PathGuard> paths;
 	
 	private AlternativesGuard(List<PathGuard> paths) {
-		this.paths = paths;
+		this.paths = PathGuard.collapse(paths);
+	}
+	
+	// package private so PathGuard can access this method
+	List<PathGuard> getPaths() {
+		return paths;
 	}
 	
 	@Override

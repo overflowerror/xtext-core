@@ -30,6 +30,14 @@ public class MergedPathGuard implements HoistingGuard {
 		pathGuards.addAll(mergedPathGuard.pathGuards);
 	}
 	
+	HoistingGuard simplify() {
+		if (pathGuards.size() == 1) {
+			return pathGuards.get(0);
+		} else {
+			return this;
+		}
+	}
+	
 	@Override
 	public boolean isTrivial() {
 		return pathGuards.stream().anyMatch(Guard::isTrivial);
