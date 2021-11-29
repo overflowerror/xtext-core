@@ -29,6 +29,8 @@ import org.eclipse.xtext.Group;
 import org.eclipse.xtext.JavaAction;
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.HoistingConfiguration;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.SymbolicAnalysisFailedException;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.TokenAnalysisAbortedException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token.Token;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.MutablePrimitiveWrapper;
 
@@ -56,7 +58,7 @@ public class TokenAnalysis {
 			result = prefix;
 			if (needsLength) {
 				// analysis is not done but there are no more mandatory tokens
-				throw new TokenAnalysisAbortedException();
+				throw new TokenAnalysisAbortedException("needed path length not satisfied due to optional cardinality");
 			}
 		} else {
 			result = TokenAnalysisPaths.empty(prefix);
@@ -102,7 +104,7 @@ public class TokenAnalysis {
 			result = prefix;
 			if (needsLength) {
 				// analysis is not done but there are no more mandatory tokens
-				throw new TokenAnalysisAbortedException();
+				throw new TokenAnalysisAbortedException("needed path length not satisfied due to optional cardinality");
 			}
 		} else {
 			result = TokenAnalysisPaths.empty(prefix);
@@ -123,7 +125,7 @@ public class TokenAnalysis {
 			
 			if (needsLength && !current.isDone()) {
 				// analysis is not done but there are no more mandatory tokens
-				throw new TokenAnalysisAbortedException();
+				throw new TokenAnalysisAbortedException("needed path length not satisfied");
 			}
 			
 			result = result.merge(current);
@@ -144,7 +146,7 @@ public class TokenAnalysis {
 		if (isOptionalCardinality(path)) {
 			result = prefix;
 			if (needsLength) {
-				throw new TokenAnalysisAbortedException();
+				throw new TokenAnalysisAbortedException("needed path length not satisfied due to optional cardinality");
 			}
 		} else {
 			result = TokenAnalysisPaths.empty(prefix);
@@ -178,7 +180,7 @@ public class TokenAnalysis {
 			}
 			
 			if (needsLength) {
-				throw new TokenAnalysisAbortedException();
+				throw new TokenAnalysisAbortedException("needed path length not satisfied");
 			}
 		} while(loop);
 		
@@ -248,7 +250,7 @@ public class TokenAnalysis {
 		
 		// we can't analyze the paths any further
 		// TODO maybe assume paths are equal and show warning instead of exception
-		throw new TokenAnalysisAbortedException();
+		throw new TokenAnalysisAbortedException("token limit exhausted while looking for identical paths");
 	}
 	
 	public boolean arePathsIdentical(AbstractElement path1, AbstractElement path2) {
@@ -269,8 +271,13 @@ public class TokenAnalysis {
 			}
 		}
 		// we tried all possible combinations
+		// TODO: can only happen if no symbolic analysis is implemented
 		// -> abort
-		throw new TokenAnalysisAbortedException();
+		if (limit.get().equals(config.getTokenLimit())) {
+			throw new TokenAnalysisAbortedException("token limit exhausted while searching for minimal differences");
+		} else {
+			throw new TokenAnalysisAbortedException("path length exhausted while searching for minimal differences");
+		}
 	}
 	private boolean tokenCombinations(long prefix, int prefixLength, int ones, Function<List<Integer>, Boolean> callback, MutablePrimitiveWrapper<Integer> limit) {
 		if (ones == 0) {
@@ -295,7 +302,6 @@ public class TokenAnalysis {
 					// tokens exhausted; abort current prefix
 					// set limit for calling functions so this index is not checked again
 					limit.set(i);
-					log.info("tokens exhausted");
 					return false;
 				}
 			}

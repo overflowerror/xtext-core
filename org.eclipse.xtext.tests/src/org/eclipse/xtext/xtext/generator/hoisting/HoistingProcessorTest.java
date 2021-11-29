@@ -17,8 +17,8 @@ import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.testing.GlobalRegistries;
 import org.eclipse.xtext.tests.AbstractXtextTests;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.HoistingProcessor;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.TokenAnalysisAbortedException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.HoistingGuard;
-import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.pathAnalysis.TokenAnalysisAbortedException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -79,7 +79,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertTrue(guard.isTrivial());
 		assertFalse(guard.hasTerminal());
 	}
@@ -95,7 +95,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertFalse(guard.hasTerminal());
 		assertEquals("(p0)", guard.render());
@@ -112,7 +112,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		assertEquals("(p0)", guard.render());
@@ -129,7 +129,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertTrue(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 	}
@@ -146,7 +146,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertTrue(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 	}
@@ -163,7 +163,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		assertEquals("(p0)", guard.render());
@@ -180,7 +180,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		assertEquals("((p0) && (p1))", guard.render());
@@ -198,7 +198,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		assertEquals("(p0)", guard.render());
@@ -216,7 +216,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertTrue(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 	}
@@ -232,7 +232,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		assertEquals("(p0)", guard.render());
@@ -249,7 +249,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		assertEquals("((" + getSyntaxForKeywordToken("s", 1) + " || (p1)) && (" + getSyntaxForKeywordToken("a", 1) + " || (p0)))", guard.render());
@@ -266,7 +266,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		assertEquals("((" + getSyntaxForKeywordToken("s", 1) + " || (p1)) && (" + getSyntaxForKeywordToken("a", 1) + " || (p0)))", guard.render());
@@ -284,7 +284,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		//assertEquals("((" + getSyntaxForKeywordToken("s", 1) + " || (p2)) && ((" + getSyntaxForKeywordToken("a", 1) + " && " + getSyntaxForKeywordToken("b", 1) + ") || ((" + getSyntaxForKeywordToken("a", 1)+ " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))))", guard.render());
@@ -303,7 +303,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertFalse(guard.hasTerminal());
 		assertEquals("((p0) || (p1))", guard.render());
@@ -321,7 +321,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))", guard.render());
@@ -341,7 +341,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		assertEquals("(((" + getSyntaxForKeywordToken("a", 1) + " && " + getSyntaxForKeywordToken("b", 1) + ") || (p0)) && ((" + getSyntaxForKeywordToken("c", 1) + " && " + getSyntaxForKeywordToken("d", 1) + ") || (p1)))", guard.render());
@@ -360,7 +360,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		assertEquals("((" + getSyntaxForKeywordToken("a", 2) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 2) + " || (p1)))", guard.render());
@@ -380,7 +380,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		assertEquals("((" + getSyntaxForKeywordToken("j", 10) + " || ((p0) || (p1))) && (" + getSyntaxForKeywordToken("k", 10) + " || (p2)))", guard.render());
@@ -398,7 +398,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertTrue(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 	}
@@ -415,7 +415,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		assertEquals("(" + getSyntaxForKeywordToken("a", 1) + " || (p0))", guard.render());
@@ -438,7 +438,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		assertEquals("((" + getSyntaxForKeywordToken("b", 2) + " || ((p0) && (p2))) && (" + getSyntaxForKeywordToken("c", 2) + " || ((p0) && (p3))) && (" + getSyntaxForKeywordToken("d", 3) + " || (p1)))", guard.render());
@@ -461,7 +461,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		
@@ -483,7 +483,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		
@@ -502,7 +502,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 	}
 	
 	@Test(expected = TokenAnalysisAbortedException.class)
@@ -517,7 +517,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 	}
 	
 	@Test(expected = TokenAnalysisAbortedException.class)
@@ -533,7 +533,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 	}
 	
 	// symbolic analysis not yet implemented
@@ -550,7 +550,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		AbstractRule rule = getRule(grammar, "S");
 		
-		HoistingGuard guard = hoistingProcessor.findGuardForElement(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		assertEquals("((p0) || (p1))", guard.render());

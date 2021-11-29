@@ -6,7 +6,7 @@
  * 
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
-package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.pathAnalysis;
+package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions;
 
 /**
  * @author overflow - Initial contribution and API

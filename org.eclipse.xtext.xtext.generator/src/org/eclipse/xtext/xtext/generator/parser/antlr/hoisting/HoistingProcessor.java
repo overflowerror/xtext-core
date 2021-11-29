@@ -24,6 +24,7 @@ import org.eclipse.xtext.AbstractSemanticPredicate;
 import org.eclipse.xtext.Action;
 import org.eclipse.xtext.Alternatives;
 import org.eclipse.xtext.Assignment;
+import org.eclipse.xtext.CompoundElement;
 import org.eclipse.xtext.Group;
 import org.eclipse.xtext.JavaAction;
 import org.eclipse.xtext.RuleCall;
@@ -32,6 +33,9 @@ import org.eclipse.xtext.XtextFactory;
 import org.eclipse.xtext.util.Tuples;
 import static org.eclipse.xtext.GrammarUtil.*;
 
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.OptionalCardinalityWithoutContextException;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.TokenAnalysisAbortedException;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.UnsupportedConstructException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.AlternativeTokenSequenceGuard;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.AlternativesGuard;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.GroupGuard;
@@ -64,12 +68,12 @@ public class HoistingProcessor {
 	}
 	
 	// TODO: handling for TokenAnalysisAbortedException
-	private HoistingGuard findGuardForAlternatives(Alternatives alternatives) {
+	private HoistingGuard findGuardForAlternatives(Alternatives alternatives, AbstractRule currentRule) {
 		log.info("find guard for alternative");
 		
 		List<AbstractElement> paths = alternatives.getElements();
 		List<MergedPathGuard> guards = paths.stream()
-				.map(this::findGuardForElement)
+				.map(p -> findGuardForElement(p, currentRule))
 				.map(MergedPathGuard::new)
 				.collect(Collectors.toList());
 		
@@ -84,20 +88,24 @@ public class HoistingProcessor {
 				return HoistingGuard.unguarded();
 			}
 		}
-		
+
 		log.info("path identity check");
 		int size = paths.size();
-		for (int i = 0; i < size; i++) {
-			for (int j = i + 1; j < size; j++) {
-				if (analysis.arePathsIdentical(paths.get(i), paths.get(j))) {
-					guards.get(i).add(guards.get(j));
-					
-					paths.remove(j);
-					guards.remove(j);
-					j--;
-					size--;
+		try {
+			for (int i = 0; i < size; i++) {
+				for (int j = i + 1; j < size; j++) {
+					if (analysis.arePathsIdentical(paths.get(i), paths.get(j))) {
+						guards.get(i).add(guards.get(j));
+						
+						paths.remove(j);
+						guards.remove(j);
+						j--;
+						size--;
+					}
 				}
 			}
+		} catch (TokenAnalysisAbortedException e) {
+			throw new TokenAnalysisAbortedException(e.getMessage(), e, currentRule);
 		}
 		
 		log.info("paths:" + paths);
@@ -107,21 +115,25 @@ public class HoistingProcessor {
 		// if all paths are empty the above step will eliminate all paths
 		// -> size = 1
 		if (size > 1) {
-			return StreamUtils.zip(
-				analysis.findMinimalPathDifference(paths).stream()
-					.map(a -> a.stream()
-						.map(s -> s.stream()
-								.map(SingleTokenGuard::new)
-								.collect(Collectors.toList())
+			try {
+				return StreamUtils.zip(
+					analysis.findMinimalPathDifference(paths).stream()
+						.map(a -> a.stream()
+							.map(s -> s.stream()
+									.map(SingleTokenGuard::new)
+									.collect(Collectors.toList())
+							)
+							.map(TokenSequenceGuard::new)
+							.collect(Collectors.toList())
 						)
-						.map(TokenSequenceGuard::new)
-						.collect(Collectors.toList())
-					)
-					.map(AlternativeTokenSequenceGuard::new),
-				guards.stream(),
-				(TokenGuard tokenGuard, MergedPathGuard pathGuard) -> Tuples.pair(tokenGuard, pathGuard)
-			).map(p -> new PathGuard(p.getFirst(), p.getSecond()))
-			.collect(AlternativesGuard.collector());
+						.map(AlternativeTokenSequenceGuard::new),
+					guards.stream(),
+					(TokenGuard tokenGuard, MergedPathGuard pathGuard) -> Tuples.pair(tokenGuard, pathGuard)
+				).map(p -> new PathGuard(p.getFirst(), p.getSecond()))
+				.collect(AlternativesGuard.collector());
+			} catch(TokenAnalysisAbortedException e) {
+				throw new TokenAnalysisAbortedException(e.getMessage(), e, currentRule);
+			}
 		} else {
 			return guards.get(0);
 		}
@@ -148,7 +160,7 @@ public class HoistingProcessor {
 		return elements;
 	}
 	
-	private HoistingGuard findGuardForGroup(Group group) {
+	private HoistingGuard findGuardForGroup(Group group, AbstractRule currentRule) {
 		log.info("find guard for group");
 		
 		GroupGuard groupGuard = new GroupGuard();
@@ -162,7 +174,7 @@ public class HoistingProcessor {
 			    cardinality.equals("") ||
 			    cardinality.equals("+")) {
 				
-				HoistingGuard guard = findGuardForElementWithTrivialCardinality(element);
+				HoistingGuard guard = findGuardForElementWithTrivialCardinality(element, currentRule);
 				groupGuard.add(guard);
 				
 				// if cardinality is + and there is a terminal we don't need to consider
@@ -178,7 +190,6 @@ public class HoistingProcessor {
 				// rewrite cardinality to alternatives
 				// A? B -> A B | B
 				// A* B -> A+ B | B -> A B (see above)
-				// TODO: what if B is empty?
 				
 				// we need a clone of the element because we need to set the cardinality without changing the
 				// original syntax tree
@@ -188,6 +199,12 @@ public class HoistingProcessor {
 				// make copy of every element because we can't use any element twice
 				List<AbstractElement> remainingElementsInGroup = StreamUtils.fromIterator(iterator)
 						.collect(Collectors.toList());
+				
+				if (remainingElementsInGroup.isEmpty()) {
+					// B is empty
+					// context is needed to generate virtual alternatives
+					throw new OptionalCardinalityWithoutContextException("no context in group", currentRule);
+				}
 				
 				// make copy of first branch and add the cloned element
 				List<AbstractElement> remainingElementsInGroupIncludingCurrent = new LinkedList<>(remainingElementsInGroup);
@@ -203,7 +220,7 @@ public class HoistingProcessor {
 				addElementsToCompoundElement(virtualAlternatives, Arrays.asList(virtualPathRemaining, virtualPathRemainingPlusCurrent));
 				
 				// get Guard for virtual alternatives
-				HoistingGuard guard = findGuardForElementWithTrivialCardinality(virtualAlternatives);
+				HoistingGuard guard = findGuardForElementWithTrivialCardinality(virtualAlternatives, currentRule);
 				groupGuard.add(guard);
 				
 				if (guard.hasTerminal()) {
@@ -220,81 +237,112 @@ public class HoistingProcessor {
 		return groupGuard;
 	}
 	
-	// issue: groupCache can't be Concurrent because of possible recursive calls to computeIfAbent
-	// solution: atomic section
-	public synchronized HoistingGuard findGuardForRule(AbstractRule rule) {
+	// TODO: make private
+	public HoistingGuard findGuardForRule(AbstractRule rule) {
 		HoistingGuard guard = ruleCache.get(rule.getName());
 		if (guard == null) {
-			guard = findGuardForElement(rule.getAlternatives());
+			guard = findGuardForElement(rule.getAlternatives(), rule);
 			ruleCache.put(rule.getName(), guard);
 		}
 		return guard;
 	}
 	
-	private boolean pathHasToken(AbstractElement path) {
+	private boolean pathHasTokenOrAction(AbstractElement path) {
 		// we are only interested in whether or not there could be any tokens on this path
 		// -> ignore cardinality
 		
 		if (Token.isToken(path)) {
 			return true;
+		} else if (isEnumRuleCall(path)) {
+			return true;
+		} else if (path instanceof JavaAction) {
+			return true;
 		} else if (isParserRuleCall(path)) {
 			// can not be self recursive since ANTLR uses LL(*) and therefore does not support left recursion
-			return pathHasToken(((RuleCall) path).getRule().getAlternatives());
+			return pathHasTokenOrAction(((RuleCall) path).getRule().getAlternatives());
 		} else if (path instanceof Assignment) {
-			return pathHasToken(((Assignment) path).getTerminal());
-		} else if (path instanceof Group) {
-			return ((Group) path).getElements().stream()
-					.anyMatch(this::pathHasToken);
-		} else if (path instanceof Alternatives) {
-			return ((Alternatives) path).getElements().stream()
-					.anyMatch(this::pathHasToken);
+			return pathHasTokenOrAction(((Assignment) path).getTerminal());
+		} else if (path instanceof CompoundElement) {
+			return ((CompoundElement) path).getElements().stream()
+					.anyMatch(this::pathHasTokenOrAction);
 		} else {
-			// Actions, JavaActions, Predicates, ...
+			// Actions, Predicates, ...
 			return false;
 		}
 	}
 	
-	public HoistingGuard findGuardForElement(AbstractElement element) {
-		String cardinality = element.getCardinality();
-		if (cardinality == null || cardinality.equals("")) {
-			return findGuardForElementWithTrivialCardinality(element);
-		} else if (cardinality.equals("+")) {
-			return findGuardForElementWithTrivialCardinality(element);
-		} else if (cardinality.equals("?") ||
-		           cardinality.equals("*")) {
-			if (pathHasToken(element)) {
+	@SuppressWarnings("unused")
+	private boolean pathHasHoistablePredicate(AbstractElement path) {
+		// we are only interested in whether or not there could be any hoistable predicate on this path
+		// -> ignore cardinality
+		
+		if (path instanceof AbstractSemanticPredicate) {
+			return true;
+		} else if (isParserRuleCall(path)) {
+			// can not be self recursive since ANTLR uses LL(*) and therefore does not support left recursion
+			return pathHasHoistablePredicate(((RuleCall) path).getRule().getAlternatives());
+		} else if (path instanceof Assignment) {
+			return pathHasHoistablePredicate(((Assignment) path).getTerminal());
+		} else if (path instanceof Alternatives ||
+		           path instanceof UnorderedGroup) {
+			return ((CompoundElement) path).getElements().stream()
+					.anyMatch(this::pathHasHoistablePredicate);
+		} else if (path instanceof Group) {
+			for (AbstractElement element : ((CompoundElement) path).getElements()) {
+				if (pathHasHoistablePredicate(element)) {
+					return true;
+				}
+				if (pathHasTokenOrAction(element)) {
+					return false;
+				}
+			}
+			return false;
+		} else {
+			// Tokens, EnumRule, Actions, JavaActions, ...
+			return false;
+		}
+	}
+	
+	public HoistingGuard findHoistingGuard(AbstractElement element) {
+		return findGuardForElement(element, containingParserRule(element));
+	}
+	
+	private HoistingGuard findGuardForElement(AbstractElement element, AbstractRule currentRule) {
+		if (isTrivialCardinality(element)) {
+			return findGuardForElementWithTrivialCardinality(element, currentRule);
+		} else if (isOneOrMoreCardinality(element)) {
+			return findGuardForElementWithTrivialCardinality(element, currentRule);
+		} else if (isOptionalCardinality(element)) {
+			if (pathHasTokenOrAction(element)) {
 				// there might be a token in this element
 				// no context accessible to construct guard
 				// this does only work when analyzing group
-				// TODO: generate warning
-				// this is not a terminal, but there is no point constructing guards past this point
-				return HoistingGuard.terminal();
+				
+				// TODO: maybe generate warning and return terminal()
+				throw new OptionalCardinalityWithoutContextException("optional cardinality is only supported in groups", currentRule);
 			} else {
-				// element with cardinality ? or * has no token
+				// element with cardinality ? or * has no token or action
+				// -> the path is accessible whether or not this element is guarded
 				// -> we can assume it is unguarded
 				return HoistingGuard.unguarded();
 			}
 		} else {
-			throw new IllegalArgumentException("unknown cardinality: " + cardinality);
+			throw new IllegalArgumentException("unknown cardinality: " + element.getCardinality());
 		}
 	}
 	
-	private HoistingGuard findGuardForElementWithTrivialCardinality(AbstractElement element) {
+	private HoistingGuard findGuardForElementWithTrivialCardinality(AbstractElement element, AbstractRule currentRule) {
 		log.info("finding guard for element: " + element.toString());
 		
 		if (element instanceof Alternatives) {
-			return findGuardForAlternatives((Alternatives) element);
+			return findGuardForAlternatives((Alternatives) element, currentRule);
 		} else if (element instanceof Group) {
-			// issue: groupCache can't be Concurrent because of possible recursive calls to computeIfAbent
-			// solution: atomic section
-			synchronized (groupCache) {
-				HoistingGuard guard = groupCache.get(element);
-				if (guard == null) {
-					guard = findGuardForGroup((Group) element);
-					groupCache.put((Group) element, guard);
-				}
-				return guard;
+			HoistingGuard guard = groupCache.get(element);
+			if (guard == null) {
+				guard = findGuardForGroup((Group) element, currentRule);
+				groupCache.put((Group) element, guard);
 			}
+			return guard;
 		} else if (element instanceof AbstractSemanticPredicate) {
 			return new PredicateGuard((AbstractSemanticPredicate) element);
 		} else if (Token.isToken(element)) {
@@ -308,12 +356,21 @@ public class HoistingProcessor {
 		} else if (element instanceof JavaAction) {
 			return HoistingGuard.action();
 		} else if (element instanceof UnorderedGroup) {
-			// TODO: maybe add warning and return unguarded
-			throw new UnsupportedOperationException("unordered groups are only supported in groups");
+			if (pathHasTokenOrAction(element)) {
+				// if unordered group has tokens or actions we need the context which is not available here
+				// only works when analyzing groups
+				
+				// TODO: maybe add warning and return unguarded
+				throw new UnsupportedConstructException("unordered groups are only supported in groups", currentRule);
+			} else {
+				// the path is accessible whether or not any guard is satisfied
+				// -> assume it's unguarded
+				return HoistingGuard.unguarded();
+			}
 		} else if (element instanceof Assignment) {
-			return findGuardForElement(((Assignment) element).getTerminal());
+			return findGuardForElement(((Assignment) element).getTerminal(), currentRule);
 		} else {
-			throw new UnsupportedOperationException("element not supported: " + element.toString());
+			throw new UnsupportedConstructException("element not supported: " + element.toString(), currentRule);
 		}
 	}
 }

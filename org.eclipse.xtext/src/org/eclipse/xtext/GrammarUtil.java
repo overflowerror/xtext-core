@@ -586,6 +586,10 @@ public class GrammarUtil {
 	public static boolean isMultipleAssignment(Action a) {
 		return "+=".equals(a.getOperator());
 	}
+	
+	public static boolean isTrivialCardinality(AbstractElement e) {
+		return e.getCardinality() == null || e.getCardinality().equals("");
+	}
 
 	public static boolean isOptionalCardinality(AbstractElement e) {
 		return e.getCardinality() != null && (e.getCardinality().equals("?") || e.getCardinality().equals("*"));

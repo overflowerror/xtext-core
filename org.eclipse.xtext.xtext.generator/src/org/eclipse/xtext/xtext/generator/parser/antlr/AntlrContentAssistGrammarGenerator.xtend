@@ -161,7 +161,7 @@ class AntlrContentAssistGrammarGenerator extends AbstractAntlrGrammarWithActions
 				int stackSize = keepStackSize();
 			}
 		:
-			«FOR element : elements SEPARATOR '\n|'»«element.findGuardForElement.renderPredicate»«element.ebnf(options, false)»«ENDFOR»
+			«FOR element : elements SEPARATOR '\n|'»«element.findHoistingGuard.renderPredicate»«element.ebnf(options, false)»«ENDFOR»
 		;
 		finally {
 			restoreStackSize(stackSize);

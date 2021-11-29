@@ -818,7 +818,7 @@ public abstract class AbstractAntlrGrammarGenerator {
         } else {
           _builder.appendImmediate("\n    |", "");
         }
-        String _renderPredicate = this._hoistingProcessor.findGuardForElement(e).renderPredicate();
+        String _renderPredicate = this._hoistingProcessor.findHoistingGuard(e).renderPredicate();
         _builder.append(_renderPredicate);
         String _dataTypeEbnf = this.dataTypeEbnf(e, supportActions);
         _builder.append(_dataTypeEbnf);
@@ -890,7 +890,7 @@ public abstract class AbstractAntlrGrammarGenerator {
         } else {
           _builder.appendImmediate("\n    |", "");
         }
-        String _renderPredicate = this._hoistingProcessor.findGuardForElement(element).renderPredicate();
+        String _renderPredicate = this._hoistingProcessor.findHoistingGuard(element).renderPredicate();
         _builder.append(_renderPredicate);
         String _ebnf = this.ebnf(element, options, supportActions);
         _builder.append(_ebnf);

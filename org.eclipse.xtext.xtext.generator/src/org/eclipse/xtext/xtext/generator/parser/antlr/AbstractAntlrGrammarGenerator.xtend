@@ -37,7 +37,6 @@ import static extension org.eclipse.xtext.xtext.generator.parser.antlr.AntlrGram
 import static extension org.eclipse.xtext.xtext.generator.parser.antlr.TerminalRuleToLexerBody.*
 import org.eclipse.xtext.xtext.generator.util.SyntheticTerminalDetector
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.HoistingProcessor
-import java.lang.reflect.Parameter
 import org.eclipse.xtext.AbstractSemanticPredicate
 import org.eclipse.xtext.JavaAction
 import org.eclipse.xtext.GatedSemanticPredicate
@@ -337,7 +336,7 @@ abstract class AbstractAntlrGrammarGenerator {
 	protected dispatch def String dataTypeEbnf2(AbstractElement it, boolean supportActions) '''ERROR «eClass.name» not matched'''
 
 	protected dispatch def String dataTypeEbnf2(Alternatives it, boolean supportActions) '''
-		«FOR e:elements SEPARATOR '\n    |'»«e.findGuardForElement.renderPredicate»«e.dataTypeEbnf(supportActions)»«ENDFOR»
+		«FOR e:elements SEPARATOR '\n    |'»«e.findHoistingGuard.renderPredicate»«e.dataTypeEbnf(supportActions)»«ENDFOR»
 	'''
 
 	protected dispatch def String dataTypeEbnf2(Group it, boolean supportActions) '''
@@ -359,7 +358,7 @@ abstract class AbstractAntlrGrammarGenerator {
 	protected dispatch def String ebnf2(AbstractElement it, AntlrOptions options, boolean supportActions) '''ERROR «eClass.name» not matched'''
 	
 	protected dispatch def String ebnf2(Alternatives it, AntlrOptions options, boolean supportActions) '''
-		«FOR element:elements SEPARATOR '\n    |'»«element.findGuardForElement.renderPredicate»«element.ebnf(options, supportActions)»«ENDFOR»
+		«FOR element:elements SEPARATOR '\n    |'»«element.findHoistingGuard.renderPredicate»«element.ebnf(options, supportActions)»«ENDFOR»
 	'''
 	
 	protected dispatch def String ebnf2(Group it, AntlrOptions options, boolean supportActions) '''
