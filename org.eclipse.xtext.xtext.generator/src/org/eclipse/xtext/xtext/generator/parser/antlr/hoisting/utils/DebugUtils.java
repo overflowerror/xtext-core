@@ -8,6 +8,9 @@
  *******************************************************************************/
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import org.eclipse.emf.ecore.EObject;
@@ -17,6 +20,7 @@ import org.eclipse.xtext.Alternatives;
 import org.eclipse.xtext.Assignment;
 import org.eclipse.xtext.DisambiguatingSemanticPredicate;
 import org.eclipse.xtext.GatedSemanticPredicate;
+import org.eclipse.xtext.GrammarUtil;
 import org.eclipse.xtext.Group;
 import org.eclipse.xtext.JavaAction;
 import org.eclipse.xtext.Keyword;
@@ -30,7 +34,7 @@ import com.google.common.base.Strings;
  * @author overflow - Initial contribution and API
  */
 public class DebugUtils {
-	private static void abstractElementToString(AbstractElement element, StringBuilder builder, int indentation) {
+	private static void abstractElementToString(AbstractElement element, StringBuilder builder, int indentation, List<String> calledRules) {
 		String indentationString = Strings.repeat(" ", indentation);
 		
 		if (element == null) {
@@ -50,7 +54,7 @@ public class DebugUtils {
 				builder.append(indentationString);
 				builder.append("Group (\n");
 				object.getElements().forEach(e -> {
-					abstractElementToString(e, builder, indentation + 1);
+					abstractElementToString(e, builder, indentation + 1, calledRules);
 				});
 				builder.append(indentationString);
 				builder.append(")");
@@ -61,7 +65,7 @@ public class DebugUtils {
 				builder.append(indentationString);
 				builder.append("Alternatives (\n");
 				object.getElements().forEach(e -> {
-					abstractElementToString(e, builder, indentation + 1);
+					abstractElementToString(e, builder, indentation + 1, calledRules);
 				});
 				builder.append(indentationString);
 				builder.append(")");
@@ -70,10 +74,16 @@ public class DebugUtils {
 			@Override
 			public Boolean caseRuleCall(RuleCall object) {
 				AbstractRule rule = object.getRule();
-				if (rule instanceof ParserRule) {
+				if (rule instanceof ParserRule) {					
 					builder.append(indentationString);
 					builder.append("ParserRule ").append(rule.getName()).append(" (\n");
-					abstractElementToString(rule.getAlternatives(), builder, indentation + 1);
+					if (calledRules.contains(rule.getName())) {
+						builder.append(indentationString).append(" [recursive]\n");
+					} else {
+						List<String> localRuleCalls = new ArrayList<>(calledRules);
+						localRuleCalls.add(rule.getName());
+						abstractElementToString(rule.getAlternatives(), builder, indentation + 1, localRuleCalls);
+					}
 					builder.append(indentationString);
 					builder.append(")");
 				} else {
@@ -104,7 +114,7 @@ public class DebugUtils {
 			public Boolean caseAssignment(Assignment object) {
 				builder.append(indentationString);
 				builder.append("Assignment (\n");
-				abstractElementToString(object.getTerminal(), builder, indentation + 1);
+				abstractElementToString(object.getTerminal(), builder, indentation + 1, calledRules);
 				builder.append(indentationString);
 				builder.append(")");
 				return true;
@@ -122,7 +132,7 @@ public class DebugUtils {
 	
 	public static String abstractElementToString(AbstractElement element) {
 		StringBuilder builder = new StringBuilder();
-		abstractElementToString(element, builder, 0);
+		abstractElementToString(element, builder, 0, Arrays.asList(GrammarUtil.containingRule(element).getName()));
 		return builder.toString();
 	}
 }
