@@ -24,6 +24,7 @@ import org.eclipse.xtext.Assignment;
 import org.eclipse.xtext.EnumRule;
 import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.GrammarUtil;
+import org.eclipse.xtext.JavaAction;
 import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.ParserRule;
 import org.eclipse.xtext.RuleCall;
@@ -650,6 +651,9 @@ public class SyntacticSequencerPDAProvider implements ISyntacticSequencerPDAProv
 					else
 						return SynStateType.ASSIGNED_ACTION_CALL;
 				} else if (ele instanceof AbstractSemanticPredicate) {
+					// TODO sem-predicates: Do something useful here.
+					return SynStateType.ASSIGNED_ACTION_CALL;
+				} else if (ele instanceof JavaAction) {
 					// TODO sem-predicates: Do something useful here.
 					return SynStateType.ASSIGNED_ACTION_CALL;
 				} else if (GrammarUtil.containingCrossReference(ele) != null) {
