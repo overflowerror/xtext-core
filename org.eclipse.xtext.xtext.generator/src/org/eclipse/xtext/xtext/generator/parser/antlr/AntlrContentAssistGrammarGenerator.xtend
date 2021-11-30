@@ -71,6 +71,13 @@ class AntlrContentAssistGrammarGenerator extends AbstractAntlrGrammarWithActions
 					return result;
 				«ENDIF»
 			}
+			
+		   	«IF it.initBlock === null»
+		   		// no init block
+		   	«ELSE»
+		   		// init block
+		   		«JavaCodeUtils.getSource(it.initBlock.code)»
+		   	«ENDIF»
 		}
 	'''
 	
