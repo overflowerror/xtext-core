@@ -49,6 +49,7 @@ import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.TokenGuard
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.TokenSequenceGuard;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.pathAnalysis.TokenAnalysis;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token.Token;
+import static org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.DebugUtils.*;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.StreamUtils;
 
 /**
@@ -304,6 +305,7 @@ public class HoistingProcessor {
 	}
 	
 	public HoistingGuard findHoistingGuard(AbstractElement element) {
+		log.info("hoisting guard of: \n" + abstractElementToString(element));
 		return findGuardForElement(element, containingParserRule(element));
 	}
 	
@@ -332,7 +334,7 @@ public class HoistingProcessor {
 	}
 	
 	private HoistingGuard findGuardForElementWithTrivialCardinality(AbstractElement element, AbstractRule currentRule) {
-		log.info("finding guard for element: " + element.toString());
+		log.info(currentRule.getName() + ": " + abstractElementToShortString(element));
 		
 		if (element instanceof Alternatives) {
 			return findGuardForAlternatives((Alternatives) element, currentRule);

@@ -37,21 +37,16 @@ public class DebugUtils {
 	private static void abstractElementToString(AbstractElement element, StringBuilder builder, int indentation, List<String> calledRules) {
 		String indentationString = Strings.repeat(" ", indentation);
 		
+		builder.append(indentationString);
+		
 		if (element == null) {
-			builder.append(indentationString).append("null");
+			builder.append("null");
 			return;
 		}
 		
 		new XtextSwitch<Boolean>(){
 			@Override
-			public Boolean caseKeyword(Keyword object) {
-				builder.append(indentationString);
-				builder.append("Keyword (").append(object.getValue()).append(")");
-				return true;
-			};
-			@Override
 			public Boolean caseGroup(Group object) {
-				builder.append(indentationString);
 				builder.append("Group (\n");
 				object.getElements().forEach(e -> {
 					abstractElementToString(e, builder, indentation + 1, calledRules);
@@ -62,7 +57,6 @@ public class DebugUtils {
 			};
 			@Override
 			public Boolean caseAlternatives(Alternatives object) {
-				builder.append(indentationString);
 				builder.append("Alternatives (\n");
 				object.getElements().forEach(e -> {
 					abstractElementToString(e, builder, indentation + 1, calledRules);
@@ -74,9 +68,8 @@ public class DebugUtils {
 			@Override
 			public Boolean caseRuleCall(RuleCall object) {
 				AbstractRule rule = object.getRule();
-				if (rule instanceof ParserRule) {					
-					builder.append(indentationString);
-					builder.append("ParserRule ").append(rule.getName()).append(" (\n");
+				if (rule instanceof ParserRule) {
+					builder.append("ParserRule (").append(rule.getName()).append(", \n");
 					if (calledRules.contains(rule.getName())) {
 						builder.append(indentationString).append(" [recursive]\n");
 					} else {
@@ -87,35 +80,93 @@ public class DebugUtils {
 					builder.append(indentationString);
 					builder.append(")");
 				} else {
-					builder.append(indentationString);
-					builder.append(rule.eClass().getName()).append(" ").append(rule.getName());
+					builder.append(rule.eClass().getName()).append(" (").append(rule.getName()).append(")");
+				}
+				return true;
+			};
+			
+			@Override
+			public Boolean caseAssignment(Assignment object) {
+				builder.append("Assignment (");
+				builder.append(object.getFeature());
+				builder.append(",\n");
+				abstractElementToString(object.getTerminal(), builder, indentation + 1, calledRules);
+				builder.append(indentationString);
+				builder.append(")");
+				return true;
+			};
+			
+			@Override
+			public Boolean defaultCase(EObject object) {
+				abstractElementToShortString((AbstractElement) object, builder);
+				return false;
+			};
+		}.doSwitch(element);
+		
+		builder.append("\n");
+	}
+	
+	public static String abstractElementToString(AbstractElement element) {
+		StringBuilder builder = new StringBuilder();
+		abstractElementToString(element, builder, 0, Arrays.asList(GrammarUtil.containingRule(element).getName()));
+		return builder.toString();
+	}
+	
+	private static void abstractElementToShortString(AbstractElement element, StringBuilder builder) {
+		if (element == null) {
+			builder.append("null");
+			return;
+		}
+		
+		new XtextSwitch<Boolean>(){
+			@Override
+			public Boolean caseKeyword(Keyword object) {
+				builder.append("Keyword (").append(object.getValue()).append(")");
+				return true;
+			};
+			@Override
+			public Boolean caseGroup(Group object) {
+				builder.append("Group (");
+				builder.append(object.getElements().size());
+				builder.append(")");
+				return true;
+			};
+			@Override
+			public Boolean caseAlternatives(Alternatives object) {
+				builder.append("Alternatives (");
+				builder.append(object.getElements().size());
+				builder.append(")");
+				return true;
+			};
+			@Override
+			public Boolean caseRuleCall(RuleCall object) {
+				AbstractRule rule = object.getRule();
+				if (rule instanceof ParserRule) {
+					builder.append("ParserRule (").append(rule.getName()).append(")");
+				} else {
+					builder.append(rule.eClass().getName()).append(" (").append(rule.getName()).append(")");
 				}
 				return true;
 			};
 			@Override
 			public Boolean caseJavaAction(JavaAction object) {
-				builder.append(indentationString);
 				builder.append("JavaAction (").append(object.getCode().getSource()).append(")");
 				return true;
 			};
 			@Override
 			public Boolean caseGatedSemanticPredicate(GatedSemanticPredicate object) {
-				builder.append(indentationString);
 				builder.append("GatedSemanticPredicate (").append(object.getCode().getSource()).append(")");
 				return true;
 			};
 			@Override
 			public Boolean caseDisambiguatingSemanticPredicate(DisambiguatingSemanticPredicate object) {
-				builder.append(indentationString);
 				builder.append("DisambiguatingSemanticPredicate (").append(object.getCode().getSource()).append(")");
 				return true;
 			};
 			@Override
 			public Boolean caseAssignment(Assignment object) {
-				builder.append(indentationString);
-				builder.append("Assignment (\n");
-				abstractElementToString(object.getTerminal(), builder, indentation + 1, calledRules);
-				builder.append(indentationString);
+				builder.append("Assignment (");
+				builder.append(object.getFeature());
 				builder.append(")");
 				return true;
 			};
@@ -127,12 +178,11 @@ public class DebugUtils {
 		}.doSwitch(element);
 		
 		builder.append(Objects.toString(element.getCardinality(), ""));
-		builder.append("\n");
 	}
 	
-	public static String abstractElementToString(AbstractElement element) {
+	public static String abstractElementToShortString(AbstractElement element) {
 		StringBuilder builder = new StringBuilder();
-		abstractElementToString(element, builder, 0, Arrays.asList(GrammarUtil.containingRule(element).getName()));
+		abstractElementToShortString(element, builder);
 		return builder.toString();
 	}
 }
