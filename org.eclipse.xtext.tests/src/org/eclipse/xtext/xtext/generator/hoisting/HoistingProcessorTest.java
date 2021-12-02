@@ -290,6 +290,23 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
+		assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))", guard.render());
+	}
+	
+	//@Test
+	public void testUnorderedGroupsWithoutMandatoryContent() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: (($$ p0 $$?=> 'a')? & ($$ p1 $$?=> 'b')?) $$ p2 $$?=> 's';";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		AbstractRule rule = getRule(grammar, "S");
+		
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
 		assertEquals("((" + getSyntaxForKeywordToken("s", 1) + " || (p2)) && (" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))", guard.render());
 	}
 	
@@ -307,7 +324,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("((" + getSyntaxForKeywordToken("s", 1) + " || (p2)) && (" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))", guard.render());
+		assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))", guard.render());
 		
 		// check sizes of groups in unordered group
 		Group group = (Group) rule.getAlternatives();

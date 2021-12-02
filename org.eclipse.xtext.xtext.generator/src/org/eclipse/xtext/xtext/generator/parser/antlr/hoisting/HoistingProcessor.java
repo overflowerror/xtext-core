@@ -25,6 +25,7 @@ import org.eclipse.xtext.Action;
 import org.eclipse.xtext.Alternatives;
 import org.eclipse.xtext.Assignment;
 import org.eclipse.xtext.CompoundElement;
+import org.eclipse.xtext.GrammarUtil;
 import org.eclipse.xtext.Group;
 import org.eclipse.xtext.JavaAction;
 import org.eclipse.xtext.RuleCall;
@@ -152,7 +153,12 @@ public class HoistingProcessor {
 				
 				Alternatives virtualAlternatives = XtextFactory.eINSTANCE.createAlternatives();
 				addElementsToCompoundElement(virtualAlternatives, ((UnorderedGroup) element).getElements());
-				virtualAlternatives.setCardinality("*");
+				if (((UnorderedGroup) element).getElements().stream().allMatch(GrammarUtil::isOptionalCardinality)) {
+					virtualAlternatives.setCardinality("*");
+					// TODO: alternatives analysis needs special case
+				} else {
+					virtualAlternatives.setCardinality("+");
+				}
 				
 				elements.set(i, virtualAlternatives);
 			}
