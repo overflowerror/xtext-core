@@ -11,6 +11,7 @@ package org.eclipse.xtext.xtext.generator.hoisting;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.xml.type.XMLTypePackage;
 import org.eclipse.xtext.AbstractRule;
+import org.eclipse.xtext.Alternatives;
 import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.XtextStandaloneSetup;
 import org.eclipse.xtext.resource.XtextResource;
@@ -384,6 +385,30 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		assertEquals("((" + getSyntaxForKeywordToken("j", 10) + " || ((p0) || (p1))) && (" + getSyntaxForKeywordToken("k", 10) + " || (p2)))", guard.render());
+	}
+	
+	@Test
+	public void testAlternativeIdenticalPaths_bugChangesToEcoreOjects_expectNoChange() throws Exception {
+		// @formatter:off
+		String model =
+			// boundary check: the 10th token should be handled correctly
+			MODEL_PREAMBLE +
+			"S: {S} $$ p0 $$?=> 'a' \n" +
+			" | {S} $$ p1 $$?=> 'a' \n" +
+			" | {S} $$ p2 $$?=> 'b' ;";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		AbstractRule rule = getRule(grammar, "S");
+		
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || ((p0) || (p1))) && (" + getSyntaxForKeywordToken("b", 1) + " || (p2)))", guard.render());
+		
+		// number of elements in Alternatives object has to stay the same
+		// even though the identical paths are collapsed during the hoisting process
+		assertEquals(3, ((Alternatives) rule.getAlternatives()).getElements().size());
 	}
 	
 	@Test

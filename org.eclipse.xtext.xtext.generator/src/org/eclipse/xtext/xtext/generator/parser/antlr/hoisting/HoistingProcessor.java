@@ -72,7 +72,7 @@ public class HoistingProcessor {
 	private HoistingGuard findGuardForAlternatives(Alternatives alternatives, AbstractRule currentRule) {
 		log.info("find guard for alternative");
 		
-		List<AbstractElement> paths = alternatives.getElements();
+		List<AbstractElement> paths = new ArrayList<>(alternatives.getElements());
 		List<MergedPathGuard> guards = paths.stream()
 				.map(p -> findGuardForElement(p, currentRule))
 				.map(MergedPathGuard::new)
