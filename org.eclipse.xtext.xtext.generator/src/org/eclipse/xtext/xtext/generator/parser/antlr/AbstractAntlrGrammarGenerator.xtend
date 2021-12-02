@@ -378,7 +378,6 @@ abstract class AbstractAntlrGrammarGenerator {
 	}
 	
 	protected dispatch def String ebnf2(GatedSemanticPredicate it, AntlrOptions options, boolean supportActions) '''
-		{«JavaCodeUtils.getSource(code)»}?=>
 	'''
 	
 	protected dispatch def String ebnf2(AbstractSemanticPredicate it, AntlrOptions options, boolean supportActions) '''

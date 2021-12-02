@@ -948,11 +948,6 @@ public abstract class AbstractAntlrGrammarGenerator {
   
   protected String _ebnf2(final GatedSemanticPredicate it, final AntlrOptions options, final boolean supportActions) {
     StringConcatenation _builder = new StringConcatenation();
-    _builder.append("{");
-    String _source = JavaCodeUtils.getSource(it.getCode());
-    _builder.append(_source);
-    _builder.append("}?=>");
-    _builder.newLineIfNotEmpty();
     return _builder.toString();
   }
   
