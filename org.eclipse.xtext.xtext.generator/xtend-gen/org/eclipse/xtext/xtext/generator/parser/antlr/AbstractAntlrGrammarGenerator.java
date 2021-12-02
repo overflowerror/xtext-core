@@ -820,11 +820,13 @@ public abstract class AbstractAntlrGrammarGenerator {
         }
         String _renderPredicate = this._hoistingProcessor.findHoistingGuard(e).renderPredicate();
         _builder.append(_renderPredicate);
+        _builder.newLineIfNotEmpty();
+        _builder.append("\t");
         String _dataTypeEbnf = this.dataTypeEbnf(e, supportActions);
-        _builder.append(_dataTypeEbnf);
+        _builder.append(_dataTypeEbnf, "\t");
+        _builder.newLineIfNotEmpty();
       }
     }
-    _builder.newLineIfNotEmpty();
     return _builder.toString();
   }
   
@@ -892,11 +894,13 @@ public abstract class AbstractAntlrGrammarGenerator {
         }
         String _renderPredicate = this._hoistingProcessor.findHoistingGuard(element).renderPredicate();
         _builder.append(_renderPredicate);
+        _builder.newLineIfNotEmpty();
+        _builder.append("\t");
         String _ebnf = this.ebnf(element, options, supportActions);
-        _builder.append(_ebnf);
+        _builder.append(_ebnf, "\t");
+        _builder.newLineIfNotEmpty();
       }
     }
-    _builder.newLineIfNotEmpty();
     return _builder.toString();
   }
   
@@ -925,8 +929,13 @@ public abstract class AbstractAntlrGrammarGenerator {
         } else {
           _builder.appendImmediate("\n    |", "");
         }
+        String _renderPredicate = this._hoistingProcessor.findHoistingGuard(element).renderPredicate();
+        _builder.append(_renderPredicate);
+        _builder.newLineIfNotEmpty();
+        _builder.append("\t");
         String _ebnf = this.ebnf(element, options, supportActions);
-        _builder.append(_ebnf);
+        _builder.append(_ebnf, "\t");
+        _builder.newLineIfNotEmpty();
       }
     }
     _builder.append(")*");

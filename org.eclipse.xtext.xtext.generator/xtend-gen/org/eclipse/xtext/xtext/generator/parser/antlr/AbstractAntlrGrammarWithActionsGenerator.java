@@ -261,6 +261,9 @@ public abstract class AbstractAntlrGrammarWithActionsGenerator extends AbstractA
             } else {
               _builder.appendImmediate("|", "");
             }
+            String _renderPredicate = this._hoistingProcessor.findHoistingGuard(element.getValue()).renderPredicate();
+            _builder.append(_renderPredicate);
+            _builder.newLineIfNotEmpty();
             _builder.append("(");
             _builder.newLine();
             _builder.append("\t");
@@ -424,6 +427,9 @@ public abstract class AbstractAntlrGrammarWithActionsGenerator extends AbstractA
             } else {
               _builder.appendImmediate("|", "");
             }
+            String _renderPredicate = this._hoistingProcessor.findHoistingGuard(element.getValue()).renderPredicate();
+            _builder.append(_renderPredicate);
+            _builder.newLineIfNotEmpty();
             _builder.append("(");
             _builder.newLine();
             _builder.append("\t");

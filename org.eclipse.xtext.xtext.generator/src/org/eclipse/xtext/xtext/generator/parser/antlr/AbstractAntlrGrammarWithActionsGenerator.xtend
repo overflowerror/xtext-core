@@ -107,6 +107,7 @@ abstract class AbstractAntlrGrammarWithActionsGenerator extends AbstractAntlrGra
 					(
 						(
 				«FOR element:elements.indexed SEPARATOR '|'»
+							«element.value.findHoistingGuard.renderPredicate»
 							(
 								{getUnorderedGroupHelper().canSelect(grammarAccess.«(originalElement as AbstractElement).gaRuleElementAccessor», «element.key»)}?=>(
 									{
@@ -151,6 +152,7 @@ abstract class AbstractAntlrGrammarWithActionsGenerator extends AbstractAntlrGra
 					(
 						(
 				«FOR element:elements.indexed SEPARATOR '|'»
+							«element.value.findHoistingGuard.renderPredicate»
 							(
 								{getUnorderedGroupHelper().canSelect(grammarAccess.«(originalElement as AbstractElement).gaRuleElementAccessor», «element.key»)}?=>(
 									{
