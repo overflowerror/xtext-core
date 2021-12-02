@@ -13,6 +13,8 @@ import org.eclipse.emf.ecore.xml.type.XMLTypePackage;
 import org.eclipse.xtext.AbstractRule;
 import org.eclipse.xtext.Alternatives;
 import org.eclipse.xtext.Grammar;
+import org.eclipse.xtext.Group;
+import org.eclipse.xtext.UnorderedGroup;
 import org.eclipse.xtext.XtextStandaloneSetup;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.testing.GlobalRegistries;
@@ -288,8 +290,34 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		//assertEquals("((" + getSyntaxForKeywordToken("s", 1) + " || (p2)) && ((" + getSyntaxForKeywordToken("a", 1) + " && " + getSyntaxForKeywordToken("b", 1) + ") || ((" + getSyntaxForKeywordToken("a", 1)+ " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))))", guard.render());
 		assertEquals("((" + getSyntaxForKeywordToken("s", 1) + " || (p2)) && (" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))", guard.render());
+	}
+	
+	@Test
+	public void testUnorderedGroups_bugGroupsChangeDuringHoisting_expectNoChange() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: (($$ p0 $$?=> 'a') & ($$ p1 $$?=> 'b')) $$ p2 $$?=> 's';";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		AbstractRule rule = getRule(grammar, "S");
+		
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		assertEquals("((" + getSyntaxForKeywordToken("s", 1) + " || (p2)) && (" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))", guard.render());
+		
+		// check sizes of groups in unordered group
+		Group group = (Group) rule.getAlternatives();
+		assertEquals(3, group.getElements().size());
+		UnorderedGroup unorderedGroup = (UnorderedGroup) group.getElements().get(0);
+		assertEquals(2, unorderedGroup.getElements().size());
+		group = (Group) unorderedGroup.getElements().get(0);
+		assertEquals(2, group.getElements().size());
+		group = (Group) unorderedGroup.getElements().get(1);
+		assertEquals(2, group.getElements().size());
 	}
 	
 	@Test

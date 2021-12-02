@@ -32,6 +32,7 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.EcorePackage;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.nodemodel.BidiIterator;
 import org.eclipse.xtext.nodemodel.ICompositeNode;
 import org.eclipse.xtext.nodemodel.ILeafNode;
@@ -707,23 +708,8 @@ public class GrammarUtil {
 		return null;
 	}
 	
-	public static EObject cloneEObject(EObject element) {
-		EObject clone = XtextFactory.eINSTANCE.create(element.eClass());
-		for (EStructuralFeature feature : element.eClass().getEAllStructuralFeatures()) {
-			Object value = element.eGet(feature);
-			if (value instanceof EObject) {
-				// if value is EObject a deep copy is needed since an EObject can only be 
-				// referenced by one other EObject.
-
-				value = cloneEObject((EObject) value);
-			}
-			clone.eSet(feature, value);
-		}
-		return clone;
-	}
-	
 	public static AbstractElement cloneAbstractElement(AbstractElement element) {
-		return (AbstractElement) cloneEObject(element);
+		return (AbstractElement) EcoreUtil.copy(element);
 	}
 	
 	public static void addElementsToCompoundElement(CompoundElement element, Stream<? extends AbstractElement> elements) {
