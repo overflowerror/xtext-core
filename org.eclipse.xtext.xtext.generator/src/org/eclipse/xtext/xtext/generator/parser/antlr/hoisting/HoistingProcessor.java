@@ -240,8 +240,10 @@ public class HoistingProcessor {
 	
 	// TODO: make private
 	public HoistingGuard findGuardForRule(AbstractRule rule) {
+		log.info("finding guard for rule: " + rule.getName());
 		HoistingGuard guard = ruleCache.get(rule.getName());
 		if (guard == null) {
+			log.info("not in cache");
 			guard = findGuardForElement(rule.getAlternatives(), rule);
 			ruleCache.put(rule.getName(), guard);
 		}
@@ -306,6 +308,7 @@ public class HoistingProcessor {
 	
 	public HoistingGuard findHoistingGuard(AbstractElement element) {
 		log.info("hoisting guard of: \n" + abstractElementToString(element));
+		// should only be called for valid AST elements, so element can never be floating
 		return findGuardForElement(element, containingParserRule(element));
 	}
 	

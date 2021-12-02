@@ -108,7 +108,7 @@ public class DebugUtils {
 	
 	public static String abstractElementToString(AbstractElement element) {
 		StringBuilder builder = new StringBuilder();
-		abstractElementToString(element, builder, 0, Arrays.asList(GrammarUtil.containingRule(element).getName()));
+		abstractElementToString(element, builder, 0, Arrays.asList(containingRuleSafe(element)));
 		return builder.toString();
 	}
 	
@@ -184,5 +184,14 @@ public class DebugUtils {
 		StringBuilder builder = new StringBuilder();
 		abstractElementToShortString(element, builder);
 		return builder.toString();
+	}
+	
+	public static String containingRuleSafe(AbstractElement element) {
+		AbstractRule rule = GrammarUtil.containingRule(element);
+		if (rule == null) {
+			return "{floating}";
+		} else {
+			return rule.getName();
+		}
 	}
 }
