@@ -651,11 +651,9 @@ public class SyntacticSequencerPDAProvider implements ISyntacticSequencerPDAProv
 					else
 						return SynStateType.ASSIGNED_ACTION_CALL;
 				} else if (ele instanceof AbstractSemanticPredicate) {
-					// TODO sem-predicates: Do something useful here.
-					return SynStateType.ASSIGNED_ACTION_CALL;
+					return SynStateType.SEMANTIC_PREDICATE;
 				} else if (ele instanceof JavaAction) {
-					// TODO sem-predicates: Do something useful here.
-					return SynStateType.ASSIGNED_ACTION_CALL;
+					return SynStateType.JAVA_ACTION;
 				} else if (GrammarUtil.containingCrossReference(ele) != null) {
 					if (ele instanceof RuleCall) {
 						RuleCall rc = (RuleCall) ele;
