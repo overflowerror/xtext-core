@@ -329,18 +329,24 @@ public class HoistingProcessor {
 	}
 	
 	private HoistingGuard findGuardForElement(AbstractElement element, AbstractRule currentRule) {
-		if (isTrivialCardinality(element)) {
-			return findGuardForElementWithTrivialCardinality(element, currentRule);
-		} else if (isOneOrMoreCardinality(element)) {
+		if (isTrivialCardinality(element) ||
+			isOneOrMoreCardinality(element)
+		) {
 			return findGuardForElementWithTrivialCardinality(element, currentRule);
 		} else if (isOptionalCardinality(element)) {
 			if (pathHasTokenOrAction(element)) {
-				// there might be a token in this element
-				// no context accessible to construct guard
-				// this does only work when analyzing group
-				
-				// TODO: maybe generate warning and return terminal()
-				throw new OptionalCardinalityWithoutContextException("optional cardinality is only supported in groups", currentRule);
+				if (!pathHasHoistablePredicate(currentRule.getAlternatives())) {
+					// unsupported construct doesn't matter since there is no
+					// hoistable predicate in the rule anyway.
+					return HoistingGuard.unguarded();
+				} else {
+					// there might be a token in this element
+					// no context accessible to construct guard
+					// this does only work when analyzing group
+					
+					// TODO: maybe generate warning and return terminal()
+					throw new OptionalCardinalityWithoutContextException("optional cardinality is only supported in groups", currentRule);
+				}
 			} else {
 				// element with cardinality ? or * has no token or action
 				// -> the path is accessible whether or not this element is guarded
@@ -379,11 +385,17 @@ public class HoistingProcessor {
 		} else if (element instanceof UnorderedGroup) {
 			if (((UnorderedGroup) element).getElements().stream().allMatch(GrammarUtil::isOptionalCardinality)) {
 				if (pathHasTokenOrAction(element)) {
-					// if unordered group has tokens or actions we need the context which is not available here
-					// only works when analyzing groups
-					
-					// TODO: maybe add warning and return unguarded
-					throw new UnsupportedConstructException("unordered groups with hoisting-relevant elements and optional cardinalities are only supported in groups", currentRule);
+					if (!pathHasHoistablePredicate(currentRule.getAlternatives())) {
+						// unsupported construct but rule doesn't contain hoistable predicates
+						return HoistingGuard.unguarded();
+					} else {
+						// if unordered group has tokens or actions we need the context which is 
+						// not available here
+						// only works when analyzing groups
+						
+						// TODO: maybe add warning and return unguarded
+						throw new UnsupportedConstructException("unordered groups with hoisting-relevant elements and optional cardinalities are only supported in groups", currentRule);
+					}
 				} else {
 					// the path is accessible whether or not any guard is satisfied
 					// -> assume it's unguarded
@@ -403,7 +415,12 @@ public class HoistingProcessor {
 		} else if (element instanceof Assignment) {
 			return findGuardForElement(((Assignment) element).getTerminal(), currentRule);
 		} else {
-			throw new UnsupportedConstructException("element not supported: " + element.toString(), currentRule);
+			if (!pathHasHoistablePredicate(currentRule.getAlternatives())) {
+				// unsupported construct but rule doesn't contain hoistable predicates
+				return HoistingGuard.unguarded();
+			} else {
+				throw new UnsupportedConstructException("element not supported: " + element.toString(), currentRule);
+			}
 		}
 	}
 }

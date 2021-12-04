@@ -20,7 +20,6 @@ import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.testing.GlobalRegistries;
 import org.eclipse.xtext.tests.AbstractXtextTests;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.HoistingProcessor;
-import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.HoistingException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.TokenAnalysisAbortedException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.UnsupportedConstructException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.HoistingGuard;
@@ -291,6 +290,22 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertEquals("((" + getSyntaxForKeywordToken("s", 1) + " || (p1)) && (" + getSyntaxForKeywordToken("a", 1) + " || (p0)))", guard.render());
 	}
 	
+	@Test
+	public void testCardinalityStarWithoutContextWithoutPredicates_expectUnguarded() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: ('a')*;";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		AbstractRule rule = getRule(grammar, "S");
+		
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertTrue(guard.isTrivial());
+		assertFalse(guard.hasTerminal());
+	}
+	
 	@Test(expected = UnsupportedConstructException.class)
 	public void testCardinalityStarWithoutContext_expectUnsupporedConstruct() throws Exception {
 		// @formatter:off
@@ -321,6 +336,22 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))", guard.render());
+	}
+	
+	@Test
+	public void testUnorderedGroupWithEmptyPathsWithoutContextWithoutPredicates_expectUnguarded() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: ('a')? & ('b');";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		AbstractRule rule = getRule(grammar, "S");
+		
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertTrue(guard.isTrivial());
+		assertFalse(guard.hasTerminal());
 	}
 	
 	@Test
