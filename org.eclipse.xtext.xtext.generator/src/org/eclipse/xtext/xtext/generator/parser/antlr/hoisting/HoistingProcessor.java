@@ -70,7 +70,7 @@ public class HoistingProcessor {
 	}
 	
 	// TODO: handling for TokenAnalysisAbortedException
-	private HoistingGuard findGuardForAlternatives(Alternatives alternatives, AbstractRule currentRule) {
+	private HoistingGuard findGuardForAlternatives(CompoundElement alternatives, AbstractRule currentRule) {
 		log.info("find guard for alternative");
 		
 		List<AbstractElement> paths = new ArrayList<>(alternatives.getElements());
@@ -148,17 +148,15 @@ public class HoistingProcessor {
 		for (int i = 0; i < size; i++) {
 			AbstractElement element = elements.get(i);
 			if (element instanceof UnorderedGroup) {
-				// Unordered group (A & B) is the same as (A | B)*
+				// Unordered group (A & B) is the same as (A | B)+ or (A | B)* (is A and B are optional)
 				// -> create virtual element
 				
 				Alternatives virtualAlternatives = XtextFactory.eINSTANCE.createAlternatives();
 				addElementsToCompoundElement(virtualAlternatives, ((UnorderedGroup) element).getElements());
-				if (((UnorderedGroup) element).getElements().stream().allMatch(GrammarUtil::isOptionalCardinality)) {
-					virtualAlternatives.setCardinality("*");
-					// TODO: alternatives analysis needs special case
-				} else {
-					virtualAlternatives.setCardinality("+");
-				}
+				
+				// if A and B are optional the cardinality would be *
+				// but it doesn't matter for hoisting
+				virtualAlternatives.setCardinality("+");
 				
 				elements.set(i, virtualAlternatives);
 			}
@@ -367,16 +365,28 @@ public class HoistingProcessor {
 		} else if (element instanceof JavaAction) {
 			return HoistingGuard.action();
 		} else if (element instanceof UnorderedGroup) {
-			if (pathHasTokenOrAction(element)) {
-				// if unordered group has tokens or actions we need the context which is not available here
-				// only works when analyzing groups
-				
-				// TODO: maybe add warning and return unguarded
-				throw new UnsupportedConstructException("unordered groups are only supported in groups", currentRule);
+			if (((UnorderedGroup) element).getElements().stream().allMatch(GrammarUtil::isOptionalCardinality)) {
+				if (pathHasTokenOrAction(element)) {
+					// if unordered group has tokens or actions we need the context which is not available here
+					// only works when analyzing groups
+					
+					// TODO: maybe add warning and return unguarded
+					throw new UnsupportedConstructException("unordered groups with hoisting-relevant elements and optional cardinalities are only supported in groups", currentRule);
+				} else {
+					// the path is accessible whether or not any guard is satisfied
+					// -> assume it's unguarded
+					return HoistingGuard.unguarded();
+				}
 			} else {
-				// the path is accessible whether or not any guard is satisfied
-				// -> assume it's unguarded
-				return HoistingGuard.unguarded();
+				if (pathHasTokenOrAction(element)) {
+					// there is no context but it might still be possible to find a guard for this group
+					// only works if none of the paths is empty or optional
+					return findGuardForAlternatives((CompoundElement) element, currentRule);
+				} else {
+					// the path is accessible whether or not any guard is satisfied
+					// -> assume it's unguarded
+					return HoistingGuard.unguarded();
+				}
 			}
 		} else if (element instanceof Assignment) {
 			return findGuardForElement(((Assignment) element).getTerminal(), currentRule);

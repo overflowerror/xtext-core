@@ -20,7 +20,9 @@ import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.testing.GlobalRegistries;
 import org.eclipse.xtext.tests.AbstractXtextTests;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.HoistingProcessor;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.HoistingException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.TokenAnalysisAbortedException;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.UnsupportedConstructException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.HoistingGuard;
 import org.junit.After;
 import org.junit.Before;
@@ -225,11 +227,11 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 	}
 
 	@Test
-	public void testCardinalityPlusWithTokens() throws Exception {
+	public void testCardinalityPlusPredicate_expectPredicateAfterGroupNotInGuard() throws Exception {
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
-			"S: ($$ p0 $$?=> 'a')+ $$ p1 $$?=> 's';";
+			"S: ($$ p0 $$?=> 'a')+ $$ p1 $$?=> ;";
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
@@ -242,7 +244,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 	}
 
 	@Test
-	public void testCardinalityQuestionmarkWithTokens() throws Exception {
+	public void testCardinalityQuestionmarkWithContext() throws Exception {
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
@@ -257,9 +259,23 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertTrue(guard.hasTerminal());
 		assertEquals("((" + getSyntaxForKeywordToken("s", 1) + " || (p1)) && (" + getSyntaxForKeywordToken("a", 1) + " || (p0)))", guard.render());
 	}
+	
+	@Test(expected = UnsupportedConstructException.class)
+	public void testCardinalityQuestionmarkWithoutContext_expectUnsupportedConstruct() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: ($$ p0 $$?=> 'a')?;";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		AbstractRule rule = getRule(grammar, "S");
+		
+		hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+	}
 
 	@Test
-	public void testCardinalityStarWithTokens() throws Exception {
+	public void testCardinalityStarWithContext() throws Exception {
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
@@ -275,9 +291,23 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertEquals("((" + getSyntaxForKeywordToken("s", 1) + " || (p1)) && (" + getSyntaxForKeywordToken("a", 1) + " || (p0)))", guard.render());
 	}
 	
+	@Test(expected = UnsupportedConstructException.class)
+	public void testCardinalityStarWithoutContext_expectUnsupporedConstruct() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: ($$ p0 $$?=> 'a')* ;";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		AbstractRule rule = getRule(grammar, "S");
+		
+		hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+	}
+	
 
 	@Test
-	public void testUnorderedGroups() throws Exception {
+	public void testUnorderedGroup() throws Exception {
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
@@ -293,8 +323,39 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))", guard.render());
 	}
 	
+	@Test
+	public void testUnorderedGroupWithNoEmptyPathsWithoutContext() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: ($$ p0 $$?=> 'a') & ($$ p1 $$?=> 'b');";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		AbstractRule rule = getRule(grammar, "S");
+		
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))", guard.render());
+	}
+	
+	@Test(expected = UnsupportedConstructException.class)
+	public void testUnorderedGroupWithEmptyPathsWithoutContext_expectUnsupportedConstruct() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: ($$ p0 $$?=> 'a')? & ($$ p1 $$?=> 'b');";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		AbstractRule rule = getRule(grammar, "S");
+		
+		hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+	}
+	
 	//@Test
-	public void testUnorderedGroupsWithoutMandatoryContent() throws Exception {
+	public void testUnorderedGroupWithoutMandatoryContent() throws Exception {
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
@@ -310,8 +371,22 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertEquals("((" + getSyntaxForKeywordToken("s", 1) + " || (p2)) && (" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))", guard.render());
 	}
 	
+	@Test(expected = UnsupportedConstructException.class)
+	public void testUnorderedGroupWithoutMandatoryContentWithoutContext_expectUnsupportedConstruct() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: ($$ p0 $$?=> 'a')? & ($$ p1 $$?=> 'b')?;";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		AbstractRule rule = getRule(grammar, "S");
+		
+		hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+	}
+	
 	@Test
-	public void testUnorderedGroups_bugGroupsChangeDuringHoisting_expectNoChange() throws Exception {
+	public void testUnorderedGroup_bugGroupsChangeDuringHoisting_expectNoChange() throws Exception {
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
