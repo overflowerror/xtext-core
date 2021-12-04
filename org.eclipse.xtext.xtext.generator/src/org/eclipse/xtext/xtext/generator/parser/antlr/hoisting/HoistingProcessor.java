@@ -310,6 +310,18 @@ public class HoistingProcessor {
 		}
 	}
 	
+	public HoistingGuard findHoistingGuardIgnoreCardinality(AbstractElement element) {
+		log.info("hoisting (trivial) guard of: \n" + abstractElementToString(element));
+		// should only be called for valid AST elements, so element can never be floating
+		
+		AbstractRule rule = containingParserRule(element);
+		if (element instanceof UnorderedGroup) {
+			return findGuardForAlternatives(((CompoundElement) element), rule);
+		} else {
+			return findGuardForElementWithTrivialCardinality(element, rule);
+		}
+	}
+	
 	public HoistingGuard findHoistingGuard(AbstractElement element) {
 		log.info("hoisting guard of: \n" + abstractElementToString(element));
 		// should only be called for valid AST elements, so element can never be floating

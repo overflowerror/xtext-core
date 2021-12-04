@@ -315,6 +315,7 @@ abstract class AbstractAntlrGrammarGenerator {
 		
 	protected def String ebnf(AbstractElement it, AntlrOptions options, boolean supportActions) '''
 		«IF mustBeParenthesized»(
+			«IF !isTrivialCardinality»«findHoistingGuardIgnoreCardinality.renderPredicate»«ENDIF»
 			«ebnfPredicate(options)»«ebnf2(options, supportActions)»
 		)«ELSE»«ebnf2(options, supportActions)»«ENDIF»«cardinality»
 	'''
@@ -325,6 +326,7 @@ abstract class AbstractAntlrGrammarGenerator {
 	
 	protected def String dataTypeEbnf(AbstractElement it, boolean supportActions) '''
 		«IF mustBeParenthesized»(
+			«IF !isTrivialCardinality»«findHoistingGuardIgnoreCardinality.renderPredicate»«ENDIF»
 			«dataTypeEbnfPredicate»«dataTypeEbnf2(supportActions)»
 		)«ELSE»«dataTypeEbnf2(supportActions)»«ENDIF»«cardinality»
 	'''

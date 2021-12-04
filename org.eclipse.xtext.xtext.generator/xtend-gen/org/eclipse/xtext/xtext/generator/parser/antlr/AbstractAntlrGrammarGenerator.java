@@ -690,6 +690,16 @@ public abstract class AbstractAntlrGrammarGenerator {
         _builder.append("(");
         _builder.newLineIfNotEmpty();
         _builder.append("\t");
+        {
+          boolean _isTrivialCardinality = GrammarUtil.isTrivialCardinality(it);
+          boolean _not = (!_isTrivialCardinality);
+          if (_not) {
+            String _renderPredicate = this._hoistingProcessor.findHoistingGuardIgnoreCardinality(it).renderPredicate();
+            _builder.append(_renderPredicate, "\t");
+          }
+        }
+        _builder.newLineIfNotEmpty();
+        _builder.append("\t");
         String _ebnfPredicate = this.ebnfPredicate(it, options);
         _builder.append(_ebnfPredicate, "\t");
         String _ebnf2 = this.ebnf2(it, options, supportActions);
@@ -746,6 +756,16 @@ public abstract class AbstractAntlrGrammarGenerator {
       boolean _mustBeParenthesized = this.mustBeParenthesized(it);
       if (_mustBeParenthesized) {
         _builder.append("(");
+        _builder.newLineIfNotEmpty();
+        _builder.append("\t");
+        {
+          boolean _isTrivialCardinality = GrammarUtil.isTrivialCardinality(it);
+          boolean _not = (!_isTrivialCardinality);
+          if (_not) {
+            String _renderPredicate = this._hoistingProcessor.findHoistingGuardIgnoreCardinality(it).renderPredicate();
+            _builder.append(_renderPredicate, "\t");
+          }
+        }
         _builder.newLineIfNotEmpty();
         _builder.append("\t");
         String _dataTypeEbnfPredicate = this.dataTypeEbnfPredicate(it);
