@@ -226,6 +226,23 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 	}
 
 	@Test
+	public void testGroupInGroup_expectMinimalParentheses() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: $$ p0 $$?=> ($$ p1 $$?=> ($$ p2 $$?=> 'a')); ";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		AbstractRule rule = getRule(grammar, "S");
+		
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		assertEquals("((p0) && (p1) && (p2))", guard.render());
+	}
+	
+	@Test
 	public void testCardinalityPlusPredicate_expectPredicateAfterGroupNotInGuard() throws Exception {
 		// @formatter:off
 		String model =

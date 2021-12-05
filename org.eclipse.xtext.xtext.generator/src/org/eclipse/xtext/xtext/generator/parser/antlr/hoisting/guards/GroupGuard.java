@@ -31,8 +31,15 @@ public class GroupGuard implements HoistingGuard {
 	}
 	
 	public void add(Guard guard) {
-		if (!guard.isTrivial())
+		if (guard.isTrivial()) {
+			return;
+		}
+		
+		if (guard instanceof GroupGuard) {
+			((GroupGuard) guard).elementGuards.forEach(this::add);
+		} else {
 			elementGuards.add(guard);
+		}
 	}
 	
 	public void setHasTerminal() {
