@@ -25,12 +25,16 @@ import org.eclipse.xtext.AbstractSemanticPredicate;
 import org.eclipse.xtext.Action;
 import org.eclipse.xtext.Alternatives;
 import org.eclipse.xtext.Assignment;
+import org.eclipse.xtext.CompoundElement;
+import org.eclipse.xtext.GrammarUtil;
 import org.eclipse.xtext.Group;
 import org.eclipse.xtext.JavaAction;
 import org.eclipse.xtext.RuleCall;
+import org.eclipse.xtext.UnorderedGroup;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.HoistingConfiguration;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.SymbolicAnalysisFailedException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.TokenAnalysisAbortedException;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.UnsupportedConstructException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token.Token;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.MutablePrimitiveWrapper;
 
@@ -48,7 +52,7 @@ public class TokenAnalysis {
 		this.config = config;
 	}
 	
-	private TokenAnalysisPaths getTokenForIndexesAlternatives(Alternatives path, TokenAnalysisPaths prefix, boolean needsLength) throws TokenAnalysisAbortedException {
+	private TokenAnalysisPaths getTokenForIndexesAlternatives(CompoundElement path, TokenAnalysisPaths prefix, boolean needsLength) throws TokenAnalysisAbortedException {
 		if (prefix.isDone()) {
 			return prefix;
 		}
@@ -165,7 +169,7 @@ public class TokenAnalysis {
 			} else if (path instanceof Assignment) {
 				current = getTokenForIndexes(((Assignment) path).getTerminal(), current, false);
 			} else {
-				throw new IllegalArgumentException("unknown element: " + path.eClass().getName());
+				throw new UnsupportedConstructException("unknown element: " + path.eClass().getName());
 			}
 			
 			// add path to result
@@ -192,6 +196,23 @@ public class TokenAnalysis {
 			return getTokenForIndexesAlternatives((Alternatives) path, prefix, needsLength);
 		} else if (path instanceof Group) {
 			return getTokenForIndexesGroup((Group) path, prefix, needsLength);
+		} else if (path instanceof UnorderedGroup) {
+			// clone unordered group
+			// set cardinality accordingly
+			// use code for alternatives
+			
+			CompoundElement clonedUnorderedGroup = (CompoundElement) cloneAbstractElement(path);
+			if (isOptionalCardinality(path) || 
+				((UnorderedGroup) path).getElements().stream().allMatch(GrammarUtil::isOptionalCardinality)
+			){
+				clonedUnorderedGroup.setCardinality("*");
+			} else {
+				clonedUnorderedGroup.setCardinality("+");
+			}
+			
+			// getTokenForIndexesAlternatives only needs a CompoundElement so we can give it
+			// the modified unordered group
+			return getTokenForIndexesAlternatives(clonedUnorderedGroup, prefix, needsLength);
 		} else if (path instanceof Action ||
 		           path instanceof AbstractSemanticPredicate ||
 		           path instanceof JavaAction
@@ -217,7 +238,7 @@ public class TokenAnalysis {
 	}
 	
 	private boolean arePathsIdenticalFallback(AbstractElement path1, AbstractElement path2) {
-		// + 1, because otherwise identical paths of length TOKEN_ANALYSIS_LIMIT can't be checked
+		// + 1, because otherwise identical paths of length token limit can't be checked
 		for (int i = 0; i < config.getTokenLimit() + 1; i++) {
 			Set<List<Token>> tokenListSet1;
 			Set<List<Token>> tokenListSet2;

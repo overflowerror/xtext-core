@@ -580,6 +580,24 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 	}
 	
 	@Test
+	public void testUnorderedGroupInAlternatives_bugUnknownElementInTokenAnalysis_expectNoException() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: {S} $$ p0 $$?=> 'a' \n" +
+			" | {S} $$ p1 $$?=> ('b' & 'c');";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		AbstractRule rule = getRule(grammar, "S");
+		
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && ((" + getSyntaxForKeywordToken("b", 1) + " && " + getSyntaxForKeywordToken("c", 1) + ") || (p1)))", guard.render());
+	}
+	
+	@Test
 	public void testAlternativeUnguardedPath() throws Exception {
 		// @formatter:off
 		String model =

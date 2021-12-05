@@ -10,8 +10,6 @@ package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils;
 
 import java.util.function.Function;
 
-import com.google.errorprone.annotations.MustBeClosed;
-
 /**
  * @author overflow - Initial contribution and API
  */
