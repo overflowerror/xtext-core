@@ -69,7 +69,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		return "!\"" + keyword + "\".equals(input.LT(" + offset + ").getText())";
 	}
 	private String getSyntaxForTerminalToken(String terminal, int offset) {
-		return "input.LT(" + offset + ").getType() != " + terminal;
+		return "input.LA(" + offset + ") != " + terminal;
 	}
 	
 	@Test

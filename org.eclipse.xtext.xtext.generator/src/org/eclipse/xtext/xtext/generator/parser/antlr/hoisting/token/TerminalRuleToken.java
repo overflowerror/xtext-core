@@ -24,7 +24,7 @@ public class TerminalRuleToken implements Token {
 
 	@Override
 	public String negatedCondition() {
-		return "input.LT(" + position + ").getType() != " + rule.getName();
+		return "input.LA(" + position + ") != " + rule.getName();
 	}
 	
 	@Override
