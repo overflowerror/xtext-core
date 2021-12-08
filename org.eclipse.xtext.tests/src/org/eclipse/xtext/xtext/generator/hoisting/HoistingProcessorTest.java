@@ -523,6 +523,27 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertTrue(guard.hasTerminal());
 		assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))", guard.render());
 	}
+	
+	@Test
+	public void testAlternativesWithPrefixPathsAndNonEofContext_expectGuardBasedOnContext() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: a=A 's' ;\n" +
+			"A: {A} $$ p0 $$?=> 'a' \n" +
+			" | {A} $$ p1 $$?=> 'a' 'b' ;";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
+		AbstractRule rule = getRule(grammar, "A");
+		
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		System.out.println(guard.toString());
+		assertEquals("((" + getSyntaxForKeywordToken("s", 2) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 2) + " || (p1)))", guard.render());
+	}
 
 	@Test
 	public void testAlternativeWithDifferentEnumRule() throws Exception {

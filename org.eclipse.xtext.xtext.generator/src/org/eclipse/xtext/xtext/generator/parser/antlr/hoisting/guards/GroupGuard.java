@@ -8,6 +8,7 @@
  *******************************************************************************/
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -84,6 +85,19 @@ public class GroupGuard implements HoistingGuard {
 	@Override
 	public boolean hasTerminal() {
 		return hasTerminal;
+	}
+
+	@Override
+	public String toString() {
+		return "GroupGuard (\n" +
+				elementGuards.stream()
+					.map(Object::toString)
+					.map(s -> Arrays.stream(s.split("\n"))
+							.map(l -> "\t" + l)
+							.collect(Collectors.joining("\n"))
+					).map(s -> s + "\n")
+					.collect(Collectors.joining("\n")) +
+				")\n";
 	}
 	
 }

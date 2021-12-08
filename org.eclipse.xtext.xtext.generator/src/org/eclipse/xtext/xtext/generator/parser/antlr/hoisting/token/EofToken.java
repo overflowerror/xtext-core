@@ -45,5 +45,10 @@ public class EofToken implements Token {
 			return false;
 		return true;
 	}
+	
+	@Override
+	public String toString() {
+		return "EofToken(" + position + ")\n";
+	}
 
 }

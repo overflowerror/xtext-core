@@ -24,4 +24,11 @@ public class SingleTokenGuard implements TokenGuard {
 	public String render() {
 		return token.negatedCondition();
 	}
+	
+	@Override
+	public String toString() {
+		return "SingleTokenGuard (\n" +
+				"\t" + token + "\n" +
+				")\n";
+	}
 }

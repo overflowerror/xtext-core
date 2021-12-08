@@ -29,7 +29,7 @@ public class TerminalRuleToken implements Token {
 	
 	@Override
 	public String toString() {
-		return "terminal " + rule.getName();
+		return "TerminalToken(" + rule.getName() + ", " + position + ")\n";
 	}
 
 	@Override

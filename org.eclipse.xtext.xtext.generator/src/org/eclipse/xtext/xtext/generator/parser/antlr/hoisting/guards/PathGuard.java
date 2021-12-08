@@ -8,8 +8,10 @@
  *******************************************************************************/
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.xtext.util.Pair;
 
@@ -82,5 +84,17 @@ public class PathGuard implements HoistingGuard {
 		}
 		
 		return result;
+	}
+	
+	@Override
+	public String toString() {
+		return "PathGuard (\n" +
+				"\ttokenGuard:\n\t" + Arrays.stream(tokenGuard.toString().split("\n"))
+					.map(l -> "\t" + l)
+					.collect(Collectors.joining("\n")) + "\n" +
+				"\thoistngGuard:\n\t" + Arrays.stream(hoistngGuard.toString().split("\n"))
+					.map(l -> "\t" + l)
+					.collect(Collectors.joining("\n")) + "\n" + 
+				")\n";
 	}
 }

@@ -37,4 +37,11 @@ public class PredicateGuard implements HoistingGuard {
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return "PredicateGuard (\n" +
+				"\t" + JavaCodeUtils.getSource(element.getCode()).trim() + "\n" +
+				")\n";
+	}
+	
 }

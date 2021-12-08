@@ -8,6 +8,7 @@
  *******************************************************************************/
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -68,5 +69,18 @@ public class AlternativesGuard implements HoistingGuard {
 			AlternativesGuard::new, 
 			Collector.Characteristics.CONCURRENT
 		);
+	}
+	
+	@Override
+	public String toString() {
+		return "AlternativesGuard (\n" +
+				paths.stream()
+					.map(Object::toString)
+					.map(s -> Arrays.stream(s.split("\n"))
+							.map(l -> "\t" + l)
+							.collect(Collectors.joining("\n"))
+					).map(s -> s + "\n")
+					.collect(Collectors.joining("\n")) +
+				")\n";
 	}
 }

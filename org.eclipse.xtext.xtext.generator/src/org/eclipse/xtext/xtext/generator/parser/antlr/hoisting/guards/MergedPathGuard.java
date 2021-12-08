@@ -8,6 +8,7 @@
  *******************************************************************************/
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,5 +62,17 @@ public class MergedPathGuard implements HoistingGuard {
 		// only need to check first element since all paths should be identical
 		return pathGuards.get(0).hasTerminal();
 	}
-
+	
+	@Override
+	public String toString() {
+		return "MergedPathGuard (\n" +
+				pathGuards.stream()
+					.map(Object::toString)
+					.map(s -> Arrays.stream(s.split("\n"))
+							.map(l -> "\t" + l)
+							.collect(Collectors.joining("\n"))
+					).map(s -> s + "\n")
+					.collect(Collectors.joining("\n")) +
+				")\n";
+	}
 }

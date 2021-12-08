@@ -56,28 +56,39 @@ public class TokenAnalysis {
 		this.grammar = grammar;
 	}
 	
+	private AbstractElement getContainer(AbstractElement element) {
+		EObject tmp = element.eContainer();
+		while (!(tmp instanceof AbstractElement)) {
+			if (tmp == null) {
+				return null;
+			}
+			tmp = tmp.eContainer();
+		}
+		return (AbstractElement) tmp;
+	}
+	
 	private CompoundElement getCompoundContainer(AbstractElement element) {
 		if (element instanceof CompoundElement) {
 			// get container of compoundElement since getContainerOfType 
 			// would return the same element
-			EObject tmp = element.eContainer();
-			while (!(tmp instanceof AbstractElement)) {
-				if (tmp == null) {
-					return null;
-				}
-				tmp = tmp.eContainer();
+			element = getContainer(element);
+			if (element == null) {
+				return null;
 			}
-			element = (AbstractElement) tmp;
 		}
 		return getContainerOfType(element, CompoundElement.class);
 	}
 	
-	private List<AbstractElement> getNextElementsInContext(AbstractElement last) {
-		
+	private List<AbstractElement> getNextElementsInContext(AbstractElement last) {		
 		CompoundElement container = getCompoundContainer(last);
-		while (container instanceof Alternatives) {
+		while (container instanceof Alternatives || 
+		       last.eContainer() instanceof Assignment
+		) {
 			// skip alternatives since they have to be covered separately
-			last = container;
+			last = getContainer(last);
+			if (last == null) {
+				return Arrays.asList((AbstractElement) null);
+			}
 			container = getCompoundContainer(last);
 		}
 		
@@ -89,7 +100,11 @@ public class TokenAnalysis {
 		} else if (container instanceof Group) {
 			List<AbstractElement> elements = container.getElements();
 			int index = elements.indexOf(last);
-			log.info(index);
+			if (index < 0) {
+				log.error("context analysis: element not part of compound");
+				log.info(last.eClass().getName());
+				log.info(abstractElementToString(container));
+			}
 			if (index < elements.size() - 1) {
 				return Arrays.asList(elements.get(index + 1));
 			} else {
@@ -98,7 +113,7 @@ public class TokenAnalysis {
 			}
 		} else if (container == null) {
 			// end of rule
-			AbstractRule rule = containingRule(last);
+			AbstractRule rule = containingRule(last);			
 			List<RuleCall> calls = findAllRuleCalls(grammar, rule);
 
 			if (calls.isEmpty()) {
@@ -121,7 +136,7 @@ public class TokenAnalysis {
 	
 	private TokenAnalysisPaths getTokenPathsContext(AbstractElement last, TokenAnalysisPaths prefix) {
 		List<AbstractElement> context = getNextElementsInContext(last);
-		
+				
 		TokenAnalysisPaths result = TokenAnalysisPaths.empty(prefix);
 		
 		if (context.isEmpty()) {
@@ -129,10 +144,10 @@ public class TokenAnalysis {
 			throw new TokenAnalysisAbortedException("context analysis failed: no context");
 		}
 		
-		for (AbstractElement element : context) {
+		for (AbstractElement element : context) {			
 			TokenAnalysisPaths path = new TokenAnalysisPaths(prefix);
 			path = getTokenPaths(element, path, false, false);
-			if (!path.isDone()) {
+			if (!path.isDone() && element != null) {
 				path = getTokenPathsContext(element, path);
 			}
 			if (path.isDone()) {
@@ -264,8 +279,6 @@ public class TokenAnalysis {
 		
 		do {
 			TokenAnalysisPaths tokenPaths = getTokenPathsTrivial(path, result);
-			
-			result = result.merge(tokenPaths);
 			
 			if (tokenPaths.isDone()) {
 				result = result.merge(tokenPaths);

@@ -29,7 +29,7 @@ public class KeywordToken implements Token {
 	
 	@Override
 	public String toString() {
-		return "keyword " + keyword.getValue();
+		return "keywordToken(" + keyword.getValue() + ", " + position + ")\n";
 	}
 
 	@Override
