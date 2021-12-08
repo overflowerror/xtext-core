@@ -25,6 +25,7 @@ import org.eclipse.xtext.Action;
 import org.eclipse.xtext.Alternatives;
 import org.eclipse.xtext.Assignment;
 import org.eclipse.xtext.CompoundElement;
+import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.GrammarUtil;
 import org.eclipse.xtext.Group;
 import org.eclipse.xtext.JavaAction;
@@ -65,8 +66,8 @@ public class HoistingProcessor {
 	private HoistingConfiguration config = new HoistingConfiguration();
 	private TokenAnalysis analysis;
 	
-	public HoistingProcessor() {
-		analysis = new TokenAnalysis(config);
+	public void init(Grammar grammar) {
+		analysis = new TokenAnalysis(config, grammar);
 	}
 	
 	// TODO: handling for TokenAnalysisAbortedException

@@ -73,6 +73,8 @@ abstract class AbstractAntlrGrammarGenerator {
 		if (!isCombinedGrammar) {
 			fsa.generateFile(grammarNaming.getLexerGrammar(it).grammarFileName, flattened.compileLexer(options))
 		}
+		
+		init
 	}
 	
 	protected def isCombinedGrammar() {

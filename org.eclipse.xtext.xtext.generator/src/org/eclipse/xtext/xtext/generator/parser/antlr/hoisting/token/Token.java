@@ -22,7 +22,9 @@ public interface Token {
 	String negatedCondition();
 	
 	static boolean isToken(AbstractElement element) {
-		if (element instanceof Keyword) {
+		if (element == null) {
+			return true;
+		} else if (element instanceof Keyword) {
 			return true;
 		} else if (element instanceof RuleCall) {
 			return (((RuleCall) element).getRule() instanceof TerminalRule);
@@ -34,7 +36,9 @@ public interface Token {
 	}
 	
 	static Token fromElement(AbstractElement element, int position) {
-		if (element instanceof Keyword) {
+		if (element == null) {
+			return new EofToken(position);
+		} else if (element instanceof Keyword) {
 			return new KeywordToken((Keyword) element, position);
 		} else if (element instanceof RuleCall) {
 			AbstractRule rule = ((RuleCall) element).getRule();
@@ -45,6 +49,6 @@ public interface Token {
 			return new KeywordToken(((EnumLiteralDeclaration) element).getLiteral(), position);
 		}
 		
-		throw new NotATokenException();
+		throw new NotATokenException(element.eClass().getName());
 	}
 }

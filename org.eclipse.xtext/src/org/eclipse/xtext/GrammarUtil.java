@@ -41,6 +41,7 @@ import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.eclipse.xtext.util.Pair;
 import org.eclipse.xtext.util.Strings;
 import org.eclipse.xtext.util.Tuples;
+import org.eclipse.xtext.util.XtextSwitch;
 import org.eclipse.xtext.xtext.CurrentTypeFinder;
 
 import com.google.common.base.Function;
@@ -722,5 +723,40 @@ public class GrammarUtil {
 	
 	public static void addElementsToCompoundElement(CompoundElement element, Collection<? extends AbstractElement> elements) {
 		addElementsToCompoundElement(element, elements.stream());
+	}
+	
+	private static void findAllRuleCalls(List<RuleCall> calls, AbstractElement element, AbstractRule rule) {
+		new XtextSwitch<Boolean>(){
+			@Override
+			public Boolean caseRuleCall(RuleCall object) {
+				if (object.getRule() == rule) {
+					calls.add(object);
+				}
+				return true;
+			};
+			@Override
+			public Boolean caseAssignment(Assignment object) {
+				findAllRuleCalls(calls, object.getTerminal(), rule);
+				return true;
+			};
+			@Override
+			public Boolean caseCompoundElement(CompoundElement object) {
+				for (AbstractElement element : object.getElements()) {
+					findAllRuleCalls(calls, element, rule);
+				}
+				return true;
+			};
+		}.doSwitch(element);
+	}
+	
+	public static List<RuleCall> findAllRuleCalls(Grammar grammar, AbstractRule rule) {
+		List<AbstractRule> rules = allRules(grammar);
+		List<RuleCall> calls = new ArrayList<>();
+		
+		for (AbstractRule r : rules) {
+			findAllRuleCalls(calls, r.getAlternatives(), rule);
+		}
+		
+		return calls;
 	}
 }

@@ -13,5 +13,13 @@ package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token;
  */
 public class NotATokenException extends RuntimeException {
 	private static final long serialVersionUID = 643265533068524552L;
+	
+	public NotATokenException() {
+		super();
+	}
+	
+	public NotATokenException(String msg) {
+		super(msg);
+	}
 
 }

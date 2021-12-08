@@ -11,6 +11,7 @@ package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.pathAnalysis;
 import static org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.DebugUtils.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -20,211 +21,270 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.apache.log4j.Logger;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.AbstractElement;
-import org.eclipse.xtext.AbstractSemanticPredicate;
-import org.eclipse.xtext.Action;
+import org.eclipse.xtext.AbstractRule;
 import org.eclipse.xtext.Alternatives;
 import org.eclipse.xtext.Assignment;
 import org.eclipse.xtext.CompoundElement;
+import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.GrammarUtil;
 import org.eclipse.xtext.Group;
-import org.eclipse.xtext.JavaAction;
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.UnorderedGroup;
+import org.eclipse.xtext.util.XtextSwitch;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.HoistingConfiguration;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.SymbolicAnalysisFailedException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.TokenAnalysisAbortedException;
-import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.UnsupportedConstructException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token.Token;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.MutablePrimitiveWrapper;
 
 import static org.eclipse.xtext.GrammarUtil.*;
+import static org.eclipse.xtext.EcoreUtil2.*;
 
 /**
  * @author overflow - Initial contribution and API
  */
 public class TokenAnalysis {
 	private HoistingConfiguration config;
+	private Grammar grammar;
 	
 	private Logger log = Logger.getLogger(TokenAnalysis.class);
 	
-	public TokenAnalysis(HoistingConfiguration config) {
+	public TokenAnalysis(HoistingConfiguration config, Grammar grammar) {
 		this.config = config;
+		this.grammar = grammar;
 	}
 	
-	private TokenAnalysisPaths getTokenForIndexesAlternatives(CompoundElement path, TokenAnalysisPaths prefix, boolean needsLength) throws TokenAnalysisAbortedException {
-		if (prefix.isDone()) {
-			return prefix;
-		}
-		
-		TokenAnalysisPaths result;
-		if (isOptionalCardinality(path)) {
-			result = prefix;
-			if (needsLength) {
-				// analysis is not done but there are no more mandatory tokens
-				throw new TokenAnalysisAbortedException("needed path length not satisfied due to optional cardinality");
-			}
-		} else {
-			result = TokenAnalysisPaths.empty(prefix);
-		}
-		
-		boolean loop = isMultipleCardinality(path);
-		
-		do {
-			boolean allDone = true;
-			
-			for (AbstractElement element : path.getElements()) {
-				TokenAnalysisPaths current = new TokenAnalysisPaths(prefix);
-				current = getTokenForIndexes(element, current, needsLength); // will check for needsLength
-				
-				if (!current.isDone()) {
-					allDone = false;
+	private CompoundElement getCompoundContainer(AbstractElement element) {
+		if (element instanceof CompoundElement) {
+			// get container of compoundElement since getContainerOfType 
+			// would return the same element
+			EObject tmp = element.eContainer();
+			while (!(tmp instanceof AbstractElement)) {
+				if (tmp == null) {
+					return null;
 				}
-				
-				result = result.merge(current);
+				tmp = tmp.eContainer();
+			}
+			element = (AbstractElement) tmp;
+		}
+		return getContainerOfType(element, CompoundElement.class);
+	}
+	
+	private List<AbstractElement> getNextElementsInContext(AbstractElement last) {
+		
+		CompoundElement container = getCompoundContainer(last);
+		while (container instanceof Alternatives) {
+			// skip alternatives since they have to be covered separately
+			last = container;
+			container = getCompoundContainer(last);
+		}
+		
+		if (container instanceof UnorderedGroup) {
+			List<AbstractElement> result = new ArrayList<>();
+			result.addAll(container.getElements());
+			result.addAll(getNextElementsInContext(container));
+			return result;
+		} else if (container instanceof Group) {
+			List<AbstractElement> elements = container.getElements();
+			int index = elements.indexOf(last);
+			log.info(index);
+			if (index < elements.size() - 1) {
+				return Arrays.asList(elements.get(index + 1));
+			} else {
+				// this is the last element
+				return getNextElementsInContext(container);
+			}
+		} else if (container == null) {
+			// end of rule
+			AbstractRule rule = containingRule(last);
+			List<RuleCall> calls = findAllRuleCalls(grammar, rule);
+
+			if (calls.isEmpty()) {
+				// has to be start rule
+				// context is EOF
+				return Arrays.asList((AbstractElement) null);
 			}
 			
-			if (allDone) {
+			List<AbstractElement> result = new ArrayList<>();
+			for (RuleCall call : calls) {
+				result.addAll(getNextElementsInContext(call));
+			}
+			
+			return result;
+		} else {
+			throw new IllegalArgumentException("unknown compound element: " + container.eClass().getName());
+		}
+	}
+	
+	
+	private TokenAnalysisPaths getTokenPathsContext(AbstractElement last, TokenAnalysisPaths prefix) {
+		List<AbstractElement> context = getNextElementsInContext(last);
+		
+		TokenAnalysisPaths result = TokenAnalysisPaths.empty(prefix);
+		
+		if (context.isEmpty()) {
+			// TODO: is this special case necessary?
+			throw new TokenAnalysisAbortedException("context analysis failed: no context");
+		}
+		
+		for (AbstractElement element : context) {
+			TokenAnalysisPaths path = new TokenAnalysisPaths(prefix);
+			path = getTokenPaths(element, path, false, false);
+			if (!path.isDone()) {
+				path = getTokenPathsContext(element, path);
+			}
+			if (path.isDone()) {
+				result = result.merge(path);
+			} else {
+				throw new TokenAnalysisAbortedException("context analysis failed");
+			}
+		}
+		
+		return result;
+	}
+	
+	private TokenAnalysisPaths getTokenPathsTrivial(Group path, TokenAnalysisPaths prefix) {
+		TokenAnalysisPaths result = new TokenAnalysisPaths(prefix);
+		
+		for(AbstractElement element : path.getElements()) {
+			result = getTokenPaths(element, result, false, false);
+			if (result.isDone()) {
 				break;
 			}
-			
-			prefix = result;
-			
-			// repeat until all further extensions of prefix are done 
-		} while(loop);
-	
-		return result;
-	}
-	
-	private TokenAnalysisPaths getTokenForIndexesGroup(Group path, TokenAnalysisPaths prefix, boolean needsLength) throws TokenAnalysisAbortedException {
-		if (prefix.isDone()) {
-			return prefix;
 		}
 		
-		TokenAnalysisPaths result; 
-		TokenAnalysisPaths current = new TokenAnalysisPaths(prefix);
+		return result;
+	}
+	private TokenAnalysisPaths getTokenPathsTrivial(Alternatives path, TokenAnalysisPaths prefix) {
+		TokenAnalysisPaths result = TokenAnalysisPaths.empty(prefix);
 		
-		if (isOptionalCardinality(path)) {
-			result = prefix;
-			if (needsLength) {
-				// analysis is not done but there are no more mandatory tokens
-				throw new TokenAnalysisAbortedException("needed path length not satisfied due to optional cardinality");
-			}
+		for(AbstractElement element : path.getElements()) {
+			result = result.merge(getTokenPaths(element, prefix, false, false));
+		}
+		
+		return result;
+	}
+	private TokenAnalysisPaths getTokenPathsTrivial(UnorderedGroup path, TokenAnalysisPaths prefix) {
+		TokenAnalysisPaths result;
+		TokenAnalysisPaths current;
+		
+		if (path.getElements().stream().allMatch(GrammarUtil::isOptionalCardinality)) {
+			result = new TokenAnalysisPaths(prefix);
 		} else {
 			result = TokenAnalysisPaths.empty(prefix);
 		}
 		
-		boolean loop = isMultipleCardinality(path);
-		
 		do {
+			current = TokenAnalysisPaths.empty(result);
 			for (AbstractElement element : path.getElements()) {
-				current = getTokenForIndexes(element, current, false);
-				
-				if (current.isDone()) {
-					// no need to look further
-					
-					return result.merge(current);
-				}
-			}
-			
-			if (needsLength && !current.isDone()) {
-				// analysis is not done but there are no more mandatory tokens
-				throw new TokenAnalysisAbortedException("needed path length not satisfied");
+				current = current.merge(getTokenPaths(element, result, false, false));
 			}
 			
 			result = result.merge(current);
-			current = new TokenAnalysisPaths(result);
-		} while(loop);
+		} while(!current.isDone());
 		
-		// if cardinality is trivial or ? return result
 		return result;
 	}
 	
-	private TokenAnalysisPaths getTokenForIndexesDefault(AbstractElement path, TokenAnalysisPaths prefix, boolean needsLength) throws TokenAnalysisAbortedException {
+	private TokenAnalysisPaths getTokenPathsTrivial(AbstractElement path, TokenAnalysisPaths prefix) {
+		return new XtextSwitch<TokenAnalysisPaths>() {
+			@Override
+			public TokenAnalysisPaths caseGroup(Group group) {
+				return getTokenPathsTrivial(group, prefix);
+			};
+			@Override
+			public TokenAnalysisPaths caseAlternatives(Alternatives alternatives) {
+				return getTokenPathsTrivial(alternatives, prefix);
+			};
+			@Override
+			public TokenAnalysisPaths caseUnorderedGroup(UnorderedGroup unorderedGroup) {
+				return getTokenPathsTrivial(unorderedGroup, prefix);
+			};
+			@Override
+			public TokenAnalysisPaths caseAssignment(Assignment assignment) {
+				return getTokenPaths(assignment.getTerminal(), prefix, false, false);
+			};
+			@Override
+			public TokenAnalysisPaths caseRuleCall(RuleCall call) {
+				if (isParserRuleCall(call) || 
+				    isEnumRuleCall(call)
+				) {
+					return getTokenPaths(call.getRule().getAlternatives(), prefix, false, false);
+				} else {
+					// go to default case
+					return null;
+				}
+			};
+			@Override
+			public TokenAnalysisPaths defaultCase(EObject object) {
+				AbstractElement element = (AbstractElement) object;
+				
+				if (Token.isToken(element)) {
+					TokenAnalysisPaths result = new TokenAnalysisPaths(prefix);
+					result.add(element);
+					return result;
+				} else {
+					// Actions, Predicates, JavaActions, ...
+					return prefix;
+				}
+			};
+		}.doSwitch(path);
+	}
+	
+	// analyseContext implies needsLength
+	private TokenAnalysisPaths getTokenPaths(AbstractElement path, TokenAnalysisPaths prefix, boolean analyseContext, boolean needsLength) {
 		if (prefix.isDone()) {
 			return prefix;
 		}
 		
 		TokenAnalysisPaths result;
 		
+		if (path == null) {
+			// empty path means EOF
+			result = new TokenAnalysisPaths(prefix);
+			result.add(path);
+			return result;
+		}
+		
 		if (isOptionalCardinality(path)) {
-			result = prefix;
-			if (needsLength) {
-				throw new TokenAnalysisAbortedException("needed path length not satisfied due to optional cardinality");
+			if (analyseContext) {
+				result = getTokenPathsContext(path, prefix);
+			} else if (needsLength) {
+				throw new TokenAnalysisAbortedException("token expected but path is optional");
+			} else {
+				result = new TokenAnalysisPaths(prefix);
 			}
 		} else {
 			result = TokenAnalysisPaths.empty(prefix);
 		}
 		
-		TokenAnalysisPaths current = new TokenAnalysisPaths(prefix);
-		
 		boolean loop = isMultipleCardinality(path);
+		
 		do {
-			if (Token.isToken(path)) {
-				current.add(path);
-			} else if (isParserRuleCall(path) ||
-			           isEnumRuleCall(path)) {
-				// path doesn't need length, because we're going to check that anyway in this function
-				current = getTokenForIndexes(((RuleCall) path).getRule().getAlternatives(), current, false);
-			} else if (path instanceof Assignment) {
-				current = getTokenForIndexes(((Assignment) path).getTerminal(), current, false);
+			TokenAnalysisPaths tokenPaths = getTokenPathsTrivial(path, result);
+			
+			result = result.merge(tokenPaths);
+			
+			if (tokenPaths.isDone()) {
+				result = result.merge(tokenPaths);
+				break;
+			} else if (analyseContext) {
+				tokenPaths = getTokenPathsContext(path, tokenPaths);
+				result = result.merge(tokenPaths);
+			} else if (needsLength) {
+				throw new TokenAnalysisAbortedException("requested length not satisfyable");
 			} else {
-				throw new UnsupportedConstructException("unknown element: " + path.eClass().getName());
+				result = result.merge(tokenPaths);
 			}
-			
-			// add path to result
-			result = result.merge(current);
-			
-			// if current path is done return result
-			// precondition: either !needsLength or result empty
-			//               result is only non-empty if ? cardinality
-			//               but then needsLength can't be true.
-			if (current.isDone()) {
-				return result;
-			}
-			
-			if (needsLength) {
-				throw new TokenAnalysisAbortedException("needed path length not satisfied");
-			}
-		} while(loop);
+		} while (loop);
 		
 		return result;
 	}
 	
-	private TokenAnalysisPaths getTokenForIndexes(AbstractElement path, TokenAnalysisPaths prefix, boolean needsLength) throws TokenAnalysisAbortedException {
-		if (path instanceof Alternatives) {
-			return getTokenForIndexesAlternatives((Alternatives) path, prefix, needsLength);
-		} else if (path instanceof Group) {
-			return getTokenForIndexesGroup((Group) path, prefix, needsLength);
-		} else if (path instanceof UnorderedGroup) {
-			// clone unordered group
-			// set cardinality accordingly
-			// use code for alternatives
-			
-			CompoundElement clonedUnorderedGroup = (CompoundElement) cloneAbstractElement(path);
-			if (isOptionalCardinality(path) || 
-				((UnorderedGroup) path).getElements().stream().allMatch(GrammarUtil::isOptionalCardinality)
-			){
-				clonedUnorderedGroup.setCardinality("*");
-			} else {
-				clonedUnorderedGroup.setCardinality("+");
-			}
-			
-			// getTokenForIndexesAlternatives only needs a CompoundElement so we can give it
-			// the modified unordered group
-			return getTokenForIndexesAlternatives(clonedUnorderedGroup, prefix, needsLength);
-		} else if (path instanceof Action ||
-		           path instanceof AbstractSemanticPredicate ||
-		           path instanceof JavaAction
-				) {
-			return prefix;
-		} else {
-			return getTokenForIndexesDefault(path, prefix, needsLength);
-		}
-	}
-	
-	private List<List<Token>> getTokenForIndexes(AbstractElement path, List<Integer> indexes) throws TokenAnalysisAbortedException {
-		return getTokenForIndexes(path, new TokenAnalysisPaths(indexes), true).getTokenPaths();
+	private List<List<Token>> getTokenPaths(AbstractElement path, List<Integer> indexes, boolean analyseContext) throws TokenAnalysisAbortedException {
+		return getTokenPaths(path, new TokenAnalysisPaths(indexes), analyseContext, true).getTokenPaths();
 	}
 	
 	private boolean arePathsIdenticalSymbolic(AbstractElement path1, AbstractElement path2) throws SymbolicAnalysisFailedException {
@@ -246,13 +306,13 @@ public class TokenAnalysis {
 			List<Integer> range = range(0,  i);
 			
 			try {
-				tokenListSet1 = new HashSet<>(getTokenForIndexes(path1, range));
+				tokenListSet1 = new HashSet<>(getTokenPaths(path1, range, false));
 			} catch (TokenAnalysisAbortedException e) {
 				tokenListSet1 = null;
 			}
 			
 			try {
-				tokenListSet2 = new HashSet<>(getTokenForIndexes(path2, range));
+				tokenListSet2 = new HashSet<>(getTokenPaths(path2, range, false));
 			} catch (TokenAnalysisAbortedException e) {
 				tokenListSet2 = null;
 			}
@@ -349,7 +409,7 @@ public class TokenAnalysis {
 			// will throw TokenAnalysisAborted if any path is too short
 			List<List<List<Token>>> tokenListsForPaths = paths.stream()
 					//.peek(p -> log.info("next path: " + p))
-					.map(p -> getTokenForIndexes(p, indexList))
+					.map(p -> getTokenPaths(p, indexList, true))
 					.collect(Collectors.toList());
 
 			log.info("token lists: " + tokenListsForPaths);

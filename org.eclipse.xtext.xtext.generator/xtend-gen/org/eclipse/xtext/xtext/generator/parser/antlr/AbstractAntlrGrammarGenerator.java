@@ -98,6 +98,7 @@ public abstract class AbstractAntlrGrammarGenerator {
     if (_not) {
       fsa.generateFile(this.getGrammarNaming().getLexerGrammar(it).getGrammarFileName(), this.compileLexer(flattened, options));
     }
+    this._hoistingProcessor.init(it);
   }
   
   protected boolean isCombinedGrammar() {

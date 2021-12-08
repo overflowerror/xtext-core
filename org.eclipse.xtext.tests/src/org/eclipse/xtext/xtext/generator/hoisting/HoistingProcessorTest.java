@@ -71,6 +71,9 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 	private String getSyntaxForTerminalToken(String terminal, int offset) {
 		return "input.LA(" + offset + ") != " + terminal;
 	}
+	private String getSyntaxForEofToken(int offset) {
+		return "input.LA(" + offset + ") != EOF";
+	}
 	
 	@Test
 	public void testEmptyRule() throws Exception {
@@ -81,6 +84,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -97,6 +101,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -114,6 +119,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -131,6 +137,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -148,6 +155,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -165,6 +173,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -182,6 +191,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -200,6 +210,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -218,6 +229,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -234,6 +246,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -251,6 +264,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -268,6 +282,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -285,6 +300,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -299,6 +315,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -316,6 +333,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -332,6 +350,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -347,6 +366,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -364,6 +384,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -380,6 +401,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -397,6 +419,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -411,6 +434,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -428,6 +452,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -442,6 +467,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -470,6 +496,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -488,6 +515,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -508,6 +536,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -527,6 +556,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -547,6 +577,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -567,6 +598,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -589,6 +621,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -606,6 +639,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -624,6 +658,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -647,6 +682,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -670,6 +706,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -692,6 +729,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -701,8 +739,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertEquals("((" + getSyntaxForKeywordToken("b", 3) + " || ((p0) && (p2))) && (" + getSyntaxForKeywordToken("c", 3) + " || ((p0) && (p3))) && (" + getSyntaxForKeywordToken("d", 3) + " || (p1)))", guard.render());
 	}
 	
-	@Test(expected = TokenAnalysisAbortedException.class)
-	public void testAlternativeEmptyAndNonEmptyPaths_expectTokenAnalysisAbortedException() throws Exception {
+	public void testAlternativeEmptyAndNonEmptyPaths_expectEofCheck() throws Exception {
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
@@ -711,13 +748,14 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
-		hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForEofToken(1) + " || (p1)))", guard.render());
 	}
 	
-	@Test(expected = TokenAnalysisAbortedException.class)
-	public void testAlternativeWithPrefixPath_expectTokenAnalysisAbortedException() throws Exception {
+	public void testAlternativeWithPrefixPath_expectEofCheck() throws Exception {
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
@@ -726,9 +764,11 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
-		hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertEquals("((" + getSyntaxForEofToken(3) + " || (p0)) && (" + getSyntaxForKeywordToken("c", 3) + " || (p1)))", guard.render());
 	}
 	
 	@Test(expected = TokenAnalysisAbortedException.class)
@@ -742,6 +782,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		hoistingProcessor.findHoistingGuard(rule.getAlternatives());
@@ -759,6 +800,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
