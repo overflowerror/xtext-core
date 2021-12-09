@@ -300,6 +300,10 @@ public class TokenAnalysis {
 		return getTokenPaths(path, new TokenAnalysisPaths(indexes), analyseContext, true).getTokenPaths();
 	}
 	
+	private List<List<Token>> getTokenPathsContextOnly(AbstractElement path, List<Integer> indexes) {
+		return getTokenPathsContext(path, new TokenAnalysisPaths(indexes)).getTokenPaths();
+	}
+	
 	private boolean arePathsIdenticalSymbolic(AbstractElement path1, AbstractElement path2) throws SymbolicAnalysisFailedException {
 		// ignore symbolic analysis for the moment
 		// TODO
@@ -401,6 +405,35 @@ public class TokenAnalysis {
 			}
 			return false;
 		}
+	}
+	
+	public List<List<Token>> findMinimalPathDifference(AbstractElement element) throws TokenAnalysisAbortedException {
+		// this method is for finding the path differences between the 
+		// element (with optional cardinality) and the context
+		
+		// first dimension of result corresponds to the alternatives
+		// the second dimension are tokens of the alternatives
+		
+		MutablePrimitiveWrapper<List<List<Token>>> result = new MutablePrimitiveWrapper<List<List<Token>>>(null);
+		
+		tokenCombinations(indexList -> {
+			log.info("current index list: " + indexList);
+			
+			// no context analysis
+			List<List<Token>> tokenListsForPath = getTokenPaths(element, indexList, false);
+			List<List<Token>> tokenListForContext = getTokenPathsContextOnly(element, indexList);
+				
+			if (!tokenListsForPath.stream()
+					.anyMatch(tokenListForContext::contains)
+			) {
+				// context does not contain any token lists for path
+				result.set(tokenListsForPath);
+			}
+			
+			return result.get() != null;
+		});
+		
+		return result.get();
 	}
 	
 	public List<List<List<Token>>> findMinimalPathDifference(List<AbstractElement> paths) throws TokenAnalysisAbortedException {

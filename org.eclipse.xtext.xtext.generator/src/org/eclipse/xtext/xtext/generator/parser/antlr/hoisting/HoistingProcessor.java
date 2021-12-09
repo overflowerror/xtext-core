@@ -70,7 +70,45 @@ public class HoistingProcessor {
 		analysis = new TokenAnalysis(config, grammar);
 	}
 	
-	// TODO: handling for TokenAnalysisAbortedException
+	private HoistingGuard findGuardForOptionalCardinalityWithoutContext(AbstractElement element, AbstractRule currentRule) {
+		HoistingGuard pathGuard = findGuardForElementWithTrivialCardinality(element, currentRule);
+		
+		if (pathGuard.isTrivial()) {
+			// path can be skipped
+			return HoistingGuard.unguarded();
+		}
+		
+		// set cardinality so the token analyse works
+		element = cloneAbstractElement(element);
+		if (isMultipleCardinality(element)) {
+			element.setCardinality("+");
+		} else {
+			// would be ? cardinality
+			element.setCardinality(null);
+		}
+		
+		// identity analysis can be skipped
+		
+		try {
+			return new AlternativesGuard(
+				new PathGuard(
+					new AlternativeTokenSequenceGuard(
+						analysis.findMinimalPathDifference(element).stream()
+							.map(s -> s.stream()
+									.map(SingleTokenGuard::new)
+									.collect(Collectors.toList())
+							)
+							.map(TokenSequenceGuard::new)
+							.collect(Collectors.toList())
+					),
+					pathGuard
+				)
+			);
+		} catch(TokenAnalysisAbortedException e) {
+			throw new TokenAnalysisAbortedException(e.getMessage(), e, currentRule);
+		}
+	}
+	
 	private HoistingGuard findGuardForAlternatives(CompoundElement alternatives, AbstractRule currentRule) {
 		log.info("find guard for alternative");
 		
@@ -335,25 +373,7 @@ public class HoistingProcessor {
 		) {
 			return findGuardForElementWithTrivialCardinality(element, currentRule);
 		} else if (isOptionalCardinality(element)) {
-			if (pathHasTokenOrAction(element)) {
-				if (!pathHasHoistablePredicate(currentRule.getAlternatives())) {
-					// unsupported construct doesn't matter since there is no
-					// hoistable predicate in the rule anyway.
-					return HoistingGuard.unguarded();
-				} else {
-					// there might be a token in this element
-					// no context accessible to construct guard
-					// this does only work when analyzing group
-					
-					// TODO: maybe generate warning and return terminal()
-					throw new OptionalCardinalityWithoutContextException("optional cardinality is only supported in groups", currentRule);
-				}
-			} else {
-				// element with cardinality ? or * has no token or action
-				// -> the path is accessible whether or not this element is guarded
-				// -> we can assume it is unguarded
-				return HoistingGuard.unguarded();
-			}
+			return findGuardForOptionalCardinalityWithoutContext(element, currentRule);
 		} else {
 			throw new IllegalArgumentException("unknown cardinality: " + element.getCardinality());
 		}

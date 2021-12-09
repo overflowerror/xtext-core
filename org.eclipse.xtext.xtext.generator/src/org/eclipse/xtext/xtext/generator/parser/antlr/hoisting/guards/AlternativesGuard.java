@@ -21,7 +21,11 @@ import java.util.stream.Collectors;
 public class AlternativesGuard implements HoistingGuard {
 	private List<PathGuard> paths;
 	
-	private AlternativesGuard(List<PathGuard> paths) {
+	public AlternativesGuard(PathGuard ...pathArray) {
+		this(Arrays.asList(pathArray));
+	}
+	
+	public AlternativesGuard(List<PathGuard> paths) {
 		this.paths = PathGuard.collapse(paths);
 	}
 	

@@ -291,8 +291,8 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertEquals("((" + getSyntaxForKeywordToken("s", 1) + " || (p1)) && (" + getSyntaxForKeywordToken("a", 1) + " || (p0)))", guard.render());
 	}
 	
-	@Test(expected = UnsupportedConstructException.class)
-	public void testCardinalityQuestionmarkWithoutContext_expectUnsupportedConstruct() throws Exception {
+	@Test
+	public void testCardinalityQuestionmarkWithoutContext_expectNoContextCheck() throws Exception {
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
@@ -303,9 +303,31 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
-		hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		assertEquals("(" + getSyntaxForKeywordToken("a", 1) + " || (p0))", guard.render());
 	}
 
+	@Test
+	public void testCardinalityQuestionmarkWithExternalContext_expectContextCheck() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: A 'a' 'b';\n" +
+			"A: ($$ p0 $$?=> 'a')?;";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
+		AbstractRule rule = getRule(grammar, "A");
+		
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		assertEquals("(" + getSyntaxForKeywordToken("a", 1) + " || (p0))", guard.render());
+	}
+	
 	@Test
 	public void testCardinalityStarWithContext() throws Exception {
 		// @formatter:off
@@ -341,8 +363,8 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertFalse(guard.hasTerminal());
 	}
 	
-	@Test(expected = UnsupportedConstructException.class)
-	public void testCardinalityStarWithoutContext_expectUnsupporedConstruct() throws Exception {
+	@Test
+	public void testCardinalityStarWithoutContext_expectContextCheck() throws Exception {
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
@@ -353,7 +375,10 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
-		hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		assertEquals("(" + getSyntaxForKeywordToken("a", 1) + " || (p0))", guard.render());
 	}
 	
 
@@ -410,7 +435,8 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))", guard.render());
 	}
 	
-	@Test(expected = UnsupportedConstructException.class)
+	// TODO: this is no longer unsupported
+	// @Test(expected = UnsupportedConstructException.class)
 	public void testUnorderedGroupWithEmptyPathsWithoutContext_expectUnsupportedConstruct() throws Exception {
 		// @formatter:off
 		String model =
@@ -443,6 +469,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertEquals("((" + getSyntaxForKeywordToken("s", 1) + " || (p2)) && (" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))", guard.render());
 	}
 	
+	// TODO: this is no longer unsupported
 	@Test(expected = UnsupportedConstructException.class)
 	public void testUnorderedGroupWithoutMandatoryContentWithoutContext_expectUnsupportedConstruct() throws Exception {
 		// @formatter:off
