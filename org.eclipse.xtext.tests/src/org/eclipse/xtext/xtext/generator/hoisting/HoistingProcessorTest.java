@@ -787,6 +787,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertEquals("((" + getSyntaxForKeywordToken("b", 3) + " || ((p0) && (p2))) && (" + getSyntaxForKeywordToken("c", 3) + " || ((p0) && (p3))) && (" + getSyntaxForKeywordToken("d", 3) + " || (p1)))", guard.render());
 	}
 	
+	@Test
 	public void testAlternativeEmptyAndNonEmptyPaths_expectEofCheck() throws Exception {
 		// @formatter:off
 		String model =
@@ -803,6 +804,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForEofToken(1) + " || (p1)))", guard.render());
 	}
 	
+	@Test
 	public void testAlternativeWithPrefixPath_expectEofCheck() throws Exception {
 		// @formatter:off
 		String model =
@@ -817,6 +819,60 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertEquals("((" + getSyntaxForEofToken(3) + " || (p0)) && (" + getSyntaxForKeywordToken("c", 3) + " || (p1)))", guard.render());
+	}
+	
+	@Test
+	public void testAlternativeWithPrefixPathAndContextWithSimilarities_expectLookAheadContextCheck() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: a=A 'c' 'd' ;\n" +
+			"A: {A} $$ p0 $$?=> 'a' 'b' \n" +
+			" | {A} $$ p1 $$?=> 'a' 'b' 'c' ;";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
+		AbstractRule rule = getRule(grammar, "A");
+		
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertEquals("((" + getSyntaxForKeywordToken("d", 4) + " || (p0)) && (" + getSyntaxForKeywordToken("c", 4) + " || (p1)))", guard.render());
+	}
+	
+	@Test
+	public void testAlternativeWithPrefixPathAndMultipleContexts_expectNonTrivialContextCheck() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: a=A 'c' \n" +
+			" | a=A 'd' ;\n" +
+			"A: {A} $$ p0 $$?=> 'a' \n" +
+			" | {A} $$ p1 $$?=> 'a' 'b' ;";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
+		AbstractRule rule = getRule(grammar, "A");
+		
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertEquals("(((" + getSyntaxForKeywordToken("c", 2) + " && " + getSyntaxForKeywordToken("d", 2) + ") || (p0)) && (" + getSyntaxForKeywordToken("b", 2) + " || (p1)))", guard.render());
+	}
+	
+	@Test(expected = TokenAnalysisAbortedException.class)
+	public void testAlternativeWithPrefixPathAndContextIsNotDistince_expectTokenAnalysisAbortedException() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: a=A 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b';\n" +
+			"A: {A} $$ p0 $$?=> 'a' \n" +
+			" | {A} $$ p1 $$?=> 'a' 'b' ;";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
+		AbstractRule rule = getRule(grammar, "A");
+		
+		hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 	}
 	
 	@Test(expected = TokenAnalysisAbortedException.class)
