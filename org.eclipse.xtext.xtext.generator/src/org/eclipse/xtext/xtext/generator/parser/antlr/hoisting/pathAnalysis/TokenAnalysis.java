@@ -37,6 +37,7 @@ import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.HoistingConfigura
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.SymbolicAnalysisFailedException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.TokenAnalysisAbortedException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token.Token;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.DebugUtils;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.MutablePrimitiveWrapper;
 
 import static org.eclipse.xtext.GrammarUtil.*;
@@ -92,9 +93,16 @@ public class TokenAnalysis {
 			container = getCompoundContainer(last);
 		}
 		
+		log.info("getNext: " + abstractElementToShortString(last));
+		log.info("container: " + abstractElementToShortString(container));
+		
+		final AbstractElement finalLast = last;
+		
 		if (container instanceof UnorderedGroup) {
 			List<AbstractElement> result = new ArrayList<>();
-			result.addAll(container.getElements());
+			result.addAll(container.getElements().stream()
+				.filter(e -> e != finalLast).collect(Collectors.toList())
+			);
 			result.addAll(getNextElementsInContext(container));
 			return result;
 		} else if (container instanceof Group) {
@@ -135,7 +143,12 @@ public class TokenAnalysis {
 	
 	
 	private TokenAnalysisPaths getTokenPathsContext(AbstractElement last, TokenAnalysisPaths prefix) {
+		log.info("get context for: " + abstractElementToShortString(last));
+		
 		List<AbstractElement> context = getNextElementsInContext(last);
+		
+		log.info(context.size());
+		log.info(context.stream().map(DebugUtils::abstractElementToShortString).collect(Collectors.toList()));
 				
 		TokenAnalysisPaths result = TokenAnalysisPaths.empty(prefix);
 		
@@ -157,6 +170,7 @@ public class TokenAnalysis {
 			}
 		}
 		
+		log.info("done");
 		return result;
 	}
 	

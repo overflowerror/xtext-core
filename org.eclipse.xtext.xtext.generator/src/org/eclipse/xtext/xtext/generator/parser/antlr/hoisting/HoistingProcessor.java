@@ -26,7 +26,6 @@ import org.eclipse.xtext.Alternatives;
 import org.eclipse.xtext.Assignment;
 import org.eclipse.xtext.CompoundElement;
 import org.eclipse.xtext.Grammar;
-import org.eclipse.xtext.GrammarUtil;
 import org.eclipse.xtext.Group;
 import org.eclipse.xtext.JavaAction;
 import org.eclipse.xtext.RuleCall;
@@ -180,28 +179,15 @@ public class HoistingProcessor {
 		}
 	}
 	
-	private List<AbstractElement> rewriteUnorderedGroupsAndGetElements(Group group) {
-		List<AbstractElement> elements = new ArrayList<>(group.getElements());
+	private HoistingGuard findGuardForUnorderedGroup(UnorderedGroup element, AbstractRule currentRule) {
+		// Unordered group (A & B) is the same as (A | B)+ or (A | B)* (is A and B are optional)
+		// but the cardinality doesn't matter for hoisting
+		// if A and B are optional the guard for the alternatives need to check the context
+		// if not the alternatives are actual alternatives
 		
-		int size = elements.size();
-		for (int i = 0; i < size; i++) {
-			AbstractElement element = elements.get(i);
-			if (element instanceof UnorderedGroup) {
-				// Unordered group (A & B) is the same as (A | B)+ or (A | B)* (is A and B are optional)
-				// -> create virtual element
-				
-				Alternatives virtualAlternatives = XtextFactory.eINSTANCE.createAlternatives();
-				addElementsToCompoundElement(virtualAlternatives, ((UnorderedGroup) element).getElements());
-				
-				// if A and B are optional the cardinality would be *
-				// but it doesn't matter for hoisting
-				virtualAlternatives.setCardinality("+");
-				
-				elements.set(i, virtualAlternatives);
-			}
-		}
+		// TODO: check if hasTerminal is valid
 		
-		return elements;
+		return findGuardForAlternatives(element, currentRule);
 	}
 	
 	private HoistingGuard findGuardForGroup(Group group, AbstractRule currentRule) {
@@ -209,7 +195,7 @@ public class HoistingProcessor {
 		
 		GroupGuard groupGuard = new GroupGuard();
 		
-		Iterator<AbstractElement> iterator = rewriteUnorderedGroupsAndGetElements(group).iterator();
+		Iterator<AbstractElement> iterator = group.getElements().iterator();
 		while (iterator.hasNext()) {
 			AbstractElement element = iterator.next();
 			
@@ -231,6 +217,8 @@ public class HoistingProcessor {
 				}
 			} else if (cardinality.equals("?") ||
 			           cardinality.equals("*")) {
+				// though not technically necessary, rewrite tree to context checks are not needed 
+				
 				// rewrite cardinality to alternatives
 				// A? B -> A B | B
 				// A* B -> A+ B | B -> A B (see above)
@@ -404,35 +392,7 @@ public class HoistingProcessor {
 		} else if (element instanceof JavaAction) {
 			return HoistingGuard.action();
 		} else if (element instanceof UnorderedGroup) {
-			if (((UnorderedGroup) element).getElements().stream().allMatch(GrammarUtil::isOptionalCardinality)) {
-				if (pathHasTokenOrAction(element)) {
-					if (!pathHasHoistablePredicate(currentRule.getAlternatives())) {
-						// unsupported construct but rule doesn't contain hoistable predicates
-						return HoistingGuard.unguarded();
-					} else {
-						// if unordered group has tokens or actions we need the context which is 
-						// not available here
-						// only works when analyzing groups
-						
-						// TODO: maybe add warning and return unguarded
-						throw new UnsupportedConstructException("unordered groups with hoisting-relevant elements and optional cardinalities are only supported in groups", currentRule);
-					}
-				} else {
-					// the path is accessible whether or not any guard is satisfied
-					// -> assume it's unguarded
-					return HoistingGuard.unguarded();
-				}
-			} else {
-				if (pathHasTokenOrAction(element)) {
-					// there is no context but it might still be possible to find a guard for this group
-					// only works if none of the paths is empty or optional
-					return findGuardForAlternatives((CompoundElement) element, currentRule);
-				} else {
-					// the path is accessible whether or not any guard is satisfied
-					// -> assume it's unguarded
-					return HoistingGuard.unguarded();
-				}
-			}
+			return findGuardForUnorderedGroup((UnorderedGroup) element, currentRule);
 		} else if (element instanceof Assignment) {
 			return findGuardForElement(((Assignment) element).getTerminal(), currentRule);
 		} else {
