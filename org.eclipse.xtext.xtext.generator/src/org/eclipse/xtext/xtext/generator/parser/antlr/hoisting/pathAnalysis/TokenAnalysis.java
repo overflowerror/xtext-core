@@ -30,6 +30,8 @@ import org.eclipse.xtext.CompoundElement;
 import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.GrammarUtil;
 import org.eclipse.xtext.Group;
+import org.eclipse.xtext.Keyword;
+import org.eclipse.xtext.ParserRule;
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.UnorderedGroup;
 import org.eclipse.xtext.util.XtextSwitch;
@@ -96,12 +98,10 @@ public class TokenAnalysis {
 		log.info("getNext: " + abstractElementToShortString(last));
 		log.info("container: " + abstractElementToShortString(container));
 		
-		final AbstractElement finalLast = last;
-		
 		if (container instanceof UnorderedGroup) {
 			List<AbstractElement> result = new ArrayList<>();
 			result.addAll(container.getElements().stream()
-				.filter(e -> e != finalLast).collect(Collectors.toList())
+				.collect(Collectors.toList())
 			);
 			result.addAll(getNextElementsInContext(container));
 			return result;
@@ -156,11 +156,17 @@ public class TokenAnalysis {
 			// TODO: is this special case necessary?
 			throw new TokenAnalysisAbortedException("context analysis failed: no context");
 		}
+
+		int currentPosition = prefix.getMinPosition();
 		
 		for (AbstractElement element : context) {			
 			TokenAnalysisPaths path = new TokenAnalysisPaths(prefix);
 			path = getTokenPaths(element, path, false, false);
 			if (!path.isDone() && element != null) {
+				if (path.getMinPosition() == currentPosition) {
+					throw new TokenAnalysisAbortedException("no progress in context analysis");
+				}
+				
 				path = getTokenPathsContext(element, path);
 			}
 			if (path.isDone()) {
@@ -205,10 +211,16 @@ public class TokenAnalysis {
 			result = TokenAnalysisPaths.empty(prefix);
 		}
 		
+		int currentPosition = result.getMinPosition();
+		
 		do {
 			current = TokenAnalysisPaths.empty(result);
 			for (AbstractElement element : path.getElements()) {
 				current = current.merge(getTokenPaths(element, result, false, false));
+			}
+			
+			if (current.getMinPosition() == currentPosition) {
+				throw new TokenAnalysisAbortedException("no progress in loop");
 			}
 			
 			result = result.merge(current);
@@ -291,7 +303,9 @@ public class TokenAnalysis {
 		
 		boolean loop = isMultipleCardinality(path);
 		
-		do {
+		int currentPosition = result.getMinPosition();
+		
+		do {	
 			TokenAnalysisPaths tokenPaths = getTokenPathsTrivial(path, result);
 			
 			if (tokenPaths.isDone()) {
@@ -304,6 +318,14 @@ public class TokenAnalysis {
 				throw new TokenAnalysisAbortedException("requested length not satisfyable");
 			} else {
 				result = result.merge(tokenPaths);
+			}
+			
+			if (loop) {
+				if (result.getMinPosition() == currentPosition) {
+					throw new TokenAnalysisAbortedException("no progress in loop");
+				} else {
+					currentPosition = result.getMinPosition();
+				}
 			}
 		} while (loop);
 		
@@ -330,36 +352,43 @@ public class TokenAnalysis {
 	
 	private boolean arePathsIdenticalFallback(AbstractElement path1, AbstractElement path2) {
 		// + 1, because otherwise identical paths of length token limit can't be checked
-		for (int i = 0; i < config.getTokenLimit() + 1; i++) {
-			Set<List<Token>> tokenListSet1;
-			Set<List<Token>> tokenListSet2;
+		
+		log.info("path1: " + abstractElementToString(path1));
+		log.info("path2: " + abstractElementToString(path2));
+		
+		int i;
+		int limit = config.getTokenLimit() + 1;
+		for (i = 0; i < limit; i++) {
+			TokenAnalysisPaths tokenPaths1;
+			TokenAnalysisPaths tokenPaths2;
 			
 			List<Integer> range = range(0,  i);
 			
-			try {
-				tokenListSet1 = new HashSet<>(getTokenPaths(path1, range, false));
-			} catch (TokenAnalysisAbortedException e) {
-				tokenListSet1 = null;
-			}
+			// there shouldn't be a TokenAnalysisAbortedException if needsLength is false
+			tokenPaths1 = getTokenPaths(path1, new TokenAnalysisPaths(range), false, false);
+			tokenPaths2 = getTokenPaths(path2, new TokenAnalysisPaths(range), false, false);
 			
-			try {
-				tokenListSet2 = new HashSet<>(getTokenPaths(path2, range, false));
-			} catch (TokenAnalysisAbortedException e) {
-				tokenListSet2 = null;
-			}
+			Set<Set<Token>> tokenListSet1 = tokenPaths1.getTokenPaths().stream().map(HashSet::new).collect(Collectors.toSet());
+			Set<Set<Token>> tokenListSet2 = tokenPaths2.getTokenPaths().stream().map(HashSet::new).collect(Collectors.toSet());
 			
-			if (tokenListSet1 == null && tokenListSet2 == null) {
-				return true;
-			}
-			if (tokenListSet1 == null || tokenListSet2 == null) {
-				// the paths have different length
-				return false;
-			}
+			int maxPosition1 = tokenPaths1.getMaxPosition();
+			int maxPosition2 = tokenPaths2.getMaxPosition();
+			
+			log.info("set1: " + tokenListSet1 + ", " + maxPosition1);
+			log.info("set2: " + tokenListSet2 + ", " + maxPosition2);
+			
 			if (!tokenListSet1.equals(tokenListSet2)) {
 				return false;
 			}
+			
+			if (maxPosition1 < i + 1) {
+				// different max positions would have failed the equals-Operation
+				// if the max position is smaller than i + 1 the end of the path has been reached
+				return true;
+			}
 		}
 		
+		// token analysis limit reached
 		// we can't analyze the paths any further
 		// TODO maybe assume paths are equal and show warning instead of exception
 		throw new TokenAnalysisAbortedException("token limit exhausted while looking for identical paths");
@@ -383,7 +412,6 @@ public class TokenAnalysis {
 			}
 		}
 		// we tried all possible combinations
-		// TODO: can only happen if no symbolic analysis is implemented
 		// -> abort
 		if (limit.get().equals(config.getTokenLimit())) {
 			throw new TokenAnalysisAbortedException("token limit exhausted while searching for minimal differences");

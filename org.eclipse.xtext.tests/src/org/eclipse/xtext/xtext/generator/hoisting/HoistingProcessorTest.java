@@ -21,7 +21,6 @@ import org.eclipse.xtext.testing.GlobalRegistries;
 import org.eclipse.xtext.tests.AbstractXtextTests;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.HoistingProcessor;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.TokenAnalysisAbortedException;
-import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.UnsupportedConstructException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.HoistingGuard;
 import org.junit.After;
 import org.junit.Before;
@@ -435,9 +434,8 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))", guard.render());
 	}
 	
-	// TODO: this is no longer unsupported
-	// @Test(expected = UnsupportedConstructException.class)
-	public void testUnorderedGroupWithEmptyPathsWithoutContext_expectUnsupportedConstruct() throws Exception {
+	@Test(expected = TokenAnalysisAbortedException.class)
+	public void testUnorderedGroupWithEmptyPathsWithoutContext_expectTokenAnalysisAbortedException() throws Exception {		
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
@@ -448,11 +446,14 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
-		hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))", guard.render());
 	}
 	
-	//@Test
-	public void testUnorderedGroupWithoutMandatoryContent() throws Exception {
+	@Test
+	public void testUnorderedGroupWithoutMandatoryContentWithContext() throws Exception {
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
@@ -466,12 +467,13 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("((" + getSyntaxForKeywordToken("s", 1) + " || (p2)) && (" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))", guard.render());
+		assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))", guard.render());
 	}
 	
-	// TODO: this is no longer unsupported
-	@Test(expected = UnsupportedConstructException.class)
-	public void testUnorderedGroupWithoutMandatoryContentWithoutContext_expectUnsupportedConstruct() throws Exception {
+	@Test
+	public void testUnorderedGroupWithoutMandatoryContentWithoutContext_expectNoEofCheck() throws Exception {
+		// no eof check needed since that case is covered by the two alternatives
+		
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
@@ -482,7 +484,11 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
 		
-		hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		System.out.println(guard.toString());
+		assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))", guard.render());
 	}
 	
 	@Test
@@ -888,8 +894,45 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
 		hoistingProcessor.init(grammar);
 		AbstractRule rule = getRule(grammar, "S");
+
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		System.out.println(guard.render());
+	}
+	
+	@Test
+	public void testNestedAlternativesWithIdenticalPrefix_bugPathIdentityCheckDoesNotConsiderContext_expectContextCheckInResult() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: {S} $$ p0 $$?=> (\n" +
+			"      'a' \n" +
+			"    | 'a' 'b' \n" +
+			"   ) \n" +
+			" | {S} $$ p1 $$?=> (\n" +
+			"      'a' \n" + 
+			"    | 'a' 'c' \n" + 
+			"   ) \n" +
+			" | {S} $$ p2 $$?=> 'd' ;\n";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
+		AbstractRule rule = getRule(grammar, "S");
 		
-		hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		System.out.println(guard.render());
+		assertEquals(
+				"(" + 
+					"(" + getSyntaxForKeywordToken("a", 1) + " || (" + getSyntaxForEofToken(2) + " && " + getSyntaxForKeywordToken("b", 2) + ") || (p0)) && " + 
+					"(" + getSyntaxForKeywordToken("a", 1) + " || (" + getSyntaxForEofToken(2) + " && " + getSyntaxForKeywordToken("c", 2) + ") || (p1)) && " + 
+					"(" + getSyntaxForKeywordToken("d", 1) + " || (p2))" + 
+				")", 
+			guard.render()
+		);
 	}
 	
 	// symbolic analysis not yet implemented

@@ -32,6 +32,10 @@ public class TokenAnalysisPath {
 		path = new LinkedList<>(prefix.path);
 		position = prefix.position;
 	}
+
+	int getPosition() {
+		return position - 1;
+	}
 	
 	public boolean isDone() {
 		return remainingIndexes.isEmpty();

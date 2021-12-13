@@ -63,6 +63,14 @@ public class TokenAnalysisPaths {
 		return empty;
 	}
 	
+	public int getMinPosition() {
+		return tokenPaths.stream().map(TokenAnalysisPath::getPosition).mapToInt(Integer::intValue).min().getAsInt();
+	}
+	
+	public int getMaxPosition() {
+		return tokenPaths.stream().map(TokenAnalysisPath::getPosition).mapToInt(Integer::intValue).max().getAsInt();
+	}
+	
 	@Override
 	public String toString() {
 		if (isEmpty) {
