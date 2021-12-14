@@ -69,12 +69,11 @@ abstract class AbstractAntlrGrammarGenerator {
 		val RuleNames ruleNames = RuleNames.getRuleNames(it, true);
 		val Grammar flattened = new FlattenedGrammarAccess(ruleNames, filter).getFlattenedGrammar();
 		new CombinedGrammarMarker(combinedGrammar).attachToEmfObject(flattened)
+		init(flattened)
 		fsa.generateFile(grammarNaming.getParserGrammar(it).grammarFileName, flattened.compileParser(options))
 		if (!isCombinedGrammar) {
 			fsa.generateFile(grammarNaming.getLexerGrammar(it).grammarFileName, flattened.compileLexer(options))
 		}
-		
-		init
 	}
 	
 	protected def isCombinedGrammar() {

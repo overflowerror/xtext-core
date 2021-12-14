@@ -92,13 +92,13 @@ public abstract class AbstractAntlrGrammarGenerator {
     final Grammar flattened = new FlattenedGrammarAccess(ruleNames, filter).getFlattenedGrammar();
     boolean _isCombinedGrammar = this.isCombinedGrammar();
     new CombinedGrammarMarker(_isCombinedGrammar).attachToEmfObject(flattened);
+    this._hoistingProcessor.init(flattened);
     fsa.generateFile(this.getGrammarNaming().getParserGrammar(it).getGrammarFileName(), this.compileParser(flattened, options));
     boolean _isCombinedGrammar_1 = this.isCombinedGrammar();
     boolean _not = (!_isCombinedGrammar_1);
     if (_not) {
       fsa.generateFile(this.getGrammarNaming().getLexerGrammar(it).getGrammarFileName(), this.compileLexer(flattened, options));
     }
-    this._hoistingProcessor.init(it);
   }
   
   protected boolean isCombinedGrammar() {
