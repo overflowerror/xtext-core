@@ -16,30 +16,31 @@ import java.util.stream.Collectors;
  * @author overflow - Initial contribution and API
  */
 public class AlternativeTokenSequenceGuard implements TokenGuard {
-	private Collection<? extends TokenSequenceGuard> alternatives;
+	private Collection<? extends TokenGuard> alternatives;
 	
-	public AlternativeTokenSequenceGuard(Collection<? extends TokenSequenceGuard> alternatives) {
+	public AlternativeTokenSequenceGuard(Collection<? extends TokenGuard> alternatives) {
 		this.alternatives = alternatives;
+	}
+	
+	public TokenGuard reduce() {
+		if (alternatives.size() == 1) {
+			return alternatives.stream().findAny().get();
+		} else {
+			return this;
+		}
 	}
 	
 	@Override
 	public String render() {
-		boolean addParentheses = alternatives.size() != 1;
-		String result = "";
-		
-		if (addParentheses) {
-			result += "(";
+		if (alternatives.size() != 1) {
+			return "(" + 
+					alternatives.stream()
+						.map(TokenGuard::render)
+						.collect(Collectors.joining(" && ")) + 
+					")";
+		} else {
+			return alternatives.stream().findAny().get().render();
 		}
-		
-		result += alternatives.stream()
-				.map(TokenGuard::render)
-				.collect(Collectors.joining(" && "));
-
-		if (addParentheses) {
-			result += ")";
-		}
-		
-		return result;
 	}
 	
 	@Override

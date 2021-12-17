@@ -31,7 +31,7 @@ public class MergedPathGuard implements HoistingGuard {
 		pathGuards.addAll(mergedPathGuard.pathGuards);
 	}
 	
-	HoistingGuard simplify() {
+	HoistingGuard reduce() {
 		if (pathGuards.size() == 1) {
 			return pathGuards.get(0);
 		} else {
@@ -49,12 +49,14 @@ public class MergedPathGuard implements HoistingGuard {
 		if (pathGuards.size() == 1) {
 			return pathGuards.get(0).render();
 		} else {
-			return "(" + 
-					pathGuards.stream()
-						.map(Guard::render)
-						.collect(Collectors.joining(" || ")) +
-					")";
+			return "(" + renderWithoutParentheses() + ")";
 		}
+	}
+	
+	String renderWithoutParentheses() {
+		return pathGuards.stream()
+				.map(Guard::render)
+				.collect(Collectors.joining(" || "));
 	}
 
 	@Override

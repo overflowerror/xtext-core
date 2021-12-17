@@ -39,6 +39,7 @@ import org.eclipse.xtext.util.Tuples;
 
 import static org.eclipse.xtext.GrammarUtil.*;
 
+import org.eclipse.xtext.xtext.generator.parser.antlr.JavaCodeUtils;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.NestedPrefixAlternativesException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.OptionalCardinalityWithoutContextException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.TokenAnalysisAbortedException;
@@ -116,7 +117,7 @@ public class HoistingProcessor {
 
 	private AbstractElement getNopElement() {
 		JavaCode virtualJavaCodeForAction = XtextFactory.eINSTANCE.createJavaCode();
-		virtualJavaCodeForAction.setSource("$$ /* nop */ $$");
+		virtualJavaCodeForAction.setSource(JavaCodeUtils.formatCodeForGrammar("/* nop */"));
 		
 		JavaAction virtualNopJavaAction = XtextFactory.eINSTANCE.createJavaAction();
 		virtualNopJavaAction.setCode(virtualJavaCodeForAction);
@@ -145,7 +146,7 @@ public class HoistingProcessor {
 				
 				if (!guard.isTrivial()) {
 					JavaCode virtualJavaCodeForPredicate = XtextFactory.eINSTANCE.createJavaCode();
-					virtualJavaCodeForPredicate.setSource("$$ " + guard.render() + " $$");
+					virtualJavaCodeForPredicate.setSource(JavaCodeUtils.formatGuardForGrammar(guard));
 				
 					renderedVirtualPredicate = XtextFactory.eINSTANCE.createGatedSemanticPredicate();
 					renderedVirtualPredicate.setCode(virtualJavaCodeForPredicate);
@@ -234,9 +235,11 @@ public class HoistingProcessor {
 									.collect(Collectors.toList())
 							)
 							.map(TokenSequenceGuard::new)
+							.map(TokenGuard::reduce)
 							.collect(Collectors.toList())
 						)
-						.map(AlternativeTokenSequenceGuard::new),
+						.map(AlternativeTokenSequenceGuard::new)
+						.map(TokenGuard::reduce),
 					guards.stream(),
 					(TokenGuard tokenGuard, MergedPathGuard pathGuard) -> Tuples.pair(tokenGuard, pathGuard)
 				).map(p -> new PathGuard(p.getFirst(), p.getSecond()))

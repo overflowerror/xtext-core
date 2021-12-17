@@ -42,7 +42,24 @@ public class PathGuard implements HoistingGuard {
 	@Override
 	public String render() {
 		// parentheses needed since tokenGuard is never empty
-		return "(" + tokenGuard.render() + " || " + hoistngGuard.render() + ")";
+		String result = "(";
+		
+		if (tokenGuard instanceof TokenSequenceGuard) {
+			result += ((TokenSequenceGuard) tokenGuard).renderWithoutParenthesis();
+		} else {
+			result += tokenGuard.render();
+		}
+		
+		result += " || ";
+		
+		if (hoistngGuard instanceof MergedPathGuard) {
+			result += ((MergedPathGuard) hoistngGuard).renderWithoutParentheses();
+		} else {
+			result += hoistngGuard.render();
+		}
+		
+		result += ")";
+		return result;
 	}
 	
 	public static List<PathGuard> collapse(List<PathGuard> paths) {
@@ -57,7 +74,7 @@ public class PathGuard implements HoistingGuard {
 			
 			// TODO: allow merged paths
 			if (guard instanceof MergedPathGuard) {
-				guard = ((MergedPathGuard) guard).simplify();
+				guard = ((MergedPathGuard) guard).reduce();
 			}
 			
 			if (guard instanceof AlternativesGuard) {

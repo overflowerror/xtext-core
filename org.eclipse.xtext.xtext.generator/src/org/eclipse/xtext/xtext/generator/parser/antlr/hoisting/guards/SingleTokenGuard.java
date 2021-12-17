@@ -19,6 +19,11 @@ public class SingleTokenGuard implements TokenGuard {
 	public SingleTokenGuard(Token token) {
 		this.token = token;
 	}
+	
+	@Override
+	public TokenGuard reduce() {
+		return this;
+	}
 
 	@Override
 	public String render() {

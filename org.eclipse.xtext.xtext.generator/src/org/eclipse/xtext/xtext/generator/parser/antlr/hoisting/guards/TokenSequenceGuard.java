@@ -23,6 +23,15 @@ public class TokenSequenceGuard implements TokenGuard {
 	}
 
 	@Override
+	public TokenGuard reduce() {
+		if (sequence.size() == 1) {
+			return sequence.stream().findAny().get();
+		} else {
+			return this;
+		}
+	}
+	
+	@Override
 	public String render() {
 		boolean addParentheses = sequence.size() != 1;
 		String result = "";
@@ -31,15 +40,19 @@ public class TokenSequenceGuard implements TokenGuard {
 			result += "(";
 		}
 		
-		result += sequence.stream()
-				.map(TokenGuard::render)
-				.collect(Collectors.joining(" || "));
+		result += renderWithoutParenthesis();
 
 		if (addParentheses) {
 			result += ")";
 		}
 		
 		return result;
+	}
+	
+	public String renderWithoutParenthesis() {
+		return sequence.stream()
+				.map(TokenGuard::render)
+				.collect(Collectors.joining(" || "));
 	}
 	
 	@Override

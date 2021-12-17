@@ -16,4 +16,6 @@ public interface TokenGuard extends Guard {
 	default boolean isTrivial() {
 		return false;
 	}
+	
+	TokenGuard reduce();
 }
