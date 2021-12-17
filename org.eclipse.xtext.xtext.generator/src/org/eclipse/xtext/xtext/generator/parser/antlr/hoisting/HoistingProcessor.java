@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
+
+import static org.eclipse.emf.ecore.util.EcoreUtil.*;
+
 import org.eclipse.xtext.AbstractElement;
 import org.eclipse.xtext.AbstractRule;
 import org.eclipse.xtext.AbstractSemanticPredicate;
@@ -28,12 +31,15 @@ import org.eclipse.xtext.CompoundElement;
 import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.Group;
 import org.eclipse.xtext.JavaAction;
+import org.eclipse.xtext.JavaCode;
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.UnorderedGroup;
 import org.eclipse.xtext.XtextFactory;
 import org.eclipse.xtext.util.Tuples;
+
 import static org.eclipse.xtext.GrammarUtil.*;
 
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.NestedPrefixAlternativesException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.OptionalCardinalityWithoutContextException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.TokenAnalysisAbortedException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.UnsupportedConstructException;
@@ -78,7 +84,7 @@ public class HoistingProcessor {
 		}
 		
 		// set cardinality so the token analyse works
-		element = cloneAbstractElement(element);
+		element = copy(element);
 		if (isMultipleCardinality(element)) {
 			element.setCardinality("+");
 		} else {
@@ -106,6 +112,70 @@ public class HoistingProcessor {
 		} catch(TokenAnalysisAbortedException e) {
 			throw new TokenAnalysisAbortedException(e.getMessage(), e, currentRule);
 		}
+	}
+
+	private AbstractElement getNopElement() {
+		JavaCode virtualJavaCodeForAction = XtextFactory.eINSTANCE.createJavaCode();
+		virtualJavaCodeForAction.setSource("$$ /* nop */ $$");
+		
+		JavaAction virtualNopJavaAction = XtextFactory.eINSTANCE.createJavaAction();
+		virtualNopJavaAction.setCode(virtualJavaCodeForAction);
+		
+		return virtualNopJavaAction;
+	}
+	
+	private CompoundElement flattenPaths(CompoundElement original, List<AbstractElement> paths, List<? extends HoistingGuard> guards) {
+		// work on copy of original to preserve eParent
+		CompoundElement flattened = copy(original);
+		setElementsOfCompoundElement(flattened,
+			StreamUtils.zip(
+				paths.stream()
+					.map(analysis::getAllPossiblePaths),
+				guards.stream()
+					.map(HoistingGuard.class::cast),
+				(List<List<AbstractElement>> e, HoistingGuard g) -> Tuples.pair(e, g)
+			).filter(t -> t.getFirst() != null)
+			.flatMap(t -> {
+				HoistingGuard guard = t.getSecond();
+				
+				// we can reuse objects since setElementsOfCompundElement
+				// will create copy anyway
+				AbstractElement nop = getNopElement();
+				AbstractSemanticPredicate renderedVirtualPredicate;
+				
+				if (!guard.isTrivial()) {
+					JavaCode virtualJavaCodeForPredicate = XtextFactory.eINSTANCE.createJavaCode();
+					virtualJavaCodeForPredicate.setSource("$$ " + guard.render() + " $$");
+				
+					renderedVirtualPredicate = XtextFactory.eINSTANCE.createGatedSemanticPredicate();
+					renderedVirtualPredicate.setCode(virtualJavaCodeForPredicate);
+				} else {
+					renderedVirtualPredicate = null;
+				}
+				
+				return t.getFirst()
+					.stream()
+					.map(a -> {
+						List<AbstractElement> groupElements = new ArrayList<>(a.size() + 2);
+						
+						if (renderedVirtualPredicate != null) {
+							groupElements.add(renderedVirtualPredicate);
+						}
+
+						// virtual action to prevent hoisting
+						groupElements.add(nop);
+						
+						groupElements.addAll(a);
+
+
+						Group virtualGroup = XtextFactory.eINSTANCE.createGroup();
+						setElementsOfCompoundElement(virtualGroup, groupElements);
+								
+						return virtualGroup;
+					});
+			})
+		);
+		return flattened;
 	}
 	
 	private HoistingGuard findGuardForAlternatives(CompoundElement alternatives, AbstractRule currentRule) {
@@ -171,6 +241,18 @@ public class HoistingProcessor {
 					(TokenGuard tokenGuard, MergedPathGuard pathGuard) -> Tuples.pair(tokenGuard, pathGuard)
 				).map(p -> new PathGuard(p.getFirst(), p.getSecond()))
 				.collect(AlternativesGuard.collector());
+			} catch(NestedPrefixAlternativesException e) {
+				// nested prefix alternatives
+				// -> flatten paths to alternative and try again
+				// this is very inefficient
+				log.warn("nested prefix alternatives detected");
+				log.warn("avoid these since they can't be handled efficiency");
+				log.info(abstractElementToString(alternatives));
+				
+				CompoundElement flattened = flattenPaths(alternatives, paths, guards);
+				log.info(abstractElementToString(flattened));
+				
+				return findGuardForAlternatives(flattened, currentRule);
 			} catch(TokenAnalysisAbortedException e) {
 				throw new TokenAnalysisAbortedException(e.getMessage(), e, currentRule);
 			}
@@ -225,7 +307,7 @@ public class HoistingProcessor {
 				
 				// we need a clone of the element because we need to set the cardinality without changing the
 				// original syntax tree
-				AbstractElement clonedElement = cloneAbstractElement(element);
+				AbstractElement clonedElement = copy(element);
 				clonedElement.setCardinality(null);
 				
 				// make copy of every element because we can't use any element twice
@@ -243,13 +325,13 @@ public class HoistingProcessor {
 				remainingElementsInGroupIncludingCurrent.add(0, clonedElement);
 						
 				Group virtualPathRemaining = XtextFactory.eINSTANCE.createGroup();
-				addElementsToCompoundElement(virtualPathRemaining, remainingElementsInGroup);
+				setElementsOfCompoundElement(virtualPathRemaining, remainingElementsInGroup);
 				
 				Group virtualPathRemainingPlusCurrent = XtextFactory.eINSTANCE.createGroup();
-				addElementsToCompoundElement(virtualPathRemainingPlusCurrent, remainingElementsInGroupIncludingCurrent);
+				setElementsOfCompoundElement(virtualPathRemainingPlusCurrent, remainingElementsInGroupIncludingCurrent);
 				
 				Alternatives virtualAlternatives = XtextFactory.eINSTANCE.createAlternatives();
-				addElementsToCompoundElement(virtualAlternatives, Arrays.asList(virtualPathRemaining, virtualPathRemainingPlusCurrent));
+				setElementsOfCompoundElement(virtualAlternatives, Arrays.asList(virtualPathRemaining, virtualPathRemainingPlusCurrent));
 				
 				// get Guard for virtual alternatives
 				HoistingGuard guard = findGuardForElementWithTrivialCardinality(virtualAlternatives, currentRule);

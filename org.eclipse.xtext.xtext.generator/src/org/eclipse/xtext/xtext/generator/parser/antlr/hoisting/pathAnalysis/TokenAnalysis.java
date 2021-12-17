@@ -30,12 +30,11 @@ import org.eclipse.xtext.CompoundElement;
 import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.GrammarUtil;
 import org.eclipse.xtext.Group;
-import org.eclipse.xtext.Keyword;
-import org.eclipse.xtext.ParserRule;
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.UnorderedGroup;
 import org.eclipse.xtext.util.XtextSwitch;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.HoistingConfiguration;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.NestedPrefixAlternativesException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.SymbolicAnalysisFailedException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.TokenAnalysisAbortedException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token.Token;
@@ -402,7 +401,6 @@ public class TokenAnalysis {
 		}
 	}
 	
-	
 	private void tokenCombinations(Function<List<Integer>, Boolean> callback) {
 		MutablePrimitiveWrapper<Integer> limit = new MutablePrimitiveWrapper<>(config.getTokenLimit());
 		
@@ -416,7 +414,9 @@ public class TokenAnalysis {
 		if (limit.get().equals(config.getTokenLimit())) {
 			throw new TokenAnalysisAbortedException("token limit exhausted while searching for minimal differences");
 		} else {
-			throw new TokenAnalysisAbortedException("path length exhausted while searching for minimal differences");
+			// path length exhausted while searching for minimal differences
+			// this indicates nested prefix alternatives
+			throw new NestedPrefixAlternativesException();
 		}
 	}
 	private boolean tokenCombinations(long prefix, int prefixLength, int ones, Function<List<Integer>, Boolean> callback, MutablePrimitiveWrapper<Integer> limit) {
@@ -527,5 +527,16 @@ public class TokenAnalysis {
 		});
 		
 		return result;
+	}
+	
+	public List<List<AbstractElement>> getAllPossiblePaths(AbstractElement path) {
+		return getTokenPaths(path, new TokenAnalysisPaths(range(0, config.getTokenLimit() + 1)), false, false)
+				.getTokenPaths()
+				.stream()
+				.map(l -> l.stream()
+					.map(Token::getElement)
+					.collect(Collectors.toList()))
+				.collect(Collectors.toList());
+				
 	}
 }

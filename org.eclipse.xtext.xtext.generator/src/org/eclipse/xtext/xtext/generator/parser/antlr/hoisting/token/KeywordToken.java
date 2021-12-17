@@ -8,6 +8,7 @@
  *******************************************************************************/
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token;
 
+import org.eclipse.xtext.AbstractElement;
 import org.eclipse.xtext.Keyword;
 
 /**
@@ -59,4 +60,10 @@ public class KeywordToken implements Token {
 			return false;
 		return true;
 	}
+	
+	@Override
+	public AbstractElement getElement() {
+		return keyword;
+	}
+	
 }

@@ -21,6 +21,8 @@ import org.eclipse.xtext.TerminalRule;
 public interface Token {
 	String negatedCondition();
 	
+	AbstractElement getElement();
+	
 	static boolean isToken(AbstractElement element) {
 		if (element == null) {
 			return true;
@@ -43,7 +45,7 @@ public interface Token {
 		} else if (element instanceof RuleCall) {
 			AbstractRule rule = ((RuleCall) element).getRule();
 			if (rule instanceof TerminalRule) {
-				return new TerminalRuleToken((TerminalRule) rule, position);
+				return new TerminalRuleToken((RuleCall) element, (TerminalRule) rule, position);
 			}
 		} else if (element instanceof EnumLiteralDeclaration) {
 			return new KeywordToken(((EnumLiteralDeclaration) element).getLiteral(), position);

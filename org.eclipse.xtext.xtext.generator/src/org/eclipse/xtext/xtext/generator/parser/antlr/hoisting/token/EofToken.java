@@ -8,6 +8,8 @@
  *******************************************************************************/
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token;
 
+import org.eclipse.xtext.AbstractElement;
+
 /**
  * @author overflow - Initial contribution and API
  */
@@ -49,6 +51,11 @@ public class EofToken implements Token {
 	@Override
 	public String toString() {
 		return "EofToken(" + position + ")\n";
+	}
+
+	@Override
+	public AbstractElement getElement() {
+		return null;
 	}
 
 }

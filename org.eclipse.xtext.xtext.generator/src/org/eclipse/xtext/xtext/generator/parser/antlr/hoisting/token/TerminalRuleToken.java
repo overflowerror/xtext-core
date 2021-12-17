@@ -8,16 +8,20 @@
  *******************************************************************************/
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token;
 
+import org.eclipse.xtext.AbstractElement;
+import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.TerminalRule;
 
 /**
  * @author overflow - Initial contribution and API
  */
 public class TerminalRuleToken implements Token {
+	private RuleCall call;
 	private TerminalRule rule;
 	private int position;
 	
-	public TerminalRuleToken(TerminalRule rule, int position) {
+	TerminalRuleToken(RuleCall call, TerminalRule rule, int position) {
+		this.call = call;
 		this.rule = rule;
 		this.position = position;
 	}
@@ -60,5 +64,8 @@ public class TerminalRuleToken implements Token {
 		return true;
 	}
 	
-	
+	@Override
+	public AbstractElement getElement() {
+		return call;
+	}
 }

@@ -709,20 +709,16 @@ public class GrammarUtil {
 		return null;
 	}
 	
-	public static AbstractElement cloneAbstractElement(AbstractElement element) {
-		return (AbstractElement) EcoreUtil.copy(element);
-	}
-	
-	public static void addElementsToCompoundElement(CompoundElement element, Stream<? extends AbstractElement> elements) {
+	public static void setElementsOfCompoundElement(CompoundElement element, Stream<? extends AbstractElement> elements) {
 		EStructuralFeature compoundElementElementsFeature = XtextPackage.Literals.COMPOUND_ELEMENT.getEStructuralFeature(XtextPackage.COMPOUND_ELEMENT__ELEMENTS);
 		
 		element.eSet(compoundElementElementsFeature, elements
-				.map(GrammarUtil::cloneAbstractElement)
+				.map(EcoreUtil::copy)
 				.collect(Collectors.toList()));
 	}
 	
-	public static void addElementsToCompoundElement(CompoundElement element, Collection<? extends AbstractElement> elements) {
-		addElementsToCompoundElement(element, elements.stream());
+	public static void setElementsOfCompoundElement(CompoundElement element, Collection<? extends AbstractElement> elements) {
+		setElementsOfCompoundElement(element, elements.stream());
 	}
 	
 	private static void findAllRuleCalls(List<RuleCall> calls, AbstractElement element, AbstractRule rule) {
