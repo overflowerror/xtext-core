@@ -637,7 +637,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("((" + getSyntaxForKeywordToken("j", 10) + " || ((p0) || (p1))) && (" + getSyntaxForKeywordToken("k", 10) + " || (p2)))", guard.render());
+		assertEquals("((" + getSyntaxForKeywordToken("j", 10) + " || (p0) || (p1)) && (" + getSyntaxForKeywordToken("k", 10) + " || (p2)))", guard.render());
 	}
 	
 	@Test
@@ -658,7 +658,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || ((p0) || (p1))) && (" + getSyntaxForKeywordToken("b", 1) + " || (p2)))", guard.render());
+		assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || (p0) || (p1)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p2)))", guard.render());
 		
 		// number of elements in Alternatives object has to stay the same
 		// even though the identical paths are collapsed during the hoisting process
@@ -924,12 +924,13 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		System.out.println(guard.render());
+		System.out.println(guard.toString());
 		assertEquals(
 				"(" + 
-					"(" + getSyntaxForKeywordToken("a", 1) + " || (" + getSyntaxForEofToken(2) + " && " + getSyntaxForKeywordToken("b", 2) + ") || (p0)) && " + 
-					"(" + getSyntaxForKeywordToken("a", 1) + " || (" + getSyntaxForEofToken(2) + " && " + getSyntaxForKeywordToken("c", 2) + ") || (p1)) && " + 
-					"(" + getSyntaxForKeywordToken("d", 1) + " || (p2))" + 
+					"(" + getSyntaxForKeywordToken("a", 1) + " || " + getSyntaxForEofToken(2) + " || (p0) || (p1)) && " + 
+					"(" + getSyntaxForKeywordToken("b", 2) + " || (p0)) && " + 
+					"(" + getSyntaxForKeywordToken("c", 2) + " || (p1)) && " +
+					"(" + getSyntaxForKeywordToken("d", 1) + " || (p2))" +
 				")", 
 			guard.render()
 		);
