@@ -8,19 +8,21 @@
  *******************************************************************************/
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.pathAnalysis;
 
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.eclipse.xtext.AbstractElement;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token.Token;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.StreamUtils;
 
 /**
- * @author overflow - Initial contribution and API
+ * @author overflow - Initial contribution and APILinkedHashSet
  */
 public class TokenAnalysisPaths {
-	private List<TokenAnalysisPath> tokenPaths = new LinkedList<>();
+	private LinkedHashSet<TokenAnalysisPath> tokenPaths = new LinkedHashSet<>();
 	private boolean isEmpty = false;
+	private boolean hasProgress = false;
 	
 	public List<List<Token>> getTokenPaths() {
 		return tokenPaths.stream()
@@ -36,23 +38,34 @@ public class TokenAnalysisPaths {
 	public TokenAnalysisPaths(TokenAnalysisPaths prefix) {
 		this.tokenPaths = prefix.tokenPaths.stream()
 				.map(TokenAnalysisPath::new)
-				.collect(Collectors.toList());
+				.collect(StreamUtils.collectToLinkedHashSet());
+		this.hasProgress = prefix.hasProgress;
 	}
 	
 	public boolean isDone() {
 		return !isEmpty && tokenPaths.stream().allMatch(TokenAnalysisPath::isDone);
 	}
 	
+	public boolean hasProgress() {
+		return hasProgress;
+	}
+	
+	public void resetProgress() {
+		hasProgress = false;
+	}
+	
 	public void add(AbstractElement element) {
-		tokenPaths.forEach(p -> p.add(element));
+		tokenPaths.forEach(p -> hasProgress = p.add(element) || hasProgress);
 	}
 	
 	public TokenAnalysisPaths merge(TokenAnalysisPaths other) {
 		if (isEmpty) {
 			return other;
 		} else {
-			// TODO: implement hashCode and equals to check for duplicates right awaz
-			this.tokenPaths.addAll(other.tokenPaths);
+			// set hasProgress if other has progress and progress is merged
+			if (this.tokenPaths.addAll(other.tokenPaths)) {
+				this.hasProgress |= other.hasProgress;
+			}
 			return this;
 		}
 	}
@@ -69,6 +82,10 @@ public class TokenAnalysisPaths {
 	
 	public int getMaxPosition() {
 		return tokenPaths.stream().map(TokenAnalysisPath::getPosition).mapToInt(Integer::intValue).max().getAsInt();
+	}
+	
+	public int getSize() {
+		return tokenPaths.size();
 	}
 	
 	@Override

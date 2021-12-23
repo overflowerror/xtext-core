@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -835,4 +836,16 @@ public class EcoreUtil2 extends EcoreUtil {
 			return "";
 	}
 
+	public static void setEParent(EObject child, EObject parent) {
+		List<EReference> possibleReferences = parent.eClass().getEAllContainments().stream()
+				.filter(EReference::isContainment)
+				.filter(r -> r.getEReferenceType().isInstance(child))
+				.collect(Collectors.toList());
+		if (possibleReferences.size() != 1) {
+			throw new IllegalArgumentException("no obvious containment reference found");
+		}
+		
+		parent.eSet(possibleReferences.get(0), child);
+	}
+	
 }

@@ -16,11 +16,14 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
 
 import static org.eclipse.emf.ecore.util.EcoreUtil.*;
 
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.AbstractElement;
 import org.eclipse.xtext.AbstractRule;
 import org.eclipse.xtext.AbstractSemanticPredicate;
@@ -28,6 +31,7 @@ import org.eclipse.xtext.Action;
 import org.eclipse.xtext.Alternatives;
 import org.eclipse.xtext.Assignment;
 import org.eclipse.xtext.CompoundElement;
+import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.Group;
 import org.eclipse.xtext.JavaAction;
@@ -41,7 +45,6 @@ import static org.eclipse.xtext.GrammarUtil.*;
 
 import org.eclipse.xtext.xtext.generator.parser.antlr.JavaCodeUtils;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.NestedPrefixAlternativesException;
-import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.OptionalCardinalityWithoutContextException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.TokenAnalysisAbortedException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.UnsupportedConstructException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.AlternativeTokenSequenceGuard;
@@ -125,13 +128,53 @@ public class HoistingProcessor {
 		return virtualNopJavaAction;
 	}
 	
-	private CompoundElement flattenPaths(CompoundElement original, List<AbstractElement> paths, List<? extends HoistingGuard> guards) {
-		// work on copy of original to preserve eParent
-		CompoundElement flattened = copy(original);
+	private CompoundElement flattenPaths(AbstractElement original, List<AbstractElement> paths, List<? extends HoistingGuard> guards) {
+		// we need to preserve parent for context analysis
+		// but we are not allowed to change the tree
+		// -> clone parent
+		EObject clonedParent = copy(original.eContainer());
+		CompoundElement flattened = XtextFactory.eINSTANCE.createAlternatives();
+		
+		if (clonedParent instanceof CompoundElement) {
+			setElementsOfCompoundElement((CompoundElement) clonedParent, 
+					((CompoundElement) clonedParent).getElements().stream()
+						.map(e -> {
+							if (e == original) {
+								return flattened;
+							} else {
+								return e;
+							}
+						}));
+		} else {
+			EcoreUtil2.setEParent(flattened, clonedParent);
+		}
+		
+		Stream<AbstractElement> pathsStream = paths.stream();
+		
+		if (original instanceof UnorderedGroup) {
+			// in case original element is UnorderedGroup add original after each path
+			// so token analysis can fetches all possible paths correctly
+			
+			pathsStream = pathsStream
+				.map(p -> {
+					Group virtualGroup = XtextFactory.eINSTANCE.createGroup();
+					setElementsOfCompoundElement(virtualGroup, Arrays.asList(p, copy(original)));
+					return virtualGroup;
+				});
+		}
+		
 		setElementsOfCompoundElement(flattened,
 			StreamUtils.zip(
-				paths.stream()
-					.map(analysis::getAllPossiblePaths),
+				pathsStream
+					.map(analysis::getAllPossiblePaths)
+					.map(l1 -> l1.stream()
+						.map(l2 -> l2.stream()
+							.map(EcoreUtil::copy)
+							// remove cardinality; token analysis already handled that
+							.peek(e -> e.setCardinality(null))
+							.collect(Collectors.toList())
+						).collect(Collectors.toList())
+					),
 				guards.stream()
 					.map(HoistingGuard.class::cast),
 				(List<List<AbstractElement>> e, HoistingGuard g) -> Tuples.pair(e, g)
@@ -178,6 +221,8 @@ public class HoistingProcessor {
 		);
 		return flattened;
 	}
+	
+	boolean hasSeen = false;
 	
 	private HoistingGuard findGuardForAlternatives(CompoundElement alternatives, AbstractRule currentRule) {
 		log.info("find guard for alternative");
@@ -249,11 +294,19 @@ public class HoistingProcessor {
 				// -> flatten paths to alternative and try again
 				// this is very inefficient
 				log.warn("nested prefix alternatives detected");
-				log.warn("avoid these since they can't be handled efficiency");
+				log.warn("avoid these since they can't be handled efficiently");
 				log.info(abstractElementToString(alternatives));
 				
 				CompoundElement flattened = flattenPaths(alternatives, paths, guards);
 				log.info(abstractElementToString(flattened));
+				
+				log.info(flattened.getElements().size());
+				// TODO: value configurable?
+				if (flattened.getElements().size() > 100) {
+					throw new NestedPrefixAlternativesException("nested prefix alternatives cant be analysed because of too many paths");
+				}
+				
+				//throw new RuntimeException();
 				
 				return findGuardForAlternatives(flattened, currentRule);
 			} catch(TokenAnalysisAbortedException e) {
@@ -285,9 +338,7 @@ public class HoistingProcessor {
 			AbstractElement element = iterator.next();
 			
 			String cardinality = element.getCardinality();
-			if (cardinality == null ||
-			    cardinality.equals("") ||
-			    cardinality.equals("+")) {
+			if (isTrivialCardinality(element) || isOneOrMoreCardinality(element)) {
 				
 				HoistingGuard guard = findGuardForElementWithTrivialCardinality(element, currentRule);
 				groupGuard.add(guard);
@@ -300,18 +351,12 @@ public class HoistingProcessor {
 					groupGuard.setHasTerminal();
 					break;
 				}
-			} else if (cardinality.equals("?") ||
-			           cardinality.equals("*")) {
+			} else if (isOptionalCardinality(element)) {
 				// though not technically necessary, rewrite tree to context checks are not needed 
 				
 				// rewrite cardinality to alternatives
 				// A? B -> A B | B
-				// A* B -> A+ B | B -> A B (see above)
-				
-				// we need a clone of the element because we need to set the cardinality without changing the
-				// original syntax tree
-				AbstractElement clonedElement = copy(element);
-				clonedElement.setCardinality(null);
+				// A* B -> A+ B | B -> A B | B (see above)
 				
 				// make copy of every element because we can't use any element twice
 				List<AbstractElement> remainingElementsInGroup = StreamUtils.fromIterator(iterator)
@@ -319,33 +364,50 @@ public class HoistingProcessor {
 				
 				if (remainingElementsInGroup.isEmpty()) {
 					// B is empty
-					// context is needed to generate virtual alternatives
-					throw new OptionalCardinalityWithoutContextException("no context in group", currentRule);
+					// context will be taken from parent element
+					
+					HoistingGuard guard = findGuardForOptionalCardinalityWithoutContext(element, currentRule);
+					groupGuard.add(guard);
+					
+					if (guard.hasTerminal()) {
+						groupGuard.setHasTerminal();
+					}
+					
+					// there are no following elements
+					break;
+				} else {
+					// B is non-empty
+					// -> construct context for alternatives
+					
+					// we need a clone of the element because we need to set the cardinality without changing the
+					// original syntax tree
+					AbstractElement clonedElement = copy(element);
+					clonedElement.setCardinality(null);
+					
+					// make copy of first branch and add the cloned element
+					List<AbstractElement> remainingElementsInGroupIncludingCurrent = new LinkedList<>(remainingElementsInGroup);
+					remainingElementsInGroupIncludingCurrent.add(0, clonedElement);
+							
+					Group virtualPathRemaining = XtextFactory.eINSTANCE.createGroup();
+					setElementsOfCompoundElement(virtualPathRemaining, remainingElementsInGroup);
+					
+					Group virtualPathRemainingPlusCurrent = XtextFactory.eINSTANCE.createGroup();
+					setElementsOfCompoundElement(virtualPathRemainingPlusCurrent, remainingElementsInGroupIncludingCurrent);
+					
+					Alternatives virtualAlternatives = XtextFactory.eINSTANCE.createAlternatives();
+					setElementsOfCompoundElement(virtualAlternatives, Arrays.asList(virtualPathRemaining, virtualPathRemainingPlusCurrent));
+					
+					// get Guard for virtual alternatives
+					HoistingGuard guard = findGuardForElementWithTrivialCardinality(virtualAlternatives, currentRule);
+					groupGuard.add(guard);
+					
+					if (guard.hasTerminal()) {
+						groupGuard.setHasTerminal();
+					}
+
+					// following elements are included in alternative, no need to check further
+					break;
 				}
-				
-				// make copy of first branch and add the cloned element
-				List<AbstractElement> remainingElementsInGroupIncludingCurrent = new LinkedList<>(remainingElementsInGroup);
-				remainingElementsInGroupIncludingCurrent.add(0, clonedElement);
-						
-				Group virtualPathRemaining = XtextFactory.eINSTANCE.createGroup();
-				setElementsOfCompoundElement(virtualPathRemaining, remainingElementsInGroup);
-				
-				Group virtualPathRemainingPlusCurrent = XtextFactory.eINSTANCE.createGroup();
-				setElementsOfCompoundElement(virtualPathRemainingPlusCurrent, remainingElementsInGroupIncludingCurrent);
-				
-				Alternatives virtualAlternatives = XtextFactory.eINSTANCE.createAlternatives();
-				setElementsOfCompoundElement(virtualAlternatives, Arrays.asList(virtualPathRemaining, virtualPathRemainingPlusCurrent));
-				
-				// get Guard for virtual alternatives
-				HoistingGuard guard = findGuardForElementWithTrivialCardinality(virtualAlternatives, currentRule);
-				groupGuard.add(guard);
-				
-				if (guard.hasTerminal()) {
-					groupGuard.setHasTerminal();
-				}
-				
-				// following elements are included in alternative, no need to check further
-				break;
 			} else {
 				throw new IllegalArgumentException("unknown cardinality: " + cardinality);
 			}

@@ -9,13 +9,14 @@
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils;
 
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import com.google.common.base.Splitter;
 
 /**
  * @author overflow - Initial contribution and API
@@ -42,5 +43,15 @@ public class StreamUtils {
 	
 	public static <A> Stream<A> fromIterator(Iterator<A> iterator) {
 		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator, Spliterator.NONNULL), false);
+	}
+	
+	public static <T> Collector<T, ?, LinkedHashSet<T>> collectToLinkedHashSet() {
+		return Collector.of(
+			(Supplier<LinkedHashSet<T>>) LinkedHashSet::new, 
+			LinkedHashSet::add, 
+			(a, b) -> {
+				a.addAll(b);
+				return a;
+			}, Collector.Characteristics.IDENTITY_FINISH);
 	}
 }

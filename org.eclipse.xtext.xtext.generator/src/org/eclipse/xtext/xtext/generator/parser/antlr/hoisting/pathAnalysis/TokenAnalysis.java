@@ -141,7 +141,7 @@ public class TokenAnalysis {
 	}
 	
 	
-	private TokenAnalysisPaths getTokenPathsContext(AbstractElement last, TokenAnalysisPaths prefix) {
+	private TokenAnalysisPaths getTokenPathsContext(AbstractElement last, TokenAnalysisPaths prefix, boolean shortcutEndlessLoops) {
 		log.info("get context for: " + abstractElementToShortString(last));
 		
 		List<AbstractElement> context = getNextElementsInContext(last);
@@ -160,13 +160,13 @@ public class TokenAnalysis {
 		
 		for (AbstractElement element : context) {			
 			TokenAnalysisPaths path = new TokenAnalysisPaths(prefix);
-			path = getTokenPaths(element, path, false, false);
+			path = getTokenPaths(element, path, false, false, shortcutEndlessLoops);
 			if (!path.isDone() && element != null) {
 				if (path.getMinPosition() == currentPosition) {
 					throw new TokenAnalysisAbortedException("no progress in context analysis");
 				}
 				
-				path = getTokenPathsContext(element, path);
+				path = getTokenPathsContext(element, path, shortcutEndlessLoops);
 			}
 			if (path.isDone()) {
 				result = result.merge(path);
@@ -179,11 +179,11 @@ public class TokenAnalysis {
 		return result;
 	}
 	
-	private TokenAnalysisPaths getTokenPathsTrivial(Group path, TokenAnalysisPaths prefix) {
+	private TokenAnalysisPaths getTokenPathsTrivial(Group path, TokenAnalysisPaths prefix, boolean shortcutEndlessLoops) {
 		TokenAnalysisPaths result = new TokenAnalysisPaths(prefix);
 		
 		for(AbstractElement element : path.getElements()) {
-			result = getTokenPaths(element, result, false, false);
+			result = getTokenPaths(element, result, false, false, shortcutEndlessLoops);
 			if (result.isDone()) {
 				break;
 			}
@@ -191,16 +191,18 @@ public class TokenAnalysis {
 		
 		return result;
 	}
-	private TokenAnalysisPaths getTokenPathsTrivial(Alternatives path, TokenAnalysisPaths prefix) {
+	private TokenAnalysisPaths getTokenPathsTrivial(Alternatives path, TokenAnalysisPaths prefix, boolean shortcutEndlessLoops) {
 		TokenAnalysisPaths result = TokenAnalysisPaths.empty(prefix);
 		
 		for(AbstractElement element : path.getElements()) {
-			result = result.merge(getTokenPaths(element, prefix, false, false));
+			result = result.merge(getTokenPaths(element, prefix, false, false, shortcutEndlessLoops));
 		}
 		
 		return result;
 	}
-	private TokenAnalysisPaths getTokenPathsTrivial(UnorderedGroup path, TokenAnalysisPaths prefix) {
+	private TokenAnalysisPaths getTokenPathsTrivial(UnorderedGroup path, TokenAnalysisPaths prefix, boolean shortcutEndlessLoops) {
+		log.info("unordered group");
+		
 		TokenAnalysisPaths result;
 		TokenAnalysisPaths current;
 		
@@ -213,45 +215,65 @@ public class TokenAnalysis {
 		int currentPosition = result.getMinPosition();
 		
 		do {
+			log.info("unordered group loop");
+			
 			current = TokenAnalysisPaths.empty(result);
+			current.resetProgress();
 			for (AbstractElement element : path.getElements()) {
-				current = current.merge(getTokenPaths(element, result, false, false));
+				log.info(abstractElementToShortString(element));
+				log.info(current.hasProgress() + " - " + current.getSize());
+				current = current.merge(getTokenPaths(element, result, false, false, shortcutEndlessLoops));
+				log.info(current.hasProgress() + " - " + current.getSize());
 			}
+			
+			result.resetProgress();
+			result = result.merge(current);
 			
 			if (current.getMinPosition() == currentPosition) {
-				throw new TokenAnalysisAbortedException("no progress in loop");
+				// endless loop
+				// result will never be done since there is no progress to the shortest path
+				if (shortcutEndlessLoops) {
+					if (!result.hasProgress()) {
+						// no progress
+						// abort endless loop
+						break;
+					} else {
+						// there is still some progress done
+						continue;
+					}
+				} else {
+					throw new TokenAnalysisAbortedException("no progress in loop");
+				}
 			}
-			
-			result = result.merge(current);
 		} while(!current.isDone());
 		
 		return result;
 	}
 	
-	private TokenAnalysisPaths getTokenPathsTrivial(AbstractElement path, TokenAnalysisPaths prefix) {
+	private TokenAnalysisPaths getTokenPathsTrivial(AbstractElement path, TokenAnalysisPaths prefix, boolean shortcutEndlessLoops) {
 		return new XtextSwitch<TokenAnalysisPaths>() {
 			@Override
 			public TokenAnalysisPaths caseGroup(Group group) {
-				return getTokenPathsTrivial(group, prefix);
+				return getTokenPathsTrivial(group, prefix, shortcutEndlessLoops);
 			};
 			@Override
 			public TokenAnalysisPaths caseAlternatives(Alternatives alternatives) {
-				return getTokenPathsTrivial(alternatives, prefix);
+				return getTokenPathsTrivial(alternatives, prefix, shortcutEndlessLoops);
 			};
 			@Override
 			public TokenAnalysisPaths caseUnorderedGroup(UnorderedGroup unorderedGroup) {
-				return getTokenPathsTrivial(unorderedGroup, prefix);
+				return getTokenPathsTrivial(unorderedGroup, prefix, shortcutEndlessLoops);
 			};
 			@Override
 			public TokenAnalysisPaths caseAssignment(Assignment assignment) {
-				return getTokenPaths(assignment.getTerminal(), prefix, false, false);
+				return getTokenPaths(assignment.getTerminal(), prefix, false, false, shortcutEndlessLoops);
 			};
 			@Override
 			public TokenAnalysisPaths caseRuleCall(RuleCall call) {
 				if (isParserRuleCall(call) || 
 				    isEnumRuleCall(call)
 				) {
-					return getTokenPaths(call.getRule().getAlternatives(), prefix, false, false);
+					return getTokenPaths(call.getRule().getAlternatives(), prefix, false, false, shortcutEndlessLoops);
 				} else {
 					// go to default case
 					return null;
@@ -274,7 +296,9 @@ public class TokenAnalysis {
 	}
 	
 	// analyseContext implies needsLength
-	private TokenAnalysisPaths getTokenPaths(AbstractElement path, TokenAnalysisPaths prefix, boolean analyseContext, boolean needsLength) {
+	private TokenAnalysisPaths getTokenPaths(
+			AbstractElement path, TokenAnalysisPaths prefix, boolean analyseContext, boolean needsLength, boolean shortcutEndlessLoops
+	) {
 		if (prefix.isDone()) {
 			return prefix;
 		}
@@ -290,7 +314,7 @@ public class TokenAnalysis {
 		
 		if (isOptionalCardinality(path)) {
 			if (analyseContext) {
-				result = getTokenPathsContext(path, prefix);
+				result = getTokenPathsContext(path, prefix, shortcutEndlessLoops);
 			} else if (needsLength) {
 				throw new TokenAnalysisAbortedException("token expected but path is optional");
 			} else {
@@ -302,16 +326,17 @@ public class TokenAnalysis {
 		
 		boolean loop = isMultipleCardinality(path);
 		
-		int currentPosition = result.getMinPosition();
+		int currentMinPosition = result.getMinPosition();
 		
-		do {	
-			TokenAnalysisPaths tokenPaths = getTokenPathsTrivial(path, result);
+		do {
+			result.resetProgress();
+			TokenAnalysisPaths tokenPaths = getTokenPathsTrivial(path, result, shortcutEndlessLoops);
 			
 			if (tokenPaths.isDone()) {
 				result = result.merge(tokenPaths);
 				break;
 			} else if (analyseContext) {
-				tokenPaths = getTokenPathsContext(path, tokenPaths);
+				tokenPaths = getTokenPathsContext(path, tokenPaths, shortcutEndlessLoops);
 				result = result.merge(tokenPaths);
 			} else if (needsLength) {
 				throw new TokenAnalysisAbortedException("requested length not satisfyable");
@@ -320,10 +345,23 @@ public class TokenAnalysis {
 			}
 			
 			if (loop) {
-				if (result.getMinPosition() == currentPosition) {
-					throw new TokenAnalysisAbortedException("no progress in loop");
+				if (result.getMinPosition() == currentMinPosition) {
+					// endless loop
+					// result will never be done since there is no progress to the shortest path
+					if (shortcutEndlessLoops) {
+						if (!result.hasProgress()) {
+							// no progress
+							// abort endless loop
+							break;
+						} else {
+							// there is still some progress done
+							continue;
+						}
+					} else {
+						throw new TokenAnalysisAbortedException("no progress in loop");
+					}
 				} else {
-					currentPosition = result.getMinPosition();
+					currentMinPosition = result.getMinPosition();
 				}
 			}
 		} while (loop);
@@ -332,11 +370,11 @@ public class TokenAnalysis {
 	}
 	
 	private List<List<Token>> getTokenPaths(AbstractElement path, List<Integer> indexes, boolean analyseContext) throws TokenAnalysisAbortedException {
-		return getTokenPaths(path, new TokenAnalysisPaths(indexes), analyseContext, true).getTokenPaths();
+		return getTokenPaths(path, new TokenAnalysisPaths(indexes), analyseContext, true, false).getTokenPaths();
 	}
 	
 	private List<List<Token>> getTokenPathsContextOnly(AbstractElement path, List<Integer> indexes) {
-		return getTokenPathsContext(path, new TokenAnalysisPaths(indexes)).getTokenPaths();
+		return getTokenPathsContext(path, new TokenAnalysisPaths(indexes), false).getTokenPaths();
 	}
 	
 	private boolean arePathsIdenticalSymbolic(AbstractElement path1, AbstractElement path2) throws SymbolicAnalysisFailedException {
@@ -364,8 +402,8 @@ public class TokenAnalysis {
 			List<Integer> range = range(0,  i);
 			
 			// there shouldn't be a TokenAnalysisAbortedException if needsLength is false
-			tokenPaths1 = getTokenPaths(path1, new TokenAnalysisPaths(range), false, false);
-			tokenPaths2 = getTokenPaths(path2, new TokenAnalysisPaths(range), false, false);
+			tokenPaths1 = getTokenPaths(path1, new TokenAnalysisPaths(range), false, false, false);
+			tokenPaths2 = getTokenPaths(path2, new TokenAnalysisPaths(range), false, false, false);
 			
 			Set<Set<Token>> tokenListSet1 = tokenPaths1.getTokenPaths().stream().map(HashSet::new).collect(Collectors.toSet());
 			Set<Set<Token>> tokenListSet2 = tokenPaths2.getTokenPaths().stream().map(HashSet::new).collect(Collectors.toSet());
@@ -530,7 +568,7 @@ public class TokenAnalysis {
 	}
 	
 	public List<List<AbstractElement>> getAllPossiblePaths(AbstractElement path) {
-		return getTokenPaths(path, new TokenAnalysisPaths(range(0, config.getTokenLimit() + 1)), false, false)
+		return getTokenPaths(path, new TokenAnalysisPaths(range(0, config.getTokenLimit() + 1)), false, false, true)
 				.getTokenPaths()
 				.stream()
 				.map(l -> l.stream()

@@ -26,6 +26,7 @@ import org.eclipse.xtext.JavaAction;
 import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.ParserRule;
 import org.eclipse.xtext.RuleCall;
+import org.eclipse.xtext.UnorderedGroup;
 import org.eclipse.xtext.util.XtextSwitch;
 
 import com.google.common.base.Strings;
@@ -58,6 +59,16 @@ public class DebugUtils {
 			@Override
 			public Boolean caseAlternatives(Alternatives object) {
 				builder.append("Alternatives (\n");
+				object.getElements().forEach(e -> {
+					abstractElementToString(e, builder, indentation + 1, calledRules);
+				});
+				builder.append(indentationString);
+				builder.append(")");
+				return true;
+			};
+			@Override
+			public Boolean caseUnorderedGroup(UnorderedGroup object) {
+				builder.append("Unordered Group (\n");
 				object.getElements().forEach(e -> {
 					abstractElementToString(e, builder, indentation + 1, calledRules);
 				});
@@ -134,6 +145,13 @@ public class DebugUtils {
 			@Override
 			public Boolean caseAlternatives(Alternatives object) {
 				builder.append("Alternatives (");
+				builder.append(object.getElements().size());
+				builder.append(")");
+				return true;
+			};
+			@Override
+			public Boolean caseUnorderedGroup(UnorderedGroup object) {
+				builder.append("UnorderedGroup (");
 				builder.append(object.getElements().size());
 				builder.append(")");
 				return true;

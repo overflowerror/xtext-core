@@ -14,6 +14,7 @@ import org.eclipse.xtext.AbstractRule;
 import org.eclipse.xtext.Alternatives;
 import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.Group;
+import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.UnorderedGroup;
 import org.eclipse.xtext.XtextStandaloneSetup;
 import org.eclipse.xtext.resource.XtextResource;
@@ -434,7 +435,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && (" + getSyntaxForKeywordToken("b", 1) + " || (p1)))", guard.render());
 	}
 	
-	@Test(expected = TokenAnalysisAbortedException.class)
+	@Test
 	public void testUnorderedGroupWithEmptyPathsWithoutContext_expectTokenAnalysisAbortedException() throws Exception {		
 		// @formatter:off
 		String model =
@@ -934,6 +935,44 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 				")", 
 			guard.render()
 		);
+	}
+	
+	@Test
+	public void testNestedAlternativesWithIdenticalPrefix_parentElementShouldNotBeChanged_expectContextCheckInResult() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: {S} $$ p0 $$?=> ('a')? \n" +
+			" | {S} $$ p1 $$?=> ('b')? ;\n";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
+		AbstractRule rule = getRule(grammar, "S");
+		
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		assertEquals(
+				"(" + 
+					"(" + getSyntaxForEofToken(1) + " || (p0) || (p1)) && " + 
+					"(" + getSyntaxForKeywordToken("a", 1) + " || (p0)) && " + 
+					"(" + getSyntaxForKeywordToken("b", 1) + " || (p1))" +
+				")", 
+			guard.render()
+		);
+		
+		// check sizes of groups and cardinalities of keywords
+		Alternatives alternatives = (Alternatives) rule.getAlternatives();
+		assertEquals(2, alternatives.getElements().size());
+		Group group = (Group) alternatives.getElements().get(0);
+		assertEquals(3, group.getElements().size());
+		Keyword keyword = (Keyword) group.getElements().get(2);
+		assertEquals("?", keyword.getCardinality());
+		group = (Group) alternatives.getElements().get(1);
+		assertEquals(3, group.getElements().size());
+		keyword = (Keyword) group.getElements().get(2);
+		assertEquals("?", keyword.getCardinality());
 	}
 	
 	// symbolic analysis not yet implemented

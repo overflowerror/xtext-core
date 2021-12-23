@@ -49,15 +49,19 @@ public class TokenAnalysisPath {
 		}
 	}
 	
-	public void add(AbstractElement element) {
+	public boolean add(AbstractElement element) {
 		if (isDone())
-			return;
+			return false;
 		
 		if (remainingIndexes.get(0) <= 0) {
 			path.add(Token.fromElement(element, position));
 			remainingIndexes.remove(0);
+			shift();
+			return true;
+		} else {
+			shift();
+			return false;
 		}
-		shift();
 	}
 	
 	public List<Token> getTokenPath() {
@@ -70,4 +74,33 @@ public class TokenAnalysisPath {
 				path.stream().map(Token::toString).collect(Collectors.joining(", ")) + "),\n    (" +
 				remainingIndexes.stream().map(Object::toString).collect(Collectors.joining(", ")) + ")\n  )";
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((path == null) ? 0 : path.hashCode());
+		result = prime * result + position;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TokenAnalysisPath other = (TokenAnalysisPath) obj;
+		if (path == null) {
+			if (other.path != null)
+				return false;
+		} else if (!path.equals(other.path))
+			return false;
+		if (position != other.position)
+			return false;
+		return true;
+	}
+	
 }
