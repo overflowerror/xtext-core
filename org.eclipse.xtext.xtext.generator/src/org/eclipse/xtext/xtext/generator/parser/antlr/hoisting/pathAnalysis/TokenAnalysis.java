@@ -388,12 +388,13 @@ public class TokenAnalysis {
 	}
 	
 	private boolean arePathsIdenticalFallback(AbstractElement path1, AbstractElement path2) {
-		// + 1, because otherwise identical paths of length token limit can't be checked
-		
-		log.info("path1: " + abstractElementToString(path1));
-		log.info("path2: " + abstractElementToString(path2));
+		if (config.isDebug()) {
+			log.info("path1: " + abstractElementToString(path1));
+			log.info("path2: " + abstractElementToString(path2));
+		}
 		
 		int i;
+		// + 1, because otherwise identical paths of length token limit can't be checked
 		int limit = config.getTokenLimit() + 1;
 		for (i = 0; i < limit; i++) {
 			TokenAnalysisPaths tokenPaths1;
@@ -525,9 +526,12 @@ public class TokenAnalysis {
 				.map(p -> (List<List<Token>>) null)
 				.collect(Collectors.toList());
 		
-		paths.forEach(p -> {
-			log.info("\n" + abstractElementToString(p));
-		});
+
+		if (config.isDebug()) {
+			paths.forEach(p -> {
+				log.info("\n" + abstractElementToString(p));
+			});
+		}
 		
 		tokenCombinations(indexList -> {
 			log.info("current index list: " + indexList);

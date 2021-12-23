@@ -72,10 +72,11 @@ public class HoistingProcessor {
 	
 	private Logger log = Logger.getLogger(this.getClass());
 	
-	private HoistingConfiguration config = new HoistingConfiguration();
+	private HoistingConfiguration config;
 	private TokenAnalysis analysis;
 	
 	public void init(Grammar grammar) {
+		config = new HoistingConfiguration(grammar);
 		analysis = new TokenAnalysis(config, grammar);
 	}
 	
@@ -295,10 +296,14 @@ public class HoistingProcessor {
 				// this is very inefficient
 				log.warn("nested prefix alternatives detected");
 				log.warn("avoid these since they can't be handled efficiently");
-				log.info(abstractElementToString(alternatives));
+				
+				if (config.isDebug())
+					log.info(abstractElementToString(alternatives));
 				
 				CompoundElement flattened = flattenPaths(alternatives, paths, guards);
-				log.info(abstractElementToString(flattened));
+				
+				if (config.isDebug())
+					log.info(abstractElementToString(flattened));
 				
 				log.info(flattened.getElements().size());
 				// TODO: value configurable?
@@ -485,7 +490,8 @@ public class HoistingProcessor {
 	}
 	
 	public HoistingGuard findHoistingGuardIgnoreCardinality(AbstractElement element) {
-		log.info("hoisting (trivial) guard of: \n" + abstractElementToString(element));
+		if (config.isDebug())
+			log.info("hoisting (trivial) guard of: \n" + abstractElementToString(element));
 		// should only be called for valid AST elements, so element can never be floating
 		
 		AbstractRule rule = containingParserRule(element);
@@ -497,7 +503,9 @@ public class HoistingProcessor {
 	}
 	
 	public HoistingGuard findHoistingGuard(AbstractElement element) {
-		log.info("hoisting guard of: \n" + abstractElementToString(element));
+		if (config.isDebug())
+			log.info("hoisting guard of: \n" + abstractElementToString(element));
+		
 		// should only be called for valid AST elements, so element can never be floating
 		return findGuardForElement(element, containingParserRule(element));
 	}
@@ -515,7 +523,8 @@ public class HoistingProcessor {
 	}
 	
 	private HoistingGuard findGuardForElementWithTrivialCardinality(AbstractElement element, AbstractRule currentRule) {
-		log.info(currentRule.getName() + ": " + abstractElementToShortString(element));
+		if (config.isDebug())
+			log.info(currentRule.getName() + ": " + abstractElementToShortString(element));
 		
 		if (element instanceof Alternatives) {
 			return findGuardForAlternatives((Alternatives) element, currentRule);

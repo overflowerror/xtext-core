@@ -8,13 +8,25 @@
  *******************************************************************************/
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
 
+import org.eclipse.xtext.Grammar;
+
 /**
  * @author overflow - Initial contribution and API
  */
 public class HoistingConfiguration {
 	private final int tokenLimit = 10;
+	private boolean debug = false;
+	
+	public HoistingConfiguration(Grammar grammar) {
+		// TODO: get config options from ecore object
+	}
 	
 	public int getTokenLimit() {
 		return tokenLimit;
 	}
+
+	public boolean isDebug() {
+		return debug;
+	}
+	
 }
