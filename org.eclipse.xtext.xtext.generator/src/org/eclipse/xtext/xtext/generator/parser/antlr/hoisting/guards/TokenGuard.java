@@ -8,6 +8,8 @@
  *******************************************************************************/
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards;
 
+import java.util.Set;
+
 /**
  * @author overflow - Initial contribution and API
  */
@@ -16,6 +18,8 @@ public interface TokenGuard extends Guard {
 	default boolean isTrivial() {
 		return false;
 	}
+	
+	Set<Integer> getPositions();
 	
 	TokenGuard reduce();
 }

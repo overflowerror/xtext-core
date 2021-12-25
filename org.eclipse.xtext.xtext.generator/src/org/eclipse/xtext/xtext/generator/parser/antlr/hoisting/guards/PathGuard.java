@@ -92,7 +92,7 @@ public class PathGuard implements HoistingGuard {
 							// construct new path guard and add to result
 							GroupGuard groupGuard = new GroupGuard(destructedPaths.getFirst());
 							groupGuard.add(p.hoistngGuard);
-							result.add(new PathGuard(p.tokenGuard, groupGuard));
+							result.add(new PathGuard(new TokenSequenceGuard(p.tokenGuard, path.tokenGuard), groupGuard));
 						});
 				}
 			} else {

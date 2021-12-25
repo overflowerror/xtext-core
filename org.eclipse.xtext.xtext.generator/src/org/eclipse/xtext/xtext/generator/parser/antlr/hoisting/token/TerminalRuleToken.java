@@ -68,4 +68,9 @@ public class TerminalRuleToken implements Token {
 	public AbstractElement getElement() {
 		return call;
 	}
+	
+	@Override
+	public int getPosition() {
+		return position;
+	}
 }

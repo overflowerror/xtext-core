@@ -723,30 +723,6 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 	}
 	
 	@Test
-	public void testNestedAlternativesWithSingleTokenDifference() throws Exception {
-		// @formatter:off
-		String model =
-			MODEL_PREAMBLE +
-				"S: $$ p0 $$?=> a=A \n" +
-				" | $$ p1 $$?=> b=B ;\n" +
-				"A: {A} $$ p2 $$?=> 'a' 'b' 'c' \n" +
-				" | {A} $$ p3 $$?=> 'a' 'c' 'c' ;\n" +
-				"B: {B}             'a' 'c' 'd' \n" +
-				" | {B}             'a' 'b' 'd' ;\n";
-		
-		// @formatter:off
-		XtextResource resource = getResourceFromString(model);
-		Grammar grammar = ((Grammar) resource.getContents().get(0));
-		hoistingProcessor.init(grammar);
-		AbstractRule rule = getRule(grammar, "S");
-		
-		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
-		assertFalse(guard.isTrivial());
-		assertTrue(guard.hasTerminal());
-		assertEquals("((" + getSyntaxForKeywordToken("b", 2) + " || ((p0) && (p2))) && (" + getSyntaxForKeywordToken("c", 2) + " || ((p0) && (p3))) && (" + getSyntaxForKeywordToken("d", 3) + " || (p1)))", guard.render());
-	}
-	
-	@Test
 	public void testNestedAlternativesWithNoSingleTokenDifference() throws Exception {
 		// @formatter:off
 		String model =
@@ -772,7 +748,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 	}
 	
 	@Test
-	public void testNestedAlternativesWithCollapsablePaths() throws Exception {
+	public void testNestedAlternativesWithCollapsablePathsWithSingleDifferencePosition() throws Exception {
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
@@ -792,6 +768,52 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertTrue(guard.hasTerminal());
 		
 		assertEquals("((" + getSyntaxForKeywordToken("b", 3) + " || ((p0) && (p2))) && (" + getSyntaxForKeywordToken("c", 3) + " || ((p0) && (p3))) && (" + getSyntaxForKeywordToken("d", 3) + " || (p1)))", guard.render());
+	}
+	
+	@Test
+	public void testNestedAlternativesWithCollapsablePathsWithMultipleDifferencePosition() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+				"S: $$ p0 $$?=> a=A \n" +
+				" | $$ p1 $$?=> 'a' 'b' ;\n" +
+				"A: {A} $$ p2 $$?=> 'b' 'a' \n" +
+				" | {A} $$ p3 $$?=> 'b' 'b' ;";
+		
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
+		AbstractRule rule = getRule(grammar, "S");
+		
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		
+		assertEquals("((" + getSyntaxForKeywordToken("a", 2) + " || " + getSyntaxForKeywordToken("b", 1) + " || ((p0) && (p2))) && (" + getSyntaxForKeywordToken("b", 2) + " || " + getSyntaxForKeywordToken("b", 1) + " || ((p0) && (p3))) && (" + getSyntaxForKeywordToken("a", 1) + " || (p1)))", guard.render());
+	}
+	
+	@Test
+	public void testRecursiveRuleCallingAlternative_expectCorrectGuard() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+				"S: $$ p0 $$?=> a=A \n" +
+				" | $$ p1 $$?=> 'a' 'b' 'd' ;\n" +
+				"A: $$ p2 $$?=> 'a' a=A \n" +
+				" | $$ p3 $$?=> 'b' 'c' ;\n";
+		
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
+		AbstractRule rule = getRule(grammar, "S");
+		
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		
+		assertEquals("((" + getSyntaxForKeywordToken("a", 1) + " || (" + getSyntaxForKeywordToken("c", 3) + " && " + getSyntaxForEofToken(3) + ") || ((p0) && (p2))) && (" + getSyntaxForKeywordToken("c", 1) + " || ((p0) && (p3))) && (" + getSyntaxForKeywordToken("d", 3) + " || (p1)))", guard.render());
 	}
 	
 	@Test

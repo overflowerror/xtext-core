@@ -10,6 +10,8 @@ package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -56,4 +58,19 @@ public class AlternativeTokenSequenceGuard implements TokenGuard {
 				")\n";
 	}
 
+
+	@Override
+	public Set<Integer> getPositions() {
+		if (alternatives.isEmpty()) {
+			return new HashSet<>();
+		}
+		
+		Set<Set<Integer>> positions = alternatives.stream()
+				.map(TokenGuard::getPositions)
+				.collect(Collectors.toSet());
+		return positions.stream().findAny().get().stream()
+				.filter(p -> positions.stream()
+						.allMatch(s -> s.contains(p)))
+				.collect(Collectors.toSet());
+	}
 }

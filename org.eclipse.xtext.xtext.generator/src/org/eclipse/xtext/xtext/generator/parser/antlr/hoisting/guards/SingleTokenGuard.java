@@ -8,6 +8,10 @@
  *******************************************************************************/
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token.Token;
 
 /**
@@ -35,5 +39,10 @@ public class SingleTokenGuard implements TokenGuard {
 		return "SingleTokenGuard (\n" +
 				"\t" + token + "\n" +
 				")\n";
+	}
+	
+	@Override
+	public Set<Integer> getPositions() {
+		return new HashSet<>(Arrays.asList(token.getPosition()));
 	}
 }

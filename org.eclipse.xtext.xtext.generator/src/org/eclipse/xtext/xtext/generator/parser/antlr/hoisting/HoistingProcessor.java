@@ -273,7 +273,7 @@ public class HoistingProcessor {
 		// -> size = 1
 		if (size > 1) {
 			try {
-				return StreamUtils.zip(
+				AlternativesGuard result = StreamUtils.zip(
 					analysis.findMinimalPathDifference(paths).stream()
 						.map(a -> a.stream()
 							.map(s -> s.stream()
@@ -281,15 +281,21 @@ public class HoistingProcessor {
 									.collect(Collectors.toList())
 							)
 							.map(TokenSequenceGuard::new)
+							.peek(g -> log.info(g))
 							.map(TokenGuard::reduce)
+							.peek(g -> log.info(g))
 							.collect(Collectors.toList())
 						)
 						.map(AlternativeTokenSequenceGuard::new)
-						.map(TokenGuard::reduce),
+						.peek(g -> log.info(g))
+						.map(TokenGuard::reduce)
+						.peek(g -> log.info(g)),
 					guards.stream(),
 					(TokenGuard tokenGuard, MergedPathGuard pathGuard) -> Tuples.pair(tokenGuard, pathGuard)
 				).map(p -> new PathGuard(p.getFirst(), p.getSecond()))
 				.collect(AlternativesGuard.collector());
+				log.info(result);
+				return result;
 			} catch(NestedPrefixAlternativesException e) {
 				// nested prefix alternatives
 				// -> flatten paths to alternative and try again
@@ -308,7 +314,7 @@ public class HoistingProcessor {
 				log.info(flattened.getElements().size());
 				// TODO: value configurable?
 				if (flattened.getElements().size() > 100) {
-					throw new NestedPrefixAlternativesException("nested prefix alternatives cant be analysed because of too many paths");
+					throw new NestedPrefixAlternativesException("nested prefix alternatives can't be analysed because of too many paths");
 				}
 				
 				//throw new RuntimeException();

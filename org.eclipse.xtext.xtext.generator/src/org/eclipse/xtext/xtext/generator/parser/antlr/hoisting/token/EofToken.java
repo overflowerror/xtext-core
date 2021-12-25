@@ -58,4 +58,8 @@ public class EofToken implements Token {
 		return null;
 	}
 
+	@Override
+	public int getPosition() {
+		return position;
+	}
 }

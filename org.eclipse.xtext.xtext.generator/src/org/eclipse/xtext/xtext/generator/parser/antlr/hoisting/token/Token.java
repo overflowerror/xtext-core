@@ -53,4 +53,6 @@ public interface Token {
 		
 		throw new NotATokenException(element.eClass().getName());
 	}
+
+	int getPosition();
 }

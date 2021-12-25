@@ -66,4 +66,8 @@ public class KeywordToken implements Token {
 		return keyword;
 	}
 	
+	@Override
+	public int getPosition() {
+		return position;
+	}
 }
