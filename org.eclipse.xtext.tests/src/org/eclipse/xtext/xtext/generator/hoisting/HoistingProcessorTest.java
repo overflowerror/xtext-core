@@ -793,6 +793,8 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertEquals("((" + getSyntaxForKeywordToken("a", 2) + " || " + getSyntaxForKeywordToken("b", 1) + " || ((p0) && (p2))) && (" + getSyntaxForKeywordToken("b", 2) + " || " + getSyntaxForKeywordToken("b", 1) + " || ((p0) && (p3))) && (" + getSyntaxForKeywordToken("a", 1) + " || (p1)))", guard.render());
 	}
 	
+	// currently not able to find optimal solution
+	// for that we would not to collapse alternatives before constructing guards
 	@Test
 	public void testRecursiveRuleCallingAlternative_expectCorrectGuard() throws Exception {
 		// @formatter:off
