@@ -238,7 +238,7 @@ public class HoistingProcessor {
 			// all paths are trivial
 			
 			// if there is a terminal on all branches set has terminal to true
-			// else we need might need to consider the following tokens in the path
+			// else we might need to consider the following tokens in the path
 			if (guards.stream().allMatch(HoistingGuard::hasTerminal)) {
 				return HoistingGuard.terminal();
 			} else {

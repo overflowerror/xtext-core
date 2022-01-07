@@ -500,7 +500,7 @@ public class TokenAnalysis {
 		tokenCombinations(indexList -> {
 			log.info("current index list: " + indexList);
 			
-			// no context analysis
+			// no context analysis // TODO why?
 			List<List<Token>> tokenListsForPath = getTokenPaths(element, indexList, false);
 			List<List<Token>> tokenListForContext = getTokenPathsContextOnly(element, indexList);
 				
@@ -572,7 +572,8 @@ public class TokenAnalysis {
 	}
 	
 	public List<List<AbstractElement>> getAllPossiblePaths(AbstractElement path) {
-		return getTokenPaths(path, new TokenAnalysisPaths(range(0, config.getTokenLimit() + 1)), false, false, true)
+		// token limit + 2 so identity analysis will recognize paths that are identical up to the token limit on the flattened tree
+		return getTokenPaths(path, new TokenAnalysisPaths(range(0, config.getTokenLimit() + 2)), false, false, true)
 				.getTokenPaths()
 				.stream()
 				.map(l -> l.stream()
