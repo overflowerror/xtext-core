@@ -24,12 +24,15 @@ import org.apache.log4j.Logger;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.AbstractElement;
 import org.eclipse.xtext.AbstractRule;
+import org.eclipse.xtext.AbstractSemanticPredicate;
+import org.eclipse.xtext.Action;
 import org.eclipse.xtext.Alternatives;
 import org.eclipse.xtext.Assignment;
 import org.eclipse.xtext.CompoundElement;
 import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.GrammarUtil;
 import org.eclipse.xtext.Group;
+import org.eclipse.xtext.JavaAction;
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.UnorderedGroup;
 import org.eclipse.xtext.util.XtextSwitch;
@@ -82,6 +85,7 @@ public class TokenAnalysis {
 	}
 	
 	private List<AbstractElement> getNextElementsInContext(AbstractElement last) {		
+		// TODO: deal with non-trivial cardinalities
 		CompoundElement container = getCompoundContainer(last);
 		while (container instanceof Alternatives || 
 		       last.eContainer() instanceof Assignment
@@ -112,8 +116,24 @@ public class TokenAnalysis {
 				log.info(last.eClass().getName());
 				log.info(abstractElementToString(container));
 			}
-			if (index < elements.size() - 1) {
-				return Arrays.asList(elements.get(index + 1));
+			
+			int size = elements.size();
+			AbstractElement next = null;
+			
+			while (index < size - 1) {
+				next = elements.get(index + 1);
+				if (!(
+						(next instanceof Action) ||
+						(next instanceof JavaAction) ||
+						(next instanceof AbstractSemanticPredicate)
+				)) {
+					break;
+				}
+					
+				index++;
+			}
+			if (index < size - 1) {
+				return Arrays.asList(next);
 			} else {
 				// this is the last element
 				return getNextElementsInContext(container);
@@ -155,17 +175,12 @@ public class TokenAnalysis {
 			// TODO: is this special case necessary?
 			throw new TokenAnalysisAbortedException("context analysis failed: no context");
 		}
-
-		int currentPosition = prefix.getMinPosition();
 		
-		for (AbstractElement element : context) {			
+		for (AbstractElement element : context) {
+			log.info("context element: " + abstractElementToShortString(element));
 			TokenAnalysisPaths path = new TokenAnalysisPaths(prefix);
 			path = getTokenPaths(element, path, false, false, shortcutEndlessLoops);
-			if (!path.isDone() && element != null) {
-				if (path.getMinPosition() == currentPosition) {
-					throw new TokenAnalysisAbortedException("no progress in context analysis");
-				}
-				
+			if (!path.isDone() && element != null) {				
 				path = getTokenPathsContext(element, path, shortcutEndlessLoops);
 			}
 			if (path.isDone()) {
