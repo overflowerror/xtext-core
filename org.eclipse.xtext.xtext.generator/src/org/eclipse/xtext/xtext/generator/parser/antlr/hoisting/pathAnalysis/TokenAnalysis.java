@@ -11,7 +11,6 @@ package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.pathAnalysis;
 import static org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.DebugUtils.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -45,7 +44,6 @@ import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.DebugUtils;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.MutablePrimitiveWrapper;
 
 import static org.eclipse.xtext.GrammarUtil.*;
-import static org.eclipse.xtext.EcoreUtil2.*;
 
 /**
  * @author overflow - Initial contribution and API
@@ -61,65 +59,65 @@ public class TokenAnalysis {
 		this.grammar = grammar;
 	}
 	
-	private AbstractElement getContainer(AbstractElement element) {
-		EObject tmp = element.eContainer();
-		while (!(tmp instanceof AbstractElement)) {
-			if (tmp == null) {
-				return null;
-			}
-			tmp = tmp.eContainer();
-		}
-		return (AbstractElement) tmp;
-	}
-	
-	private CompoundElement getCompoundContainer(AbstractElement element) {
-		if (element instanceof CompoundElement) {
-			// get container of compoundElement since getContainerOfType 
-			// would return the same element
-			element = getContainer(element);
-			if (element == null) {
-				return null;
-			}
-		}
-		return getContainerOfType(element, CompoundElement.class);
-	}
-	
-	private List<AbstractElement> getNextElementsInContext(AbstractElement last) {		
-		// TODO: deal with non-trivial cardinalities
-		CompoundElement container = getCompoundContainer(last);
-		while (container instanceof Alternatives || 
-		       last.eContainer() instanceof Assignment
+	private List<AbstractElement> getNextElementsInContext(AbstractElement last) {
+		List<AbstractElement> result = new ArrayList<>();
+		
+		AbstractElement _last = last;
+		AbstractElement container = last;
+		
+		while(container != null && (
+				container == last ||
+				!(container instanceof CompoundElement) ||
+				container instanceof Alternatives
+			)
 		) {
-			// skip alternatives since they have to be covered separately
-			last = getContainer(last);
-			if (last == null) {
-				return Arrays.asList((AbstractElement) null);
+			EObject _container = _last;
+			while (_container == _last || 
+			       !(_container instanceof AbstractElement)
+			) {
+				_container = _container.eContainer();
+				if (_container == null)
+					break;
 			}
-			container = getCompoundContainer(last);
+			_last = container;
+			container = (AbstractElement) _container;
+			
+			if (last != _last && isMultipleCardinality(_last)) {
+				// last is + or * quantified
+				result.add(_last);
+			}
 		}
+		last = _last;
 		
-		log.info("getNext: " + abstractElementToShortString(last));
-		log.info("container: " + abstractElementToShortString(container));
+		CompoundElement compoundContainer = (CompoundElement) container;
 		
-		if (container instanceof UnorderedGroup) {
-			List<AbstractElement> result = new ArrayList<>();
-			result.addAll(container.getElements().stream()
-				.collect(Collectors.toList())
-			);
-			result.addAll(getNextElementsInContext(container));
-			return result;
-		} else if (container instanceof Group) {
-			List<AbstractElement> elements = container.getElements();
+		if (compoundContainer == null) {
+			// no container element; this is last element in a rule definition
+			AbstractRule rule = containingRule(last);			
+			List<RuleCall> calls = findAllRuleCalls(grammar, rule);
+
+			if (calls.isEmpty()) {
+				// has to be start rule
+				// context is EOF
+				result.add(null);
+			}
+			
+			for (RuleCall call : calls) {
+				result.addAll(getNextElementsInContext(call));
+			}
+		} else if (compoundContainer instanceof Group) {
+			List<AbstractElement> elements = compoundContainer.getElements();
 			int index = elements.indexOf(last);
 			if (index < 0) {
 				log.error("context analysis: element not part of compound");
 				log.info(last.eClass().getName());
-				log.info(abstractElementToString(container));
+				log.info(abstractElementToString(compoundContainer));
 			}
 			
 			int size = elements.size();
 			AbstractElement next = null;
 			
+			// skip simple non-token-elements
 			while (index < size - 1) {
 				next = elements.get(index + 1);
 				if (!(
@@ -133,33 +131,26 @@ public class TokenAnalysis {
 				index++;
 			}
 			if (index < size - 1) {
-				return Arrays.asList(next);
+				result.add(next);
 			} else {
 				// this is the last element
-				return getNextElementsInContext(container);
+				if (isMultipleCardinality(compoundContainer)) {
+					result.add(compoundContainer);
+				}
+				
+				result.addAll(getNextElementsInContext(compoundContainer));
 			}
-		} else if (container == null) {
-			// end of rule
-			AbstractRule rule = containingRule(last);			
-			List<RuleCall> calls = findAllRuleCalls(grammar, rule);
-
-			if (calls.isEmpty()) {
-				// has to be start rule
-				// context is EOF
-				return Arrays.asList((AbstractElement) null);
-			}
-			
-			List<AbstractElement> result = new ArrayList<>();
-			for (RuleCall call : calls) {
-				result.addAll(getNextElementsInContext(call));
-			}
-			
-			return result;
+		} else if (compoundContainer instanceof UnorderedGroup) {
+			result.addAll(compoundContainer.getElements().stream()
+				.collect(Collectors.toList())
+			);
+			result.addAll(getNextElementsInContext(compoundContainer));
 		} else {
 			throw new IllegalArgumentException("unknown compound element: " + container.eClass().getName());
 		}
+		
+		return result;
 	}
-	
 	
 	private TokenAnalysisPaths getTokenPathsContext(AbstractElement last, TokenAnalysisPaths prefix, boolean shortcutEndlessLoops) {
 		log.info("get context for: " + abstractElementToShortString(last));
@@ -180,7 +171,7 @@ public class TokenAnalysis {
 			log.info("context element: " + abstractElementToShortString(element));
 			TokenAnalysisPaths path = new TokenAnalysisPaths(prefix);
 			path = getTokenPaths(element, path, false, false, shortcutEndlessLoops);
-			if (!path.isDone() && element != null) {				
+			if (!path.isDone() && element != null) {
 				path = getTokenPathsContext(element, path, shortcutEndlessLoops);
 			}
 			if (path.isDone()) {
@@ -189,7 +180,7 @@ public class TokenAnalysis {
 				throw new TokenAnalysisAbortedException("context analysis failed");
 			}
 		}
-		
+			
 		log.info("done");
 		return result;
 	}
