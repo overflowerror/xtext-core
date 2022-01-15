@@ -1019,4 +1019,64 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertTrue(guard.hasTerminal());
 		assertEquals("((p0) || (p1))", guard.render());
 	}
+	
+	@Test
+	public void testCardinalitiesDirectContext_expectCorrectResult() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: {S} a+=A+ ;\n" +
+			"A: $$ p0 $$?=> 'a' \n" +
+			" | $$ p1 $$?=> 'a' 'b' ;\n";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
+		AbstractRule rule = getRule(grammar, "A");
+		
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		assertEquals("(((" + getSyntaxForKeywordToken("a", 2) + " && " + getSyntaxForEofToken(2) + ") || (p0)) && (" + getSyntaxForKeywordToken("b", 2) + " || (p1)))", guard.render());
+	}
+	
+	@Test
+	public void testCardinalitiesInGroupContext_expectCorrectResult() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: {S} ('a' a+=A)+ ;\n" +
+			"A: $$ p0 $$?=> 'b' \n" +
+			" | $$ p1 $$?=> 'b' 'b' ;\n";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
+		AbstractRule rule = getRule(grammar, "A");
+		
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		assertEquals("(((" + getSyntaxForKeywordToken("a", 2) + " && " + getSyntaxForEofToken(2) + ") || (p0)) && (" + getSyntaxForKeywordToken("b", 2) + " || (p1)))", guard.render());
+	}
+	
+	@Test
+	public void testCardinalitiesIndirectContext_expectCorrectResult() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: {S} (a+=A)+ ;\n" +
+			"A: $$ p0 $$?=> 'a' \n" +
+			" | $$ p1 $$?=> 'a' 'b' ;\n";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
+		AbstractRule rule = getRule(grammar, "A");
+		
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		assertEquals("(((" + getSyntaxForKeywordToken("a", 2) + " && " + getSyntaxForEofToken(2) + ") || (p0)) && (" + getSyntaxForKeywordToken("b", 2) + " || (p1)))", guard.render());
+	}
 }
