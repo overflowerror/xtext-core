@@ -36,6 +36,7 @@ import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.UnorderedGroup;
 import org.eclipse.xtext.util.XtextSwitch;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.HoistingConfiguration;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.EmptyRecursionPathInContextAnalysisException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.NestedPrefixAlternativesException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.SymbolicAnalysisFailedException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.TokenAnalysisAbortedException;
@@ -153,6 +154,10 @@ public class TokenAnalysis {
 	}
 	
 	private TokenAnalysisPaths getTokenPathsContext(AbstractElement last, TokenAnalysisPaths prefix, boolean shortcutEndlessLoops) {
+		return getTokenPathsContext(last, prefix, shortcutEndlessLoops, new HashSet<>());
+	}
+	
+	private TokenAnalysisPaths getTokenPathsContext(AbstractElement last, TokenAnalysisPaths prefix, boolean shortcutEndlessLoops, Set<AbstractElement> callStack) {
 		log.info("get context for: " + abstractElementToShortString(last));
 		
 		List<AbstractElement> context = getNextElementsInContext(last);
@@ -170,9 +175,15 @@ public class TokenAnalysis {
 		for (AbstractElement element : context) {
 			log.info("context element: " + abstractElementToShortString(element));
 			TokenAnalysisPaths path = new TokenAnalysisPaths(prefix);
+			path.resetProgress();
 			path = getTokenPaths(element, path, false, false, shortcutEndlessLoops);
 			if (!path.isDone() && element != null) {
-				path = getTokenPathsContext(element, path, shortcutEndlessLoops);
+				if (callStack.contains(element) && !path.hasProgress()) {
+					throw new EmptyRecursionPathInContextAnalysisException("no progress in recursion");
+				}
+				Set<AbstractElement> localCallStack = new HashSet<>(callStack);
+				localCallStack.add(element);
+				path = getTokenPathsContext(element, path, shortcutEndlessLoops, localCallStack);
 			}
 			if (path.isDone()) {
 				result = result.merge(path);
