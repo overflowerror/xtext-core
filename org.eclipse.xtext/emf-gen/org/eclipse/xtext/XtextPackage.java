@@ -131,13 +131,31 @@ public interface XtextPackage extends EPackage {
 	int GRAMMAR__INIT_BLOCK = 6;
 
 	/**
+	 * The feature id for the '<em><b>Token Limit</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int GRAMMAR__TOKEN_LIMIT = 7;
+
+	/**
+	 * The feature id for the '<em><b>Debug</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int GRAMMAR__DEBUG = 8;
+
+	/**
 	 * The number of structural features of the '<em>Grammar</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int GRAMMAR_FEATURE_COUNT = 7;
+	int GRAMMAR_FEATURE_COUNT = 9;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.xtext.impl.AbstractRuleImpl <em>Abstract Rule</em>}' class.
@@ -2306,6 +2324,28 @@ public interface XtextPackage extends EPackage {
 	EReference getGrammar_InitBlock();
 
 	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.xtext.Grammar#getTokenLimit <em>Token Limit</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Token Limit</em>'.
+	 * @see org.eclipse.xtext.Grammar#getTokenLimit()
+	 * @see #getGrammar()
+	 * @generated
+	 */
+	EAttribute getGrammar_TokenLimit();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.xtext.Grammar#isDebug <em>Debug</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Debug</em>'.
+	 * @see org.eclipse.xtext.Grammar#isDebug()
+	 * @see #getGrammar()
+	 * @generated
+	 */
+	EAttribute getGrammar_Debug();
+
+	/**
 	 * Returns the meta object for class '{@link org.eclipse.xtext.AbstractRule <em>Abstract Rule</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3388,6 +3428,22 @@ public interface XtextPackage extends EPackage {
 		 * @generated
 		 */
 		EReference GRAMMAR__INIT_BLOCK = eINSTANCE.getGrammar_InitBlock();
+
+		/**
+		 * The meta object literal for the '<em><b>Token Limit</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute GRAMMAR__TOKEN_LIMIT = eINSTANCE.getGrammar_TokenLimit();
+
+		/**
+		 * The meta object literal for the '<em><b>Debug</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute GRAMMAR__DEBUG = eINSTANCE.getGrammar_Debug();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.xtext.impl.AbstractRuleImpl <em>Abstract Rule</em>}' class.

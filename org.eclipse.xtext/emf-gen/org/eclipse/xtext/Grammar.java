@@ -22,6 +22,8 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link org.eclipse.xtext.Grammar#getMetamodelDeclarations <em>Metamodel Declarations</em>}</li>
  *   <li>{@link org.eclipse.xtext.Grammar#getRules <em>Rules</em>}</li>
  *   <li>{@link org.eclipse.xtext.Grammar#getInitBlock <em>Init Block</em>}</li>
+ *   <li>{@link org.eclipse.xtext.Grammar#getTokenLimit <em>Token Limit</em>}</li>
+ *   <li>{@link org.eclipse.xtext.Grammar#isDebug <em>Debug</em>}</li>
  * </ul>
  *
  * @see org.eclipse.xtext.XtextPackage#getGrammar()
@@ -166,5 +168,49 @@ public interface Grammar extends EObject {
 	 * @generated
 	 */
 	void setInitBlock(InitBlock value);
+
+	/**
+	 * Returns the value of the '<em><b>Token Limit</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Token Limit</em>' attribute.
+	 * @see #setTokenLimit(int)
+	 * @see org.eclipse.xtext.XtextPackage#getGrammar_TokenLimit()
+	 * @model
+	 * @generated
+	 */
+	int getTokenLimit();
+
+	/**
+	 * Sets the value of the '{@link org.eclipse.xtext.Grammar#getTokenLimit <em>Token Limit</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Token Limit</em>' attribute.
+	 * @see #getTokenLimit()
+	 * @generated
+	 */
+	void setTokenLimit(int value);
+
+	/**
+	 * Returns the value of the '<em><b>Debug</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Debug</em>' attribute.
+	 * @see #setDebug(boolean)
+	 * @see org.eclipse.xtext.XtextPackage#getGrammar_Debug()
+	 * @model
+	 * @generated
+	 */
+	boolean isDebug();
+
+	/**
+	 * Sets the value of the '{@link org.eclipse.xtext.Grammar#isDebug <em>Debug</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Debug</em>' attribute.
+	 * @see #isDebug()
+	 * @generated
+	 */
+	void setDebug(boolean value);
 
 } // Grammar

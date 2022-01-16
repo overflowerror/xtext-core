@@ -505,6 +505,26 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 	 * @generated
 	 */
 	@Override
+	public EAttribute getGrammar_TokenLimit() {
+		return (EAttribute)grammarEClass.getEStructuralFeatures().get(7);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public EAttribute getGrammar_Debug() {
+		return (EAttribute)grammarEClass.getEStructuralFeatures().get(8);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public EClass getAbstractRule() {
 		return abstractRuleEClass;
 	}
@@ -1467,6 +1487,8 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 		createEReference(grammarEClass, GRAMMAR__METAMODEL_DECLARATIONS);
 		createEReference(grammarEClass, GRAMMAR__RULES);
 		createEReference(grammarEClass, GRAMMAR__INIT_BLOCK);
+		createEAttribute(grammarEClass, GRAMMAR__TOKEN_LIMIT);
+		createEAttribute(grammarEClass, GRAMMAR__DEBUG);
 
 		abstractRuleEClass = createEClass(ABSTRACT_RULE);
 		createEAttribute(abstractRuleEClass, ABSTRACT_RULE__NAME);
@@ -1674,6 +1696,8 @@ public class XtextPackageImpl extends EPackageImpl implements XtextPackage {
 		initEReference(getGrammar_MetamodelDeclarations(), this.getAbstractMetamodelDeclaration(), null, "metamodelDeclarations", null, 0, -1, Grammar.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getGrammar_Rules(), this.getAbstractRule(), null, "rules", null, 0, -1, Grammar.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getGrammar_InitBlock(), this.getInitBlock(), null, "initBlock", null, 0, 1, Grammar.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getGrammar_TokenLimit(), ecorePackage.getEInt(), "tokenLimit", null, 0, 1, Grammar.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getGrammar_Debug(), ecorePackage.getEBoolean(), "debug", null, 0, 1, Grammar.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(abstractRuleEClass, AbstractRule.class, "AbstractRule", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getAbstractRule_Name(), theEcorePackage.getEString(), "name", null, 0, 1, AbstractRule.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

@@ -41,6 +41,8 @@ import org.eclipse.xtext.XtextPackage;
  *   <li>{@link org.eclipse.xtext.impl.GrammarImpl#getMetamodelDeclarations <em>Metamodel Declarations</em>}</li>
  *   <li>{@link org.eclipse.xtext.impl.GrammarImpl#getRules <em>Rules</em>}</li>
  *   <li>{@link org.eclipse.xtext.impl.GrammarImpl#getInitBlock <em>Init Block</em>}</li>
+ *   <li>{@link org.eclipse.xtext.impl.GrammarImpl#getTokenLimit <em>Token Limit</em>}</li>
+ *   <li>{@link org.eclipse.xtext.impl.GrammarImpl#isDebug <em>Debug</em>}</li>
  * </ul>
  *
  * @generated
@@ -135,6 +137,46 @@ public class GrammarImpl extends MinimalEObjectImpl.Container implements Grammar
 	 * @ordered
 	 */
 	protected InitBlock initBlock;
+
+	/**
+	 * The default value of the '{@link #getTokenLimit() <em>Token Limit</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getTokenLimit()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final int TOKEN_LIMIT_EDEFAULT = 0;
+
+	/**
+	 * The cached value of the '{@link #getTokenLimit() <em>Token Limit</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getTokenLimit()
+	 * @generated
+	 * @ordered
+	 */
+	protected int tokenLimit = TOKEN_LIMIT_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #isDebug() <em>Debug</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isDebug()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean DEBUG_EDEFAULT = false;
+
+	/**
+	 * The cached value of the '{@link #isDebug() <em>Debug</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isDebug()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean debug = DEBUG_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -304,6 +346,52 @@ public class GrammarImpl extends MinimalEObjectImpl.Container implements Grammar
 	 * @generated
 	 */
 	@Override
+	public int getTokenLimit() {
+		return tokenLimit;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void setTokenLimit(int newTokenLimit) {
+		int oldTokenLimit = tokenLimit;
+		tokenLimit = newTokenLimit;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, XtextPackage.GRAMMAR__TOKEN_LIMIT, oldTokenLimit, tokenLimit));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public boolean isDebug() {
+		return debug;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void setDebug(boolean newDebug) {
+		boolean oldDebug = debug;
+		debug = newDebug;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, XtextPackage.GRAMMAR__DEBUG, oldDebug, debug));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case XtextPackage.GRAMMAR__METAMODEL_DECLARATIONS:
@@ -338,6 +426,10 @@ public class GrammarImpl extends MinimalEObjectImpl.Container implements Grammar
 				return getRules();
 			case XtextPackage.GRAMMAR__INIT_BLOCK:
 				return getInitBlock();
+			case XtextPackage.GRAMMAR__TOKEN_LIMIT:
+				return getTokenLimit();
+			case XtextPackage.GRAMMAR__DEBUG:
+				return isDebug();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -376,6 +468,12 @@ public class GrammarImpl extends MinimalEObjectImpl.Container implements Grammar
 			case XtextPackage.GRAMMAR__INIT_BLOCK:
 				setInitBlock((InitBlock)newValue);
 				return;
+			case XtextPackage.GRAMMAR__TOKEN_LIMIT:
+				setTokenLimit((Integer)newValue);
+				return;
+			case XtextPackage.GRAMMAR__DEBUG:
+				setDebug((Boolean)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -409,6 +507,12 @@ public class GrammarImpl extends MinimalEObjectImpl.Container implements Grammar
 			case XtextPackage.GRAMMAR__INIT_BLOCK:
 				setInitBlock((InitBlock)null);
 				return;
+			case XtextPackage.GRAMMAR__TOKEN_LIMIT:
+				setTokenLimit(TOKEN_LIMIT_EDEFAULT);
+				return;
+			case XtextPackage.GRAMMAR__DEBUG:
+				setDebug(DEBUG_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -435,6 +539,10 @@ public class GrammarImpl extends MinimalEObjectImpl.Container implements Grammar
 				return rules != null && !rules.isEmpty();
 			case XtextPackage.GRAMMAR__INIT_BLOCK:
 				return initBlock != null;
+			case XtextPackage.GRAMMAR__TOKEN_LIMIT:
+				return tokenLimit != TOKEN_LIMIT_EDEFAULT;
+			case XtextPackage.GRAMMAR__DEBUG:
+				return debug != DEBUG_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -453,6 +561,10 @@ public class GrammarImpl extends MinimalEObjectImpl.Container implements Grammar
 		result.append(name);
 		result.append(", definesHiddenTokens: ");
 		result.append(definesHiddenTokens);
+		result.append(", tokenLimit: ");
+		result.append(tokenLimit);
+		result.append(", debug: ");
+		result.append(debug);
 		result.append(')');
 		return result.toString();
 	}
