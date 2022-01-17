@@ -15,12 +15,16 @@ Grammar:
 	'grammar' name=GrammarID ('with' usedGrammars+=[Grammar|GrammarID] (',' usedGrammars+=[Grammar|GrammarID])*)?
 	(definesHiddenTokens?='hidden' '(' (hiddenTokens+=[AbstractRule|RuleID] (',' hiddenTokens+=[AbstractRule|RuleID])*)? ')')?
 	metamodelDeclarations+=AbstractMetamodelDeclaration*
-	(initBlock=InitBlock)?
+	(
+		('tokenLimit' tokenLimit=INT)? &
+		debug?='hoistingDebug'? &
+		initBlock=InitBlock?
+	)
 	(rules+=AbstractRule)+
 ;
 
 InitBlock returns InitBlock:
-	'@init' code=JavaCode
+	'static' code=JavaCode
 ;
 
 GrammarID returns ecore::EString:

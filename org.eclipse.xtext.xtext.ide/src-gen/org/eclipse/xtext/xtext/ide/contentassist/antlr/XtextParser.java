@@ -63,6 +63,7 @@ public class XtextParser extends AbstractContentAssistParser {
 			builder.put(grammarAccess.getGrammarAccess().getGroup_3(), "rule__Grammar__Group_3__0");
 			builder.put(grammarAccess.getGrammarAccess().getGroup_3_2(), "rule__Grammar__Group_3_2__0");
 			builder.put(grammarAccess.getGrammarAccess().getGroup_3_2_1(), "rule__Grammar__Group_3_2_1__0");
+			builder.put(grammarAccess.getGrammarAccess().getGroup_5_0(), "rule__Grammar__Group_5_0__0");
 			builder.put(grammarAccess.getInitBlockAccess().getGroup(), "rule__InitBlock__Group__0");
 			builder.put(grammarAccess.getGrammarIDAccess().getGroup(), "rule__GrammarID__Group__0");
 			builder.put(grammarAccess.getGrammarIDAccess().getGroup_1(), "rule__GrammarID__Group_1__0");
@@ -157,7 +158,9 @@ public class XtextParser extends AbstractContentAssistParser {
 			builder.put(grammarAccess.getGrammarAccess().getHiddenTokensAssignment_3_2_0(), "rule__Grammar__HiddenTokensAssignment_3_2_0");
 			builder.put(grammarAccess.getGrammarAccess().getHiddenTokensAssignment_3_2_1_1(), "rule__Grammar__HiddenTokensAssignment_3_2_1_1");
 			builder.put(grammarAccess.getGrammarAccess().getMetamodelDeclarationsAssignment_4(), "rule__Grammar__MetamodelDeclarationsAssignment_4");
-			builder.put(grammarAccess.getGrammarAccess().getInitBlockAssignment_5(), "rule__Grammar__InitBlockAssignment_5");
+			builder.put(grammarAccess.getGrammarAccess().getTokenLimitAssignment_5_0_1(), "rule__Grammar__TokenLimitAssignment_5_0_1");
+			builder.put(grammarAccess.getGrammarAccess().getDebugAssignment_5_1(), "rule__Grammar__DebugAssignment_5_1");
+			builder.put(grammarAccess.getGrammarAccess().getInitBlockAssignment_5_2(), "rule__Grammar__InitBlockAssignment_5_2");
 			builder.put(grammarAccess.getGrammarAccess().getRulesAssignment_6(), "rule__Grammar__RulesAssignment_6");
 			builder.put(grammarAccess.getInitBlockAccess().getCodeAssignment_1(), "rule__InitBlock__CodeAssignment_1");
 			builder.put(grammarAccess.getGeneratedMetamodelAccess().getNameAssignment_1(), "rule__GeneratedMetamodel__NameAssignment_1");
@@ -245,6 +248,7 @@ public class XtextParser extends AbstractContentAssistParser {
 			builder.put(grammarAccess.getEnumLiteralsAccess().getElementsAssignment_1_1_1(), "rule__EnumLiterals__ElementsAssignment_1_1_1");
 			builder.put(grammarAccess.getEnumLiteralDeclarationAccess().getEnumLiteralAssignment_0(), "rule__EnumLiteralDeclaration__EnumLiteralAssignment_0");
 			builder.put(grammarAccess.getEnumLiteralDeclarationAccess().getLiteralAssignment_1_1(), "rule__EnumLiteralDeclaration__LiteralAssignment_1_1");
+			builder.put(grammarAccess.getGrammarAccess().getUnorderedGroup_5(), "rule__Grammar__UnorderedGroup_5");
 		}
 	}
 	

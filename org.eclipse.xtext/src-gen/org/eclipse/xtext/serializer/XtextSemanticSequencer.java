@@ -996,7 +996,7 @@ public class XtextSemanticSequencer extends AbstractDelegatingSemanticSequencer 
 	 *         (usedGrammars+=[Grammar|GrammarID] usedGrammars+=[Grammar|GrammarID]*)? 
 	 *         (definesHiddenTokens?='hidden' (hiddenTokens+=[AbstractRule|RuleID] hiddenTokens+=[AbstractRule|RuleID]*)?)? 
 	 *         metamodelDeclarations+=AbstractMetamodelDeclaration* 
-	 *         initBlock=InitBlock? 
+	 *         (tokenLimit=INT | debug?='hoistingDebug' | initBlock=InitBlock)* 
 	 *         rules+=AbstractRule+
 	 *     )
 	 */

@@ -17,6 +17,7 @@ import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.ParserRule;
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.TerminalRule;
+import org.eclipse.xtext.UnorderedGroup;
 import org.eclipse.xtext.common.services.TerminalsGrammarAccess;
 import org.eclipse.xtext.service.AbstractElementFinder;
 import org.eclipse.xtext.service.GrammarProvider;
@@ -56,8 +57,15 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 		private final Keyword cRightParenthesisKeyword_3_3 = (Keyword)cGroup_3.eContents().get(3);
 		private final Assignment cMetamodelDeclarationsAssignment_4 = (Assignment)cGroup.eContents().get(4);
 		private final RuleCall cMetamodelDeclarationsAbstractMetamodelDeclarationParserRuleCall_4_0 = (RuleCall)cMetamodelDeclarationsAssignment_4.eContents().get(0);
-		private final Assignment cInitBlockAssignment_5 = (Assignment)cGroup.eContents().get(5);
-		private final RuleCall cInitBlockInitBlockParserRuleCall_5_0 = (RuleCall)cInitBlockAssignment_5.eContents().get(0);
+		private final UnorderedGroup cUnorderedGroup_5 = (UnorderedGroup)cGroup.eContents().get(5);
+		private final Group cGroup_5_0 = (Group)cUnorderedGroup_5.eContents().get(0);
+		private final Keyword cTokenLimitKeyword_5_0_0 = (Keyword)cGroup_5_0.eContents().get(0);
+		private final Assignment cTokenLimitAssignment_5_0_1 = (Assignment)cGroup_5_0.eContents().get(1);
+		private final RuleCall cTokenLimitINTTerminalRuleCall_5_0_1_0 = (RuleCall)cTokenLimitAssignment_5_0_1.eContents().get(0);
+		private final Assignment cDebugAssignment_5_1 = (Assignment)cUnorderedGroup_5.eContents().get(1);
+		private final Keyword cDebugHoistingDebugKeyword_5_1_0 = (Keyword)cDebugAssignment_5_1.eContents().get(0);
+		private final Assignment cInitBlockAssignment_5_2 = (Assignment)cUnorderedGroup_5.eContents().get(2);
+		private final RuleCall cInitBlockInitBlockParserRuleCall_5_2_0 = (RuleCall)cInitBlockAssignment_5_2.eContents().get(0);
 		private final Assignment cRulesAssignment_6 = (Assignment)cGroup.eContents().get(6);
 		private final RuleCall cRulesAbstractRuleParserRuleCall_6_0 = (RuleCall)cRulesAssignment_6.eContents().get(0);
 		
@@ -65,14 +73,14 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 		//	'grammar' name=GrammarID ('with' usedGrammars+=[Grammar|GrammarID] (',' usedGrammars+=[Grammar|GrammarID])*)?
 		//	(definesHiddenTokens?='hidden' '(' (hiddenTokens+=[AbstractRule|RuleID] (',' hiddenTokens+=[AbstractRule|RuleID])*)?
 		//	')')?
-		//	metamodelDeclarations+=AbstractMetamodelDeclaration*
-		//	initBlock=InitBlock?
-		//	rules+=AbstractRule+;
+		//	metamodelDeclarations+=AbstractMetamodelDeclaration* (('tokenLimit' tokenLimit=INT)? & debug?='hoistingDebug'? &
+		//	initBlock=InitBlock?) rules+=AbstractRule+;
 		@Override public ParserRule getRule() { return rule; }
 		
 		//'grammar' name=GrammarID ('with' usedGrammars+=[Grammar|GrammarID] (',' usedGrammars+=[Grammar|GrammarID])*)?
 		//(definesHiddenTokens?='hidden' '(' (hiddenTokens+=[AbstractRule|RuleID] (',' hiddenTokens+=[AbstractRule|RuleID])*)?
-		//')')? metamodelDeclarations+=AbstractMetamodelDeclaration* initBlock=InitBlock? rules+=AbstractRule+
+		//')')? metamodelDeclarations+=AbstractMetamodelDeclaration* (('tokenLimit' tokenLimit=INT)? & debug?='hoistingDebug'? &
+		//initBlock=InitBlock?) rules+=AbstractRule+
 		public Group getGroup() { return cGroup; }
 		
 		//'grammar'
@@ -163,11 +171,32 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 		//AbstractMetamodelDeclaration
 		public RuleCall getMetamodelDeclarationsAbstractMetamodelDeclarationParserRuleCall_4_0() { return cMetamodelDeclarationsAbstractMetamodelDeclarationParserRuleCall_4_0; }
 		
+		//(('tokenLimit' tokenLimit=INT)? & debug?='hoistingDebug'? & initBlock=InitBlock?)
+		public UnorderedGroup getUnorderedGroup_5() { return cUnorderedGroup_5; }
+		
+		//('tokenLimit' tokenLimit=INT)?
+		public Group getGroup_5_0() { return cGroup_5_0; }
+		
+		//'tokenLimit'
+		public Keyword getTokenLimitKeyword_5_0_0() { return cTokenLimitKeyword_5_0_0; }
+		
+		//tokenLimit=INT
+		public Assignment getTokenLimitAssignment_5_0_1() { return cTokenLimitAssignment_5_0_1; }
+		
+		//INT
+		public RuleCall getTokenLimitINTTerminalRuleCall_5_0_1_0() { return cTokenLimitINTTerminalRuleCall_5_0_1_0; }
+		
+		//debug?='hoistingDebug'?
+		public Assignment getDebugAssignment_5_1() { return cDebugAssignment_5_1; }
+		
+		//'hoistingDebug'
+		public Keyword getDebugHoistingDebugKeyword_5_1_0() { return cDebugHoistingDebugKeyword_5_1_0; }
+		
 		//initBlock=InitBlock?
-		public Assignment getInitBlockAssignment_5() { return cInitBlockAssignment_5; }
+		public Assignment getInitBlockAssignment_5_2() { return cInitBlockAssignment_5_2; }
 		
 		//InitBlock
-		public RuleCall getInitBlockInitBlockParserRuleCall_5_0() { return cInitBlockInitBlockParserRuleCall_5_0; }
+		public RuleCall getInitBlockInitBlockParserRuleCall_5_2_0() { return cInitBlockInitBlockParserRuleCall_5_2_0; }
 		
 		//rules+=AbstractRule+
 		public Assignment getRulesAssignment_6() { return cRulesAssignment_6; }
@@ -178,19 +207,19 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 	public class InitBlockElements extends AbstractParserRuleElementFinder {
 		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "org.eclipse.xtext.Xtext.InitBlock");
 		private final Group cGroup = (Group)rule.eContents().get(1);
-		private final Keyword cInitKeyword_0 = (Keyword)cGroup.eContents().get(0);
+		private final Keyword cStaticKeyword_0 = (Keyword)cGroup.eContents().get(0);
 		private final Assignment cCodeAssignment_1 = (Assignment)cGroup.eContents().get(1);
 		private final RuleCall cCodeJavaCodeParserRuleCall_1_0 = (RuleCall)cCodeAssignment_1.eContents().get(0);
 		
 		//InitBlock:
-		//	'@init' code=JavaCode;
+		//	'static' code=JavaCode;
 		@Override public ParserRule getRule() { return rule; }
 		
-		//'@init' code=JavaCode
+		//'static' code=JavaCode
 		public Group getGroup() { return cGroup; }
 		
-		//'@init'
-		public Keyword getInitKeyword_0() { return cInitKeyword_0; }
+		//'static'
+		public Keyword getStaticKeyword_0() { return cStaticKeyword_0; }
 		
 		//code=JavaCode
 		public Assignment getCodeAssignment_1() { return cCodeAssignment_1; }
@@ -2615,9 +2644,8 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 	//	'grammar' name=GrammarID ('with' usedGrammars+=[Grammar|GrammarID] (',' usedGrammars+=[Grammar|GrammarID])*)?
 	//	(definesHiddenTokens?='hidden' '(' (hiddenTokens+=[AbstractRule|RuleID] (',' hiddenTokens+=[AbstractRule|RuleID])*)?
 	//	')')?
-	//	metamodelDeclarations+=AbstractMetamodelDeclaration*
-	//	initBlock=InitBlock?
-	//	rules+=AbstractRule+;
+	//	metamodelDeclarations+=AbstractMetamodelDeclaration* (('tokenLimit' tokenLimit=INT)? & debug?='hoistingDebug'? &
+	//	initBlock=InitBlock?) rules+=AbstractRule+;
 	public GrammarElements getGrammarAccess() {
 		return pGrammar;
 	}
@@ -2627,7 +2655,7 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 	}
 	
 	//InitBlock:
-	//	'@init' code=JavaCode;
+	//	'static' code=JavaCode;
 	public InitBlockElements getInitBlockAccess() {
 		return pInitBlock;
 	}

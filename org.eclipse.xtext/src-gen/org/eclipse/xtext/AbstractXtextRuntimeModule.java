@@ -13,9 +13,11 @@ import org.eclipse.xtext.parser.antlr.AntlrTokenDefProvider;
 import org.eclipse.xtext.parser.antlr.AntlrTokenToStringConverter;
 import org.eclipse.xtext.parser.antlr.IAntlrTokenFileProvider;
 import org.eclipse.xtext.parser.antlr.ITokenDefProvider;
+import org.eclipse.xtext.parser.antlr.IUnorderedGroupHelper;
 import org.eclipse.xtext.parser.antlr.Lexer;
 import org.eclipse.xtext.parser.antlr.LexerBindings;
 import org.eclipse.xtext.parser.antlr.LexerProvider;
+import org.eclipse.xtext.parser.antlr.UnorderedGroupHelper;
 import org.eclipse.xtext.parser.antlr.XtextAntlrTokenFileProvider;
 import org.eclipse.xtext.parser.antlr.XtextParser;
 import org.eclipse.xtext.parser.antlr.internal.InternalXtextLexer;
@@ -96,6 +98,11 @@ public abstract class AbstractXtextRuntimeModule extends DefaultRuntimeModule {
 		binder.bind(Lexer.class)
 			.annotatedWith(Names.named(LexerBindings.RUNTIME))
 			.to(InternalXtextLexer.class);
+	}
+	
+	// contributed by org.eclipse.xtext.xtext.generator.parser.antlr.XtextAntlrGeneratorFragment2
+	public Class<? extends IUnorderedGroupHelper> bindIUnorderedGroupHelper() {
+		return UnorderedGroupHelper.class;
 	}
 	
 	// contributed by org.eclipse.xtext.xtext.generator.serializer.SerializerFragment2

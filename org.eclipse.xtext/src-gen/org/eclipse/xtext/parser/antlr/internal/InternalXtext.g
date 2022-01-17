@@ -228,29 +228,108 @@ ruleGrammar returns [EObject current=null]
 		)*
 		(
 			(
-				{
-					newCompositeNode(grammarAccess.getGrammarAccess().getInitBlockInitBlockParserRuleCall_5_0());
+				{ 
+				  getUnorderedGroupHelper().enter(grammarAccess.getGrammarAccess().getUnorderedGroup_5());
 				}
-				lv_initBlock_13_0=ruleInitBlock
-				{
-					if ($current==null) {
-						$current = createModelElementForParent(grammarAccess.getGrammarRule());
+				(
+					(
+			(
+				{getUnorderedGroupHelper().canSelect(grammarAccess.getGrammarAccess().getUnorderedGroup_5(), 0)}?=>(
+					{
+						getUnorderedGroupHelper().select(grammarAccess.getGrammarAccess().getUnorderedGroup_5(), 0);
 					}
-					set(
-						$current,
-						"initBlock",
-						lv_initBlock_13_0,
-						"org.eclipse.xtext.Xtext.InitBlock");
-					afterParserOrEnumRuleCall();
-				}
+								({true}?=>(otherlv_14='tokenLimit'
+								{
+									newLeafNode(otherlv_14, grammarAccess.getGrammarAccess().getTokenLimitKeyword_5_0_0());
+								}
+								(
+									(
+										lv_tokenLimit_15_0=RULE_INT
+										{
+											newLeafNode(lv_tokenLimit_15_0, grammarAccess.getGrammarAccess().getTokenLimitINTTerminalRuleCall_5_0_1_0());
+										}
+										{
+											if ($current==null) {
+												$current = createModelElement(grammarAccess.getGrammarRule());
+											}
+											setWithLastConsumed(
+												$current,
+												"tokenLimit",
+												lv_tokenLimit_15_0,
+												"org.eclipse.xtext.common.Terminals.INT");
+										}
+									)
+								)
+								))
+					{ 
+						getUnorderedGroupHelper().returnFromSelection(grammarAccess.getGrammarAccess().getUnorderedGroup_5());
+					}
+				)
+			)|
+			(
+				{getUnorderedGroupHelper().canSelect(grammarAccess.getGrammarAccess().getUnorderedGroup_5(), 1)}?=>(
+					{
+						getUnorderedGroupHelper().select(grammarAccess.getGrammarAccess().getUnorderedGroup_5(), 1);
+					}
+								({true}?=>((
+									lv_debug_16_0='hoistingDebug'
+									{
+										newLeafNode(lv_debug_16_0, grammarAccess.getGrammarAccess().getDebugHoistingDebugKeyword_5_1_0());
+									}
+									{
+										if ($current==null) {
+											$current = createModelElement(grammarAccess.getGrammarRule());
+										}
+										setWithLastConsumed($current, "debug", lv_debug_16_0 != null, "hoistingDebug");
+									}
+								)
+								))
+					{ 
+						getUnorderedGroupHelper().returnFromSelection(grammarAccess.getGrammarAccess().getUnorderedGroup_5());
+					}
+				)
+			)|
+			(
+				{getUnorderedGroupHelper().canSelect(grammarAccess.getGrammarAccess().getUnorderedGroup_5(), 2)}?=>(
+					{
+						getUnorderedGroupHelper().select(grammarAccess.getGrammarAccess().getUnorderedGroup_5(), 2);
+					}
+								({true}?=>((
+									{
+										newCompositeNode(grammarAccess.getGrammarAccess().getInitBlockInitBlockParserRuleCall_5_2_0());
+									}
+									lv_initBlock_17_0=ruleInitBlock
+									{
+										if ($current==null) {
+											$current = createModelElementForParent(grammarAccess.getGrammarRule());
+										}
+										set(
+											$current,
+											"initBlock",
+											lv_initBlock_17_0,
+											"org.eclipse.xtext.Xtext.InitBlock");
+										afterParserOrEnumRuleCall();
+									}
+								)
+								))
+					{ 
+						getUnorderedGroupHelper().returnFromSelection(grammarAccess.getGrammarAccess().getUnorderedGroup_5());
+					}
+				)
 			)
-		)?
+					)*
+				)
+			)
+				{ 
+				  getUnorderedGroupHelper().leave(grammarAccess.getGrammarAccess().getUnorderedGroup_5());
+				}
+		)
 		(
 			(
 				{
 					newCompositeNode(grammarAccess.getGrammarAccess().getRulesAbstractRuleParserRuleCall_6_0());
 				}
-				lv_rules_14_0=ruleAbstractRule
+				lv_rules_18_0=ruleAbstractRule
 				{
 					if ($current==null) {
 						$current = createModelElementForParent(grammarAccess.getGrammarRule());
@@ -258,7 +337,7 @@ ruleGrammar returns [EObject current=null]
 					add(
 						$current,
 						"rules",
-						lv_rules_14_0,
+						lv_rules_18_0,
 						"org.eclipse.xtext.Xtext.AbstractRule");
 					afterParserOrEnumRuleCall();
 				}
@@ -283,9 +362,9 @@ ruleInitBlock returns [EObject current=null]
 	leaveRule();
 }:
 	(
-		otherlv_0='@init'
+		otherlv_0='static'
 		{
-			newLeafNode(otherlv_0, grammarAccess.getInitBlockAccess().getInitKeyword_0());
+			newLeafNode(otherlv_0, grammarAccess.getInitBlockAccess().getStaticKeyword_0());
 		}
 		(
 			(
