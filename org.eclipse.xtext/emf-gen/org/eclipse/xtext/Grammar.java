@@ -171,12 +171,13 @@ public interface Grammar extends EObject {
 
 	/**
 	 * Returns the value of the '<em><b>Token Limit</b></em>' attribute.
+	 * The default value is <code>"10"</code>.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Token Limit</em>' attribute.
 	 * @see #setTokenLimit(int)
 	 * @see org.eclipse.xtext.XtextPackage#getGrammar_TokenLimit()
-	 * @model
+	 * @model default="10"
 	 * @generated
 	 */
 	int getTokenLimit();

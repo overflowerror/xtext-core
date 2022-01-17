@@ -14,11 +14,12 @@ import org.eclipse.xtext.Grammar;
  * @author overflow - Initial contribution and API
  */
 public class HoistingConfiguration {
-	private final int tokenLimit = 10;
-	private boolean debug = false;
+	private int tokenLimit;
+	private boolean debug;
 	
 	public HoistingConfiguration(Grammar grammar) {
-		// TODO: get config options from ecore object
+		this.tokenLimit = grammar.getTokenLimit();
+		this.debug = grammar.isDebug();
 	}
 	
 	public int getTokenLimit() {
