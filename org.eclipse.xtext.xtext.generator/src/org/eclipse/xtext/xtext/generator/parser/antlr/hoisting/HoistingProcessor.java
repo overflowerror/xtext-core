@@ -329,7 +329,7 @@ public class HoistingProcessor {
 	}
 	
 	private HoistingGuard findGuardForUnorderedGroup(UnorderedGroup element, AbstractRule currentRule) {
-		// Unordered group (A & B) is the same as (A | B)+ or (A | B)* (is A and B are optional)
+		// Unordered group (A & B) is the same as (A | B)+ or (A | B)* (if A and B are optional)
 		// but the cardinality doesn't matter for hoisting
 		// if A and B are optional the guard for the alternatives need to check the context
 		// if not the alternatives are actual alternatives

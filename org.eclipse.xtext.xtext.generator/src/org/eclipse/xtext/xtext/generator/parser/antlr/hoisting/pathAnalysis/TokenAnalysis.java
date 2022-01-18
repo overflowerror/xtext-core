@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -61,6 +62,10 @@ public class TokenAnalysis {
 	}
 	
 	private List<AbstractElement> getNextElementsInContext(AbstractElement last) {
+		return getNextElementsInContext(last, new HashSet<>());
+	}
+	
+	private List<AbstractElement> getNextElementsInContext(AbstractElement last, Set<AbstractElement> visited) {
 		List<AbstractElement> result = new ArrayList<>();
 		
 		AbstractElement _last = last;
@@ -95,7 +100,9 @@ public class TokenAnalysis {
 		if (compoundContainer == null) {
 			// no container element; this is last element in a rule definition
 			AbstractRule rule = containingRule(last);			
-			List<RuleCall> calls = findAllRuleCalls(grammar, rule);
+			List<RuleCall> calls = findAllRuleCalls(grammar, rule).stream()
+					.filter(Predicate.not(visited::contains))
+					.collect(Collectors.toList());
 
 			if (calls.isEmpty()) {
 				// has to be start rule
@@ -104,7 +111,9 @@ public class TokenAnalysis {
 			}
 			
 			for (RuleCall call : calls) {
-				result.addAll(getNextElementsInContext(call));
+				Set<AbstractElement> _visited = new HashSet<>(visited);
+				_visited.add(call);
+				result.addAll(getNextElementsInContext(call, _visited));
 			}
 		} else if (compoundContainer instanceof Group) {
 			List<AbstractElement> elements = compoundContainer.getElements();
@@ -139,13 +148,13 @@ public class TokenAnalysis {
 					result.add(compoundContainer);
 				}
 				
-				result.addAll(getNextElementsInContext(compoundContainer));
+				result.addAll(getNextElementsInContext(compoundContainer, visited));
 			}
 		} else if (compoundContainer instanceof UnorderedGroup) {
 			result.addAll(compoundContainer.getElements().stream()
 				.collect(Collectors.toList())
 			);
-			result.addAll(getNextElementsInContext(compoundContainer));
+			result.addAll(getNextElementsInContext(compoundContainer, visited));
 		} else {
 			throw new IllegalArgumentException("unknown compound element: " + container.eClass().getName());
 		}
@@ -188,6 +197,7 @@ public class TokenAnalysis {
 			if (path.isDone()) {
 				result = result.merge(path);
 			} else {
+				log.info("context analysis failed");
 				throw new TokenAnalysisAbortedException("context analysis failed");
 			}
 		}
@@ -495,6 +505,7 @@ public class TokenAnalysis {
 						return true;
 					}
 				} catch (TokenAnalysisAbortedException e) {
+					log.info("token combinations: " + e.getMessage());
 					// tokens exhausted; abort current prefix
 					// set limit for calling functions so this index is not checked again
 					limit.set(i);

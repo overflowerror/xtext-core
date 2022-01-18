@@ -8,6 +8,8 @@
  *******************************************************************************/
 package org.eclipse.xtext.xtext.generator.hoisting;
 
+import javax.management.RuntimeErrorException;
+
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.xml.type.XMLTypePackage;
 import org.eclipse.xtext.AbstractRule;
@@ -1078,5 +1080,48 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		assertEquals("(((" + getSyntaxForKeywordToken("a", 2) + " && " + getSyntaxForEofToken(2) + ") || (p0)) && (" + getSyntaxForKeywordToken("b", 2) + " || (p1)))", guard.render());
+	}
+	
+	@Test
+	public void testRecursiveContextWithIntermediate_expectCorrectResult() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"tokenLimit 4\n" + 
+			"hoistingDebug\n" +
+			"S: a=A ;\n" +
+			"A: $$ p0 $$?=> 'a' \n" +
+			" | $$ p1 $$?=> 'a' s=S ;\n";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
+		AbstractRule rule = getRule(grammar, "A");
+		
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		assertEquals("((" + getSyntaxForEofToken(2) + " || (p0)) && (" + getSyntaxForKeywordToken("a", 2) + " || (p1)))", guard.render());
+	}
+	
+	@Test
+	public void testRecursiveContextNoIntermediate_expectCorrectResult() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"tokenLimit 4\n" + 
+			"hoistingDebug\n" +
+			"S: $$ p0 $$?=> 'a' \n" +
+			" | $$ p1 $$?=> 'a' s=S ;\n";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
+		AbstractRule rule = getRule(grammar, "S");
+		
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		assertEquals("((" + getSyntaxForEofToken(2) + " || (p0)) && (" + getSyntaxForKeywordToken("a", 2) + " || (p1)))", guard.render());
 	}
 }
