@@ -70,6 +70,9 @@ public class FlattenedGrammarAccess {
 			flattenedGrammar.setInitBlock(copiedBlock);
 		}
 		
+		flattenedGrammar.setDebug(grammar.isDebug());
+		flattenedGrammar.setTokenLimit(grammar.getTokenLimit());
+		
 		Map<RuleWithParameterValues, AbstractRule> origToCopy = new LinkedHashMap<>();
 		List<AbstractRule> copies = copyRuleStubs(names, origToCopy, filter.getRules(grammar),
 				filter.isDiscardRuleTypeRef());
