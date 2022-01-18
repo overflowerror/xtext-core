@@ -207,19 +207,19 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 	public class InitBlockElements extends AbstractParserRuleElementFinder {
 		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "org.eclipse.xtext.Xtext.InitBlock");
 		private final Group cGroup = (Group)rule.eContents().get(1);
-		private final Keyword cStaticKeyword_0 = (Keyword)cGroup.eContents().get(0);
+		private final Keyword cSetupKeyword_0 = (Keyword)cGroup.eContents().get(0);
 		private final Assignment cCodeAssignment_1 = (Assignment)cGroup.eContents().get(1);
 		private final RuleCall cCodeJavaCodeParserRuleCall_1_0 = (RuleCall)cCodeAssignment_1.eContents().get(0);
 		
 		//InitBlock:
-		//	'static' code=JavaCode;
+		//	'setup' code=JavaCode;
 		@Override public ParserRule getRule() { return rule; }
 		
-		//'static' code=JavaCode
+		//'setup' code=JavaCode
 		public Group getGroup() { return cGroup; }
 		
-		//'static'
-		public Keyword getStaticKeyword_0() { return cStaticKeyword_0; }
+		//'setup'
+		public Keyword getSetupKeyword_0() { return cSetupKeyword_0; }
 		
 		//code=JavaCode
 		public Assignment getCodeAssignment_1() { return cCodeAssignment_1; }
@@ -2655,7 +2655,7 @@ public class XtextGrammarAccess extends AbstractElementFinder.AbstractGrammarEle
 	}
 	
 	//InitBlock:
-	//	'static' code=JavaCode;
+	//	'setup' code=JavaCode;
 	public InitBlockElements getInitBlockAccess() {
 		return pInitBlock;
 	}

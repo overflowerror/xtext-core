@@ -21,7 +21,7 @@ import java.util.ArrayList;
 @SuppressWarnings("all")
 public class InternalXtextParser extends AbstractInternalAntlrParser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "RULE_INT", "RULE_STRING", "RULE_ID", "RULE_JAVACODESTRING", "RULE_ML_COMMENT", "RULE_SL_COMMENT", "RULE_WS", "RULE_ANY_OTHER", "'grammar'", "'with'", "','", "'hidden'", "'('", "')'", "'tokenLimit'", "'hoistingDebug'", "'static'", "'.'", "'generate'", "'as'", "'import'", "'@'", "'fragment'", "'*'", "'returns'", "':'", "';'", "'<'", "'>'", "'::'", "'|'", "'&'", "'?=>'", "'?'", "'+'", "'{'", "'='", "'+='", "'current'", "'}'", "'true'", "'false'", "'!'", "'=>'", "'->'", "'?='", "'['", "']'", "'terminal'", "'EOF'", "'..'", "'enum'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "RULE_INT", "RULE_STRING", "RULE_ID", "RULE_JAVACODESTRING", "RULE_ML_COMMENT", "RULE_SL_COMMENT", "RULE_WS", "RULE_ANY_OTHER", "'grammar'", "'with'", "','", "'hidden'", "'('", "')'", "'tokenLimit'", "'hoistingDebug'", "'setup'", "'.'", "'generate'", "'as'", "'import'", "'@'", "'fragment'", "'*'", "'returns'", "':'", "';'", "'<'", "'>'", "'::'", "'|'", "'&'", "'?=>'", "'?'", "'+'", "'{'", "'='", "'+='", "'current'", "'}'", "'true'", "'false'", "'!'", "'=>'", "'->'", "'?='", "'['", "']'", "'terminal'", "'EOF'", "'..'", "'enum'"
     };
     public static final int T__50=50;
     public static final int T__19=19;
@@ -881,7 +881,7 @@ public class InternalXtextParser extends AbstractInternalAntlrParser {
 
 
     // $ANTLR start "ruleInitBlock"
-    // InternalXtext.g:357:1: ruleInitBlock returns [EObject current=null] : (otherlv_0= 'static' ( (lv_code_1_0= ruleJavaCode ) ) ) ;
+    // InternalXtext.g:357:1: ruleInitBlock returns [EObject current=null] : (otherlv_0= 'setup' ( (lv_code_1_0= ruleJavaCode ) ) ) ;
     public final EObject ruleInitBlock() throws RecognitionException {
         EObject current = null;
 
@@ -893,15 +893,15 @@ public class InternalXtextParser extends AbstractInternalAntlrParser {
         	enterRule();
 
         try {
-            // InternalXtext.g:363:2: ( (otherlv_0= 'static' ( (lv_code_1_0= ruleJavaCode ) ) ) )
-            // InternalXtext.g:364:2: (otherlv_0= 'static' ( (lv_code_1_0= ruleJavaCode ) ) )
+            // InternalXtext.g:363:2: ( (otherlv_0= 'setup' ( (lv_code_1_0= ruleJavaCode ) ) ) )
+            // InternalXtext.g:364:2: (otherlv_0= 'setup' ( (lv_code_1_0= ruleJavaCode ) ) )
             {
-            // InternalXtext.g:364:2: (otherlv_0= 'static' ( (lv_code_1_0= ruleJavaCode ) ) )
-            // InternalXtext.g:365:3: otherlv_0= 'static' ( (lv_code_1_0= ruleJavaCode ) )
+            // InternalXtext.g:364:2: (otherlv_0= 'setup' ( (lv_code_1_0= ruleJavaCode ) ) )
+            // InternalXtext.g:365:3: otherlv_0= 'setup' ( (lv_code_1_0= ruleJavaCode ) )
             {
             otherlv_0=(Token)match(input,20,FollowSets000.FOLLOW_11); 
 
-            			newLeafNode(otherlv_0, grammarAccess.getInitBlockAccess().getStaticKeyword_0());
+            			newLeafNode(otherlv_0, grammarAccess.getInitBlockAccess().getSetupKeyword_0());
             		
             // InternalXtext.g:369:3: ( (lv_code_1_0= ruleJavaCode ) )
             // InternalXtext.g:370:4: (lv_code_1_0= ruleJavaCode )

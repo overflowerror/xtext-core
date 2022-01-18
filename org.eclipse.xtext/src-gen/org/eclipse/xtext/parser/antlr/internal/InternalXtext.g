@@ -362,9 +362,9 @@ ruleInitBlock returns [EObject current=null]
 	leaveRule();
 }:
 	(
-		otherlv_0='static'
+		otherlv_0='setup'
 		{
-			newLeafNode(otherlv_0, grammarAccess.getInitBlockAccess().getStaticKeyword_0());
+			newLeafNode(otherlv_0, grammarAccess.getInitBlockAccess().getSetupKeyword_0());
 		}
 		(
 			(

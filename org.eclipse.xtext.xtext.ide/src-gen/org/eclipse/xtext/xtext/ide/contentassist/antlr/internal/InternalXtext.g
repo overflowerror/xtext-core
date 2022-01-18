@@ -2889,9 +2889,9 @@ rule__InitBlock__Group__0__Impl
 	}
 :
 (
-	{ before(grammarAccess.getInitBlockAccess().getStaticKeyword_0()); }
-	'static'
-	{ after(grammarAccess.getInitBlockAccess().getStaticKeyword_0()); }
+	{ before(grammarAccess.getInitBlockAccess().getSetupKeyword_0()); }
+	'setup'
+	{ after(grammarAccess.getInitBlockAccess().getSetupKeyword_0()); }
 )
 ;
 finally {

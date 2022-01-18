@@ -34,7 +34,7 @@
 'hoistingDebug'=19
 'import'=24
 'returns'=28
-'static'=20
+'setup'=20
 'terminal'=52
 'tokenLimit'=18
 'true'=44

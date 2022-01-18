@@ -24,7 +24,7 @@ Grammar:
 ;
 
 InitBlock returns InitBlock:
-	'static' code=JavaCode
+	'setup' code=JavaCode
 ;
 
 GrammarID returns ecore::EString:

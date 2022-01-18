@@ -22,7 +22,7 @@ import java.util.ArrayList;
 @SuppressWarnings("all")
 public class InternalXtextParser extends AbstractInternalContentAssistParser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "RULE_ID", "RULE_INT", "RULE_STRING", "RULE_JAVACODESTRING", "RULE_ML_COMMENT", "RULE_SL_COMMENT", "RULE_WS", "RULE_ANY_OTHER", "'?'", "'*'", "'+'", "'='", "'+='", "'false'", "'true'", "'?='", "'grammar'", "'with'", "','", "'('", "')'", "'tokenLimit'", "'static'", "'.'", "'generate'", "'as'", "'import'", "'@'", "':'", "';'", "'returns'", "'<'", "'>'", "'::'", "'|'", "'&'", "'?=>'", "'{'", "'}'", "'current'", "'!'", "'['", "']'", "'terminal'", "'->'", "'EOF'", "'..'", "'enum'", "'hidden'", "'hoistingDebug'", "'fragment'", "'=>'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "RULE_ID", "RULE_INT", "RULE_STRING", "RULE_JAVACODESTRING", "RULE_ML_COMMENT", "RULE_SL_COMMENT", "RULE_WS", "RULE_ANY_OTHER", "'?'", "'*'", "'+'", "'='", "'+='", "'false'", "'true'", "'?='", "'grammar'", "'with'", "','", "'('", "')'", "'tokenLimit'", "'setup'", "'.'", "'generate'", "'as'", "'import'", "'@'", "':'", "';'", "'returns'", "'<'", "'>'", "'::'", "'|'", "'&'", "'?=>'", "'{'", "'}'", "'current'", "'!'", "'['", "']'", "'terminal'", "'->'", "'EOF'", "'..'", "'enum'", "'hidden'", "'hoistingDebug'", "'fragment'", "'=>'"
     };
     public static final int T__50=50;
     public static final int T__19=19;
@@ -9487,21 +9487,21 @@ public class InternalXtextParser extends AbstractInternalContentAssistParser {
 
 
     // $ANTLR start "rule__InitBlock__Group__0__Impl"
-    // InternalXtext.g:2886:1: rule__InitBlock__Group__0__Impl : ( 'static' ) ;
+    // InternalXtext.g:2886:1: rule__InitBlock__Group__0__Impl : ( 'setup' ) ;
     public final void rule__InitBlock__Group__0__Impl() throws RecognitionException {
 
         		int stackSize = keepStackSize();
         	
         try {
-            // InternalXtext.g:2890:1: ( ( 'static' ) )
-            // InternalXtext.g:2891:1: ( 'static' )
+            // InternalXtext.g:2890:1: ( ( 'setup' ) )
+            // InternalXtext.g:2891:1: ( 'setup' )
             {
-            // InternalXtext.g:2891:1: ( 'static' )
-            // InternalXtext.g:2892:2: 'static'
+            // InternalXtext.g:2891:1: ( 'setup' )
+            // InternalXtext.g:2892:2: 'setup'
             {
-             before(grammarAccess.getInitBlockAccess().getStaticKeyword_0()); 
+             before(grammarAccess.getInitBlockAccess().getSetupKeyword_0()); 
             match(input,26,FollowSets000.FOLLOW_2); 
-             after(grammarAccess.getInitBlockAccess().getStaticKeyword_0()); 
+             after(grammarAccess.getInitBlockAccess().getSetupKeyword_0()); 
 
             }
 

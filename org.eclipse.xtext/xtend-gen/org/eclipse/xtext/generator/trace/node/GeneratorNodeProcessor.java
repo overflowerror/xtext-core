@@ -255,12 +255,12 @@ public class GeneratorNodeProcessor {
         return this.delegate;
       }
       
-      public boolean contains(final ITextRegion arg0) {
-        return this.getDelegate().contains(arg0);
+      public boolean contains(final ITextRegion other) {
+        return this.getDelegate().contains(other);
       }
       
-      public boolean contains(final int arg0) {
-        return this.getDelegate().contains(arg0);
+      public boolean contains(final int offset) {
+        return this.getDelegate().contains(offset);
       }
       
       public int getEndLineNumber() {
@@ -279,12 +279,12 @@ public class GeneratorNodeProcessor {
         return this.getDelegate().getOffset();
       }
       
-      public ITextRegion merge(final ITextRegion arg0) {
-        return this.getDelegate().merge(arg0);
+      public ITextRegion merge(final ITextRegion region) {
+        return this.getDelegate().merge(region);
       }
       
-      public ITextRegionWithLineInformation merge(final ITextRegionWithLineInformation arg0) {
-        return this.getDelegate().merge(arg0);
+      public ITextRegionWithLineInformation merge(final ITextRegionWithLineInformation other) {
+        return this.getDelegate().merge(other);
       }
     }
     
