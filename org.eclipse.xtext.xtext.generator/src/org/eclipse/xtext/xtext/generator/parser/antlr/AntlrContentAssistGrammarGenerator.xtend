@@ -328,14 +328,24 @@ class AntlrContentAssistGrammarGenerator extends AbstractAntlrGrammarWithActions
 				)
 				(
 					{ before(grammarAccess.«originalElement.grammarElementAccess»«paramConfig»); }
-					(«ebnf2(options, supportsActions)»)*
+					(
+						«findHoistingGuardIgnoreCardinality.renderPredicate»
+						«ebnf2(options, supportsActions)»
+					)*
 					{ after(grammarAccess.«originalElement.grammarElementAccess»«paramConfig»); }
 				)
 			)
 		«ELSE»
 			(
 				{ before(grammarAccess.«originalElement.grammarElementAccess»«paramConfig»); }
-				«IF mustBeParenthesized()»(«ebnf2(options, supportsActions)»)«ELSE»«ebnf2(options, supportsActions)»«ENDIF»«cardinality»
+				«IF mustBeParenthesized()»
+					(
+						«IF !isTrivialCardinality»«findHoistingGuardIgnoreCardinality.renderPredicate»«ENDIF»
+						«ebnf2(options, supportsActions)»
+					)
+				«ELSE»
+					«ebnf2(options, supportsActions)»
+				«ENDIF»«cardinality»
 				{ after(grammarAccess.«originalElement.grammarElementAccess»«paramConfig»); }
 			)
 		«ENDIF»

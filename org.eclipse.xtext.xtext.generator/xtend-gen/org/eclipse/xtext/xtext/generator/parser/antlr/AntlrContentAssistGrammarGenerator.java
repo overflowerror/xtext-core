@@ -1026,10 +1026,18 @@ public class AntlrContentAssistGrammarGenerator extends AbstractAntlrGrammarWith
         _builder.newLineIfNotEmpty();
         _builder.append("\t\t");
         _builder.append("(");
-        String _ebnf2_1 = this.ebnf2(it, options, supportsActions);
-        _builder.append(_ebnf2_1, "\t\t");
-        _builder.append(")*");
+        _builder.newLine();
+        _builder.append("\t\t\t");
+        String _renderPredicate = this._hoistingProcessor.findHoistingGuardIgnoreCardinality(it).renderPredicate();
+        _builder.append(_renderPredicate, "\t\t\t");
         _builder.newLineIfNotEmpty();
+        _builder.append("\t\t\t");
+        String _ebnf2_1 = this.ebnf2(it, options, supportsActions);
+        _builder.append(_ebnf2_1, "\t\t\t");
+        _builder.newLineIfNotEmpty();
+        _builder.append("\t\t");
+        _builder.append(")*");
+        _builder.newLine();
         _builder.append("\t\t");
         _builder.append("{ after(grammarAccess.");
         String _grammarElementAccess_3 = this._grammarAccessExtensions.grammarElementAccess(AntlrGrammarGenUtil.<AbstractElement>getOriginalElement(it));
@@ -1054,17 +1062,37 @@ public class AntlrContentAssistGrammarGenerator extends AbstractAntlrGrammarWith
         _builder.append(_paramConfig_4, "\t");
         _builder.append("); }");
         _builder.newLineIfNotEmpty();
-        _builder.append("\t");
         {
           boolean _mustBeParenthesized = this.mustBeParenthesized(it);
           if (_mustBeParenthesized) {
+            _builder.append("\t");
             _builder.append("(");
+            _builder.newLine();
+            _builder.append("\t");
+            _builder.append("\t");
+            {
+              boolean _isTrivialCardinality = GrammarUtil.isTrivialCardinality(it);
+              boolean _not = (!_isTrivialCardinality);
+              if (_not) {
+                String _renderPredicate_1 = this._hoistingProcessor.findHoistingGuardIgnoreCardinality(it).renderPredicate();
+                _builder.append(_renderPredicate_1, "\t\t");
+              }
+            }
+            _builder.newLineIfNotEmpty();
+            _builder.append("\t");
+            _builder.append("\t");
             String _ebnf2_2 = this.ebnf2(it, options, supportsActions);
-            _builder.append(_ebnf2_2, "\t");
+            _builder.append(_ebnf2_2, "\t\t");
+            _builder.newLineIfNotEmpty();
+            _builder.append("\t");
             _builder.append(")");
+            _builder.newLine();
           } else {
+            _builder.append("\t");
             String _ebnf2_3 = this.ebnf2(it, options, supportsActions);
             _builder.append(_ebnf2_3, "\t");
+            _builder.newLineIfNotEmpty();
+            _builder.append("\t\t\t\t");
           }
         }
         String _cardinality = it.getCardinality();
