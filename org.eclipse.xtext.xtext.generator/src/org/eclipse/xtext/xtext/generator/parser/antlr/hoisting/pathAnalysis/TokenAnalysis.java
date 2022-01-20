@@ -317,7 +317,8 @@ public class TokenAnalysis {
 					return result;
 				} else {
 					// Actions, Predicates, JavaActions, ...
-					return prefix;
+					// create new state with out empty flag
+					return new TokenAnalysisPaths(prefix);
 				}
 			};
 		}.doSwitch(path);

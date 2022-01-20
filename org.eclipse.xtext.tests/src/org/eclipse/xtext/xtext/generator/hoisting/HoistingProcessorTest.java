@@ -1122,15 +1122,36 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 	}
 	
 	@Test
-	public void testRepeatableContextWithEmptyPath_bug_expectCorrectResult() throws Exception {
+	public void testRepeatablyQuantifiedContextWithEmptyPath_bug_expectCorrectResult() throws Exception {
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
-			"hoistingDebug\n" +
 			"S: A C+ ;\n" +
 			"A: $$ p0 $$?=> 'a' " + 
 			" | $$ p1 $$?=> 'a' 'b' ;\n" +
 			"C: 'c'? ;\n";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
+		AbstractRule rule = getRule(grammar, "A");
+		
+		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
+		assertFalse(guard.isTrivial());
+		assertTrue(guard.hasTerminal());
+		assertEquals("(((" + getSyntaxForEofToken(2) + " && " + getSyntaxForKeywordToken("c", 2) + ") || (p0)) && (" + getSyntaxForKeywordToken("b", 2) + " || (p1)))", guard.render());
+	}
+	
+	@Test
+	public void testRecursiveContextWithEmptyPath_bug_expectCorrectResult() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"S: a=A c=C ;\n" +
+			"A: $$ p0 $$?=> 'a' " + 
+			" | $$ p1 $$?=> 'a' 'b' ;\n" +
+			"C: {C} \n" +
+			" | 'c' C ;\n";
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
 		Grammar grammar = ((Grammar) resource.getContents().get(0));
