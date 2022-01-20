@@ -185,7 +185,8 @@ public class TokenAnalysis {
 			log.info("context element: " + abstractElementToShortString(element));
 			TokenAnalysisPaths path = new TokenAnalysisPaths(prefix);
 			path.resetProgress();
-			path = getTokenPaths(element, path, false, false, shortcutEndlessLoops);
+			// shortcut endless loops instead of throwing exception
+			path = getTokenPaths(element, path, false, false, true);
 			if (!path.isDone() && element != null) {
 				if (callStack.contains(element) && !path.hasProgress()) {
 					throw new EmptyRecursionPathInContextAnalysisException("no progress in recursion");
