@@ -1703,6 +1703,10 @@ public class ParentProjectDescriptor extends ProjectDescriptor {
           _builder.append("<useUIHarness>false</useUIHarness>");
           _builder.newLine();
           _builder.append("\t\t\t");
+          _builder.append("\t\t");
+          _builder.append("<showEclipseLog>true</showEclipseLog>");
+          _builder.newLine();
+          _builder.append("\t\t\t");
           _builder.append("\t");
           _builder.append("</configuration>");
           _builder.newLine();

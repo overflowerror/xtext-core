@@ -516,6 +516,7 @@ class ParentProjectDescriptor extends ProjectDescriptor {
 										<argLine>${platformSystemProperties} ${systemProperties} ${moduleProperties} ${additionalTestArguments}</argLine>
 										<failIfNoTests>false</failIfNoTests>
 										<useUIHarness>false</useUIHarness>
+										<showEclipseLog>true</showEclipseLog>
 									</configuration>
 								</plugin>
 							«ENDIF»
