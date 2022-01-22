@@ -725,7 +725,9 @@ public class GrammarUtil {
 		new XtextSwitch<Boolean>(){
 			@Override
 			public Boolean caseRuleCall(RuleCall object) {
-				if (object.getRule() == rule) {
+				// compare rule name instead of rule equality because of constructed paths
+				// see isStartRule()
+				if (object.getRule().getName().equals(rule.getName())) {
 					calls.add(object);
 				}
 				return true;
@@ -754,5 +756,17 @@ public class GrammarUtil {
 		}
 		
 		return calls;
+	}
+	
+	public static boolean isStartRule(Grammar grammar, AbstractRule rule) {
+		if (grammar.getRules().isEmpty()) {
+			return false;
+		}
+		
+		// comparing rule objects directly or
+		// comparing with EcoreUtil.equals()
+		// does not work because copy() changes the reference (it's a new ecore object)
+		// and changes to the copied path will be considered for .equals()
+		return grammar.getRules().get(0).getName().equals(rule.getName());
 	}
 }

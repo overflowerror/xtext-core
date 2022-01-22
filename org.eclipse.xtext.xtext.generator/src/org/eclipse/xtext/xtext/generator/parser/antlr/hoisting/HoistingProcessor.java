@@ -88,13 +88,13 @@ public class HoistingProcessor {
 			return HoistingGuard.unguarded();
 		}
 		
-		// set cardinality so the token analyse works
-		element = copy(element);
+		// prepare virtual cardinality
+		String cardinality;
 		if (isMultipleCardinality(element)) {
-			element.setCardinality("+");
+			cardinality = "+";
 		} else {
 			// would be ? cardinality
-			element.setCardinality(null);
+			cardinality = null;
 		}
 		
 		// identity analysis can be skipped
@@ -103,7 +103,7 @@ public class HoistingProcessor {
 			return new AlternativesGuard(
 				new PathGuard(
 					new AlternativeTokenSequenceGuard(
-						analysis.findMinimalPathDifference(element).stream()
+						analysis.findMinimalPathDifference(element, cardinality).stream()
 							.map(s -> s.stream()
 									.map(SingleTokenGuard::new)
 									.collect(Collectors.toList())
@@ -317,7 +317,10 @@ public class HoistingProcessor {
 					throw new NestedPrefixAlternativesException("nested prefix alternatives can't be analysed because of too many paths");
 				}
 				
-				//throw new RuntimeException();
+				/*if (hasSeen) {
+					throw new RuntimeException();
+				}
+				hasSeen=true;*/
 				
 				return findGuardForAlternatives(flattened, currentRule);
 			} catch(TokenAnalysisAbortedException e) {

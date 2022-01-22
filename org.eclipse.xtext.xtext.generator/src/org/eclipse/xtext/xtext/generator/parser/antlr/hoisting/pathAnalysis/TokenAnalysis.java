@@ -37,7 +37,6 @@ import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.UnorderedGroup;
 import org.eclipse.xtext.util.XtextSwitch;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.HoistingConfiguration;
-import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.EmptyRecursionPathInContextAnalysisException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.NestedPrefixAlternativesException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.SymbolicAnalysisFailedException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.TokenAnalysisAbortedException;
@@ -61,11 +60,11 @@ public class TokenAnalysis {
 		this.grammar = grammar;
 	}
 	
-	private List<AbstractElement> getNextElementsInContext(AbstractElement last) {
-		return getNextElementsInContext(last, new HashSet<>());
+	private List<AbstractElement> getNextElementsInContext(AbstractElement last, boolean considerCardinalities) {
+		return getNextElementsInContext(last, considerCardinalities, new HashSet<>());
 	}
 	
-	private List<AbstractElement> getNextElementsInContext(AbstractElement last, Set<AbstractElement> visited) {
+	private List<AbstractElement> getNextElementsInContext(AbstractElement last, boolean considerCardinalities, Set<AbstractElement> visited) {
 		List<AbstractElement> result = new ArrayList<>();
 		
 		AbstractElement _last = last;
@@ -88,7 +87,7 @@ public class TokenAnalysis {
 			_last = container;
 			container = (AbstractElement) _container;
 			
-			if (last != _last && isMultipleCardinality(_last)) {
+			if (considerCardinalities && last != _last && isMultipleCardinality(_last)) {
 				// last is + or * quantified
 				result.add(_last);
 			}
@@ -98,14 +97,16 @@ public class TokenAnalysis {
 		CompoundElement compoundContainer = (CompoundElement) container;
 		
 		if (compoundContainer == null) {
+			log.info("no container");
 			// no container element; this is last element in a rule definition
-			AbstractRule rule = containingRule(last);			
+			AbstractRule rule = containingRule(last);
 			List<RuleCall> calls = findAllRuleCalls(grammar, rule).stream()
 					.filter(Predicate.not(visited::contains))
 					.collect(Collectors.toList());
-
-			if (calls.isEmpty()) {
-				// has to be start rule
+			
+			log.info("current rule: " + (rule == null ? "null" : rule.getName()));
+			
+			if (isStartRule(grammar, rule)) {
 				// context is EOF
 				result.add(null);
 			}
@@ -113,9 +114,12 @@ public class TokenAnalysis {
 			for (RuleCall call : calls) {
 				Set<AbstractElement> _visited = new HashSet<>(visited);
 				_visited.add(call);
-				result.addAll(getNextElementsInContext(call, _visited));
+				result.addAll(getNextElementsInContext(call, considerCardinalities, _visited));
 			}
+			
 		} else if (compoundContainer instanceof Group) {
+			log.info("group container");
+			
 			List<AbstractElement> elements = compoundContainer.getElements();
 			int index = elements.indexOf(last);
 			if (index < 0) {
@@ -144,17 +148,23 @@ public class TokenAnalysis {
 				result.add(next);
 			} else {
 				// this is the last element
-				if (isMultipleCardinality(compoundContainer)) {
+				if (considerCardinalities && isMultipleCardinality(compoundContainer)) {
 					result.add(compoundContainer);
 				}
 				
-				result.addAll(getNextElementsInContext(compoundContainer, visited));
+				log.info("last element; container: " + abstractElementToShortString(compoundContainer));
+				
+				result.addAll(getNextElementsInContext(compoundContainer, considerCardinalities, visited));
 			}
 		} else if (compoundContainer instanceof UnorderedGroup) {
-			result.addAll(compoundContainer.getElements().stream()
-				.collect(Collectors.toList())
-			);
-			result.addAll(getNextElementsInContext(compoundContainer, visited));
+			log.info("unordered group container");
+			
+			if (considerCardinalities) {
+				result.addAll(compoundContainer.getElements().stream()
+					.collect(Collectors.toList())
+				);
+			}
+			result.addAll(getNextElementsInContext(compoundContainer, considerCardinalities, visited));
 		} else {
 			throw new IllegalArgumentException("unknown compound element: " + container.eClass().getName());
 		}
@@ -162,25 +172,21 @@ public class TokenAnalysis {
 		return result;
 	}
 	
-	private TokenAnalysisPaths getTokenPathsContext(AbstractElement last, TokenAnalysisPaths prefix, boolean shortcutEndlessLoops) {
-		return getTokenPathsContext(last, prefix, shortcutEndlessLoops, new HashSet<>());
+	private TokenAnalysisPaths getTokenPathsContext(AbstractElement last, TokenAnalysisPaths prefix) {
+		return getTokenPathsContext(last, prefix, true, new HashSet<>());
 	}
 	
-	private TokenAnalysisPaths getTokenPathsContext(AbstractElement last, TokenAnalysisPaths prefix, boolean shortcutEndlessLoops, Set<AbstractElement> callStack) {
-		log.info("get context for: " + abstractElementToShortString(last));
+	private TokenAnalysisPaths getTokenPathsContext(AbstractElement last, TokenAnalysisPaths prefix, boolean considerCardinalities, Set<AbstractElement> callStack) {
+		log.info("get context for: " + abstractElementToShortString(last) + (considerCardinalities ? " with" : " without") + " cardinalities");
 		
-		List<AbstractElement> context = getNextElementsInContext(last);
+		List<AbstractElement> context = getNextElementsInContext(last, considerCardinalities);
 		
 		log.info(context.size());
 		log.info(context.stream().map(DebugUtils::abstractElementToShortString).collect(Collectors.toList()));
 				
 		TokenAnalysisPaths result = TokenAnalysisPaths.empty(prefix);
 		
-		if (context.isEmpty()) {
-			// TODO: is this special case necessary?
-			throw new TokenAnalysisAbortedException("context analysis failed: no context");
-		}
-		
+		int actualNumberOfElements = 0;
 		for (AbstractElement element : context) {
 			log.info("context element: " + abstractElementToShortString(element));
 			TokenAnalysisPaths path = new TokenAnalysisPaths(prefix);
@@ -188,12 +194,20 @@ public class TokenAnalysis {
 			// shortcut endless loops instead of throwing exception
 			path = getTokenPaths(element, path, false, false, true);
 			if (!path.isDone() && element != null) {
+				boolean _considerCardinalities = considerCardinalities;
 				if (callStack.contains(element) && !path.hasProgress()) {
-					throw new EmptyRecursionPathInContextAnalysisException("no progress in recursion");
+					if (_considerCardinalities) {
+						_considerCardinalities = false;
+					} else {
+						// considerCardinalities is already false
+						log.info("failed to analyse cardinalities in context");
+						// ignore this branch
+						continue;
+					}
 				}
 				Set<AbstractElement> localCallStack = new HashSet<>(callStack);
 				localCallStack.add(element);
-				path = getTokenPathsContext(element, path, shortcutEndlessLoops, localCallStack);
+				path = getTokenPathsContext(element, path, _considerCardinalities, localCallStack);
 			}
 			if (path.isDone()) {
 				result = result.merge(path);
@@ -201,6 +215,12 @@ public class TokenAnalysis {
 				log.info("context analysis failed");
 				throw new TokenAnalysisAbortedException("context analysis failed");
 			}
+			actualNumberOfElements++;
+		}
+		
+		if (actualNumberOfElements == 0) {
+			// TODO: is this special case n)ecessary?
+			throw new TokenAnalysisAbortedException("context analysis failed: no context");
 		}
 			
 		log.info("done");
@@ -324,10 +344,37 @@ public class TokenAnalysis {
 		}.doSwitch(path);
 	}
 	
-	// analyseContext implies needsLength
+	boolean isVirtualOptionalCardinality(String cardinality) {
+		return "?".equals(cardinality) || "*".equals(cardinality);
+	}
+
+	boolean isVirtualMultipleCardinality(String cardinality) {
+		return "+".equals(cardinality) || "*".equals(cardinality);
+	}
+	
 	private TokenAnalysisPaths getTokenPaths(
 			AbstractElement path, TokenAnalysisPaths prefix, boolean analyseContext, boolean needsLength, boolean shortcutEndlessLoops
 	) {
+		if (prefix.isDone()) {
+			return prefix;
+		}
+		
+		if (path == null) {
+			// empty path means EOF
+			TokenAnalysisPaths result;
+			result = new TokenAnalysisPaths(prefix);
+			result.add(path);
+			return result;
+		}
+		
+		return getTokenPaths(path, path.getCardinality(), prefix, analyseContext, needsLength, shortcutEndlessLoops);
+	}
+	
+	private TokenAnalysisPaths getTokenPaths(
+			AbstractElement path, String cardinality, TokenAnalysisPaths prefix, boolean analyseContext, boolean needsLength, boolean shortcutEndlessLoops
+	) {
+		// analyseContext implies needsLength
+		
 		if (prefix.isDone()) {
 			return prefix;
 		}
@@ -341,9 +388,9 @@ public class TokenAnalysis {
 			return result;
 		}
 		
-		if (isOptionalCardinality(path)) {
+		if (isVirtualOptionalCardinality(cardinality)) {
 			if (analyseContext) {
-				result = getTokenPathsContext(path, prefix, shortcutEndlessLoops);
+				result = getTokenPathsContext(path, prefix);
 			} else if (needsLength) {
 				throw new TokenAnalysisAbortedException("token expected but path is optional");
 			} else {
@@ -353,7 +400,7 @@ public class TokenAnalysis {
 			result = TokenAnalysisPaths.empty(prefix);
 		}
 		
-		boolean loop = isMultipleCardinality(path);
+		boolean loop = isVirtualMultipleCardinality(cardinality);
 		
 		int currentMinPosition = result.getMinPosition();
 		
@@ -365,7 +412,7 @@ public class TokenAnalysis {
 				result = result.merge(tokenPaths);
 				break;
 			} else if (analyseContext) {
-				tokenPaths = getTokenPathsContext(path, tokenPaths, shortcutEndlessLoops);
+				tokenPaths = getTokenPathsContext(path, tokenPaths);
 				result = result.merge(tokenPaths);
 			} else if (needsLength) {
 				throw new TokenAnalysisAbortedException("requested length not satisfyable");
@@ -401,9 +448,13 @@ public class TokenAnalysis {
 	private List<List<Token>> getTokenPaths(AbstractElement path, List<Integer> indexes, boolean analyseContext) throws TokenAnalysisAbortedException {
 		return getTokenPaths(path, new TokenAnalysisPaths(indexes), analyseContext, true, false).getTokenPaths();
 	}
+
+	private List<List<Token>> getTokenPaths(AbstractElement path, String virtualCardinality, List<Integer> indexes, boolean analyseContext) throws TokenAnalysisAbortedException {
+		return getTokenPaths(path, virtualCardinality, new TokenAnalysisPaths(indexes), analyseContext, true, false).getTokenPaths();
+	}
 	
 	private List<List<Token>> getTokenPathsContextOnly(AbstractElement path, List<Integer> indexes) {
-		return getTokenPathsContext(path, new TokenAnalysisPaths(indexes), false).getTokenPaths();
+		return getTokenPathsContext(path, new TokenAnalysisPaths(indexes)).getTokenPaths();
 	}
 	
 	private boolean arePathsIdenticalSymbolic(AbstractElement path1, AbstractElement path2) throws SymbolicAnalysisFailedException {
@@ -445,12 +496,14 @@ public class TokenAnalysis {
 			log.info("set2: " + tokenListSet2 + ", " + maxPosition2);
 			
 			if (!tokenListSet1.equals(tokenListSet2)) {
+				log.info("not identical");
 				return false;
 			}
 			
 			if (maxPosition1 < i + 1) {
 				// different max positions would have failed the equals-Operation
 				// if the max position is smaller than i + 1 the end of the path has been reached
+				log.info("identical");
 				return true;
 			}
 		}
@@ -518,7 +571,7 @@ public class TokenAnalysis {
 		}
 	}
 	
-	public List<List<Token>> findMinimalPathDifference(AbstractElement element) throws TokenAnalysisAbortedException {
+	public List<List<Token>> findMinimalPathDifference(AbstractElement element, String virtualCardinality) throws TokenAnalysisAbortedException {
 		// this method is for finding the path differences between the 
 		// element (with optional cardinality) and the context
 		
@@ -527,11 +580,13 @@ public class TokenAnalysis {
 		
 		MutablePrimitiveWrapper<List<List<Token>>> result = new MutablePrimitiveWrapper<List<List<Token>>>(null);
 		
+		log.info("cardinality: " + virtualCardinality);
+		
 		tokenCombinations(indexList -> {
 			log.info("current index list: " + indexList);
 			
 			// no context analysis // TODO why?
-			List<List<Token>> tokenListsForPath = getTokenPaths(element, indexList, false);
+			List<List<Token>> tokenListsForPath = getTokenPaths(element, virtualCardinality, indexList, false);
 			List<List<Token>> tokenListForContext = getTokenPathsContextOnly(element, indexList);
 				
 			if (!tokenListsForPath.stream()
