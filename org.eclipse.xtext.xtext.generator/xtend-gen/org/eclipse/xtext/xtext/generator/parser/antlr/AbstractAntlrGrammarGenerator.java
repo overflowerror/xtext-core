@@ -641,7 +641,7 @@ public abstract class AbstractAntlrGrammarGenerator {
     _builder.append(_name);
     _builder.newLineIfNotEmpty();
     {
-      if ((it instanceof ParserRule)) {
+      if (((it instanceof ParserRule) && this.originalGrammar.isDebug())) {
         _builder.append("// Guard: ");
         String _renderDescription = this._hoistingProcessor.findGuardForRule(it).renderDescription();
         _builder.append(_renderDescription);

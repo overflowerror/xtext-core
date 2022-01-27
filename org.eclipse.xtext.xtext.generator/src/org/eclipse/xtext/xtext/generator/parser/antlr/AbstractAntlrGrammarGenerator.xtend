@@ -293,7 +293,7 @@ abstract class AbstractAntlrGrammarGenerator {
 	
 	protected def String compileEBNF(AbstractRule it, AntlrOptions options) '''
 		// Rule «originalElement.name»
-		«IF it instanceof ParserRule»
+		«IF it instanceof ParserRule && originalGrammar.isDebug»
 		// Guard: «findGuardForRule.renderDescription»
 		«ENDIF»
 		«ruleName»«compileInit(options)»:

@@ -17,7 +17,7 @@ import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.Guard;
 public class JavaCodeUtils {
 	static public String getSource(JavaCode code) {
 		String source = code.getSource();
-		return source.substring(2, source.length() - 2);
+		return source.substring(2, source.length() - 2).trim();
 	}
 	
 	static public String formatCodeForGrammar(String code) {
