@@ -20,10 +20,12 @@ import org.eclipse.xtext.xtext.generator.model.IXtextGeneratorFileSystemAccess
 import com.google.inject.Injector
 import org.eclipse.xtext.xtext.generator.parser.antlr.AntlrDebugProductionGrammarGenerator
 import org.eclipse.xtext.xtext.generator.parser.antlr.AntlrDebugContentAssistGrammarGenerator
+import org.junit.Ignore
 
 /**
  * @author overflow - Initial contribution and API
  */
+@Ignore
 class HoistingGeneratorBenchmark extends AbstractXtextTests {
 	
 	val REPETITIONS = 1000

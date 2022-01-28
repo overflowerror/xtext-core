@@ -22,11 +22,13 @@ import org.eclipse.xtext.xtext.generator.model.IXtextGeneratorFileSystemAccess;
 import org.eclipse.xtext.xtext.generator.parser.antlr.AntlrDebugContentAssistGrammarGenerator;
 import org.eclipse.xtext.xtext.generator.parser.antlr.AntlrDebugProductionGrammarGenerator;
 import org.eclipse.xtext.xtext.generator.parser.antlr.AntlrOptions;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * @author overflow - Initial contribution and API
  */
+@Ignore
 @SuppressWarnings("all")
 public class HoistingGeneratorBenchmark extends AbstractXtextTests {
   public static class InMemFSA extends InMemoryFileSystemAccess implements IXtextGeneratorFileSystemAccess {
