@@ -114,6 +114,8 @@ public class DebugUtils {
 			};
 		}.doSwitch(element);
 		
+		builder.append(Objects.toString(element.getCardinality(), ""));
+		
 		builder.append("\n");
 	}
 	
