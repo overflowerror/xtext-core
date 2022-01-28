@@ -63,12 +63,14 @@ import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token.Token;
 import static org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.DebugUtils.*;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.StreamUtils;
 
+import com.google.inject.Singleton;
+
 /**
  * @author overflow - Initial contribution and API
  */
+@Singleton
 public class HoistingProcessor {
-	private Map<String, HoistingGuard> ruleCache = new HashMap<>();
-	private Map<Group, HoistingGuard> groupCache = new HashMap<>();
+	private Map<String, HoistingGuard> elementCache = new HashMap<>();
 	
 	private Logger log = Logger.getLogger(this.getClass());
 	
@@ -115,7 +117,7 @@ public class HoistingProcessor {
 				)
 			);
 		} catch(TokenAnalysisAbortedException e) {
-			throw new TokenAnalysisAbortedException(e.getMessage(), e, currentRule);
+			throw new TokenAnalysisAbortedException(e, currentRule);
 		}
 	}
 
@@ -343,87 +345,19 @@ public class HoistingProcessor {
 	}
 	
 	private HoistingGuard findGuardForGroup(Group group, AbstractRule currentRule) {
-		log.info("find guard for group");
-		
 		GroupGuard groupGuard = new GroupGuard();
 		
-		Iterator<AbstractElement> iterator = group.getElements().iterator();
-		while (iterator.hasNext()) {
-			AbstractElement element = iterator.next();
+		for(AbstractElement element : group.getElements()) {
+			HoistingGuard guard = findGuardForElement(element, currentRule);
+			groupGuard.add(guard);
 			
-			String cardinality = element.getCardinality();
-			if (isTrivialCardinality(element) || isOneOrMoreCardinality(element)) {
-				
-				HoistingGuard guard = findGuardForElementWithTrivialCardinality(element, currentRule);
-				groupGuard.add(guard);
-				
-				// if cardinality is + and there is a terminal we don't need to consider
-				// the following elements
-				// if cardinality is + and there is no token the guard won't change even if the
-				// element could be repeated
-				if (guard.hasTerminal()) {
-					groupGuard.setHasTerminal();
-					break;
-				}
-			} else if (isOptionalCardinality(element)) {
-				// though not technically necessary, rewrite tree to context checks are not needed 
-				
-				// rewrite cardinality to alternatives
-				// A? B -> A B | B
-				// A* B -> A+ B | B -> A B | B (see above)
-				
-				// make copy of every element because we can't use any element twice
-				List<AbstractElement> remainingElementsInGroup = StreamUtils.fromIterator(iterator)
-						.collect(Collectors.toList());
-				
-				if (remainingElementsInGroup.isEmpty()) {
-					// B is empty
-					// context will be taken from parent element
-					
-					HoistingGuard guard = findGuardForOptionalCardinalityWithoutContext(element, currentRule);
-					groupGuard.add(guard);
-					
-					if (guard.hasTerminal()) {
-						groupGuard.setHasTerminal();
-					}
-					
-					// there are no following elements
-					break;
-				} else {
-					// B is non-empty
-					// -> construct context for alternatives
-					
-					// we need a clone of the element because we need to set the cardinality without changing the
-					// original syntax tree
-					AbstractElement clonedElement = copy(element);
-					clonedElement.setCardinality(null);
-					
-					// make copy of first branch and add the cloned element
-					List<AbstractElement> remainingElementsInGroupIncludingCurrent = new LinkedList<>(remainingElementsInGroup);
-					remainingElementsInGroupIncludingCurrent.add(0, clonedElement);
-							
-					Group virtualPathRemaining = XtextFactory.eINSTANCE.createGroup();
-					setElementsOfCompoundElement(virtualPathRemaining, remainingElementsInGroup);
-					
-					Group virtualPathRemainingPlusCurrent = XtextFactory.eINSTANCE.createGroup();
-					setElementsOfCompoundElement(virtualPathRemainingPlusCurrent, remainingElementsInGroupIncludingCurrent);
-					
-					Alternatives virtualAlternatives = XtextFactory.eINSTANCE.createAlternatives();
-					setElementsOfCompoundElement(virtualAlternatives, Arrays.asList(virtualPathRemaining, virtualPathRemainingPlusCurrent));
-					
-					// get Guard for virtual alternatives
-					HoistingGuard guard = findGuardForElementWithTrivialCardinality(virtualAlternatives, currentRule);
-					groupGuard.add(guard);
-					
-					if (guard.hasTerminal()) {
-						groupGuard.setHasTerminal();
-					}
-
-					// following elements are included in alternative, no need to check further
-					break;
-				}
-			} else {
-				throw new IllegalArgumentException("unknown cardinality: " + cardinality);
+			// if cardinality is + and there is a terminal we don't need to consider
+			// the following elements
+			// if cardinality is + and there is no token the guard won't change even if the
+			// element could be repeated
+			if (guard.hasTerminal()) {
+				groupGuard.setHasTerminal();
+				break;
 			}
 		}
 		
@@ -433,13 +367,7 @@ public class HoistingProcessor {
 	// TODO: make private
 	public HoistingGuard findGuardForRule(AbstractRule rule) {
 		log.info("finding guard for rule: " + rule.getName());
-		HoistingGuard guard = ruleCache.get(rule.getName());
-		if (guard == null) {
-			log.info("not in cache");
-			guard = findGuardForElement(rule.getAlternatives(), rule);
-			ruleCache.put(rule.getName(), guard);
-		}
-		return guard;
+		return findGuardForElement(rule.getAlternatives(), rule);
 	}
 	
 	private boolean pathHasTokenOrAction(AbstractElement path) {
@@ -520,15 +448,26 @@ public class HoistingProcessor {
 	}
 	
 	private HoistingGuard findGuardForElement(AbstractElement element, AbstractRule currentRule) {
+		String path = getPathOfElement(element);
+		
+		HoistingGuard guard = null;//elementCache.get(path);
+		if (guard != null) {
+			log.info("from cache: " + path);
+			return guard;
+		}
+		
 		if (isTrivialCardinality(element) ||
 			isOneOrMoreCardinality(element)
 		) {
-			return findGuardForElementWithTrivialCardinality(element, currentRule);
+			guard = findGuardForElementWithTrivialCardinality(element, currentRule);
 		} else if (isOptionalCardinality(element)) {
-			return findGuardForOptionalCardinalityWithoutContext(element, currentRule);
+			guard = findGuardForOptionalCardinalityWithoutContext(element, currentRule);
 		} else {
 			throw new IllegalArgumentException("unknown cardinality: " + element.getCardinality());
 		}
+		
+		elementCache.put(path, guard);
+		return guard;
 	}
 	
 	private HoistingGuard findGuardForElementWithTrivialCardinality(AbstractElement element, AbstractRule currentRule) {
@@ -538,12 +477,7 @@ public class HoistingProcessor {
 		if (element instanceof Alternatives) {
 			return findGuardForAlternatives((Alternatives) element, currentRule);
 		} else if (element instanceof Group) {
-			HoistingGuard guard = groupCache.get(element);
-			if (guard == null) {
-				guard = findGuardForGroup((Group) element, currentRule);
-				groupCache.put((Group) element, guard);
-			}
-			return guard;
+			return findGuardForGroup((Group) element, currentRule);
 		} else if (element instanceof AbstractSemanticPredicate) {
 			return new PredicateGuard((AbstractSemanticPredicate) element);
 		} else if (Token.isToken(element)) {

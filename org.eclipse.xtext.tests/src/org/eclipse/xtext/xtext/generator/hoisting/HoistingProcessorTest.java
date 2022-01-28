@@ -288,7 +288,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("((" + getSyntaxForKeywordToken("s", 1) + " || (p1)) && (" + getSyntaxForKeywordToken("a", 1) + " || (p0)))", guard.render());
+		assertEquals("(" + getSyntaxForKeywordToken("a", 1) + " || (p0))", guard.render());
 	}
 	
 	@Test
@@ -344,7 +344,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("((" + getSyntaxForKeywordToken("s", 1) + " || (p1)) && (" + getSyntaxForKeywordToken("a", 1) + " || (p0)))", guard.render());
+		assertEquals("(" + getSyntaxForKeywordToken("a", 1) + " || (p0))", guard.render());
 	}
 	
 	@Test
@@ -443,6 +443,7 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
+			"hoistingDebug\n" +
 			"S: ($$ p0 $$?=> 'a')? & ($$ p1 $$?=> 'b');";
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
