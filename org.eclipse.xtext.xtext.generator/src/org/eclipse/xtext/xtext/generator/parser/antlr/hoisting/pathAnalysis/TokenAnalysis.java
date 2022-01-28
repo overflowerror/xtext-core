@@ -40,6 +40,7 @@ import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.HoistingConfigura
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.NestedPrefixAlternativesException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.SymbolicAnalysisFailedException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.TokenAnalysisAbortedException;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.UnsupportedConstructException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token.Token;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.DebugUtils;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.MutablePrimitiveWrapper;
@@ -97,14 +98,13 @@ public class TokenAnalysis {
 		CompoundElement compoundContainer = (CompoundElement) container;
 		
 		if (compoundContainer == null) {
-			log.info("no container");
+			if (config.isDebug())
+				log.info("no container");
 			// no container element; this is last element in a rule definition
 			AbstractRule rule = containingRule(last);
 			List<RuleCall> calls = findAllRuleCalls(grammar, rule).stream()
 					.filter(Predicate.not(visited::contains))
 					.collect(Collectors.toList());
-			
-			log.info("current rule: " + (rule == null ? "null" : rule.getName()));
 			
 			if (isStartRule(grammar, rule)) {
 				// context is EOF
@@ -118,14 +118,14 @@ public class TokenAnalysis {
 			}
 			
 		} else if (compoundContainer instanceof Group) {
-			log.info("group container");
+			if (config.isDebug())
+				log.info("group container");
 			
 			List<AbstractElement> elements = compoundContainer.getElements();
 			int index = elements.indexOf(last);
 			if (index < 0) {
-				log.error("context analysis: element not part of compound");
-				log.info(last.eClass().getName());
-				log.info(abstractElementToString(compoundContainer));
+				throw new UnsupportedConstructException("context analysis: element not part of compound: " + 
+						last.eClass().getName() + " in " + abstractElementToString(compoundContainer));
 			}
 			
 			int size = elements.size();
@@ -152,12 +152,11 @@ public class TokenAnalysis {
 					result.add(compoundContainer);
 				}
 				
-				log.info("last element; container: " + abstractElementToShortString(compoundContainer));
-				
 				result.addAll(getNextElementsInContext(compoundContainer, considerCardinalities, visited));
 			}
 		} else if (compoundContainer instanceof UnorderedGroup) {
-			log.info("unordered group container");
+			if (config.isDebug())
+				log.info("unordered group container");
 			
 			if (considerCardinalities) {
 				result.addAll(compoundContainer.getElements().stream()
@@ -177,18 +176,20 @@ public class TokenAnalysis {
 	}
 	
 	private TokenAnalysisPaths getTokenPathsContext(AbstractElement last, TokenAnalysisPaths prefix, boolean considerCardinalities, Set<AbstractElement> callStack) {
-		log.info("get context for: " + abstractElementToShortString(last) + (considerCardinalities ? " with" : " without") + " cardinalities");
+		if (config.isDebug())
+			log.info("get context for: " + abstractElementToShortString(last) + (considerCardinalities ? " with" : " without") + " cardinalities");
 		
 		List<AbstractElement> context = getNextElementsInContext(last, considerCardinalities);
 		
-		log.info(context.size());
-		log.info(context.stream().map(DebugUtils::abstractElementToShortString).collect(Collectors.toList()));
+		if (config.isDebug())
+			log.info(context.stream().map(DebugUtils::abstractElementToShortString).collect(Collectors.toList()));
 				
 		TokenAnalysisPaths result = TokenAnalysisPaths.empty(prefix);
 		
 		int actualNumberOfElements = 0;
 		for (AbstractElement element : context) {
-			log.info("context element: " + abstractElementToShortString(element));
+			if (config.isDebug())
+				log.info("context element: " + abstractElementToShortString(element));
 			TokenAnalysisPaths path = new TokenAnalysisPaths(prefix);
 			path.resetProgress();
 			// shortcut endless loops instead of throwing exception
@@ -212,7 +213,8 @@ public class TokenAnalysis {
 			if (path.isDone()) {
 				result = result.merge(path);
 			} else {
-				log.info("context analysis failed");
+				if (config.isDebug())
+					log.info("context analysis failed");
 				throw new TokenAnalysisAbortedException("context analysis failed");
 			}
 			actualNumberOfElements++;
@@ -222,8 +224,9 @@ public class TokenAnalysis {
 			// TODO: is this special case n)ecessary?
 			throw new TokenAnalysisAbortedException("context analysis failed: no context");
 		}
-			
-		log.info("done");
+		
+		if (config.isDebug())
+			log.info("done");
 		return result;
 	}
 	
@@ -248,9 +251,7 @@ public class TokenAnalysis {
 		
 		return result;
 	}
-	private TokenAnalysisPaths getTokenPathsTrivial(UnorderedGroup path, TokenAnalysisPaths prefix, boolean shortcutEndlessLoops) {
-		log.info("unordered group");
-		
+	private TokenAnalysisPaths getTokenPathsTrivial(UnorderedGroup path, TokenAnalysisPaths prefix, boolean shortcutEndlessLoops) {		
 		TokenAnalysisPaths result;
 		TokenAnalysisPaths current;
 		
@@ -263,15 +264,10 @@ public class TokenAnalysis {
 		int currentPosition = result.getMinPosition();
 		
 		do {
-			log.info("unordered group loop");
-			
 			current = TokenAnalysisPaths.empty(result);
 			current.resetProgress();
 			for (AbstractElement element : path.getElements()) {
-				log.info(abstractElementToShortString(element));
-				log.info(current.hasProgress() + " - " + current.getSize());
 				current = current.merge(getTokenPaths(element, result, false, false, shortcutEndlessLoops));
-				log.info(current.hasProgress() + " - " + current.getSize());
 			}
 			
 			result.resetProgress();
@@ -457,17 +453,11 @@ public class TokenAnalysis {
 		return getTokenPathsContext(path, new TokenAnalysisPaths(indexes)).getTokenPaths();
 	}
 	
-	private boolean arePathsIdenticalSymbolic(AbstractElement path1, AbstractElement path2) throws SymbolicAnalysisFailedException {
-		// ignore symbolic analysis for the moment
-		// TODO
-		throw new SymbolicAnalysisFailedException(); 
-	}
-	
 	private List<Integer> range(int i, int j) {
 		return IntStream.rangeClosed(i, j).boxed().collect(Collectors.toList());
 	}
 	
-	private boolean arePathsIdenticalFallback(AbstractElement path1, AbstractElement path2) {
+	public boolean arePathsIdentical(AbstractElement path1, AbstractElement path2) {
 		if (config.isDebug()) {
 			log.info("path1: " + abstractElementToString(path1));
 			log.info("path2: " + abstractElementToString(path2));
@@ -492,18 +482,13 @@ public class TokenAnalysis {
 			int maxPosition1 = tokenPaths1.getMaxPosition();
 			int maxPosition2 = tokenPaths2.getMaxPosition();
 			
-			log.info("set1: " + tokenListSet1 + ", " + maxPosition1);
-			log.info("set2: " + tokenListSet2 + ", " + maxPosition2);
-			
 			if (!tokenListSet1.equals(tokenListSet2)) {
-				log.info("not identical");
 				return false;
 			}
 			
 			if (maxPosition1 < i + 1) {
 				// different max positions would have failed the equals-Operation
 				// if the max position is smaller than i + 1 the end of the path has been reached
-				log.info("identical");
 				return true;
 			}
 		}
@@ -512,14 +497,6 @@ public class TokenAnalysis {
 		// we can't analyze the paths any further
 		// TODO maybe assume paths are equal and show warning instead of exception
 		throw new TokenAnalysisAbortedException("token limit exhausted while looking for identical paths");
-	}
-	
-	public boolean arePathsIdentical(AbstractElement path1, AbstractElement path2) {
-		try {
-			return arePathsIdenticalSymbolic(path1, path2);
-		} catch (SymbolicAnalysisFailedException e) {
-			return arePathsIdenticalFallback(path1, path2);
-		}
 	}
 	
 	private void tokenCombinations(Function<List<Integer>, Boolean> callback) {
@@ -560,7 +537,9 @@ public class TokenAnalysis {
 						return true;
 					}
 				} catch (TokenAnalysisAbortedException e) {
-					log.info("token combinations: " + e.getMessage());
+					if (config.isDebug())
+						log.info("tokens exhausted: " + e.getMessage());
+					
 					// tokens exhausted; abort current prefix
 					// set limit for calling functions so this index is not checked again
 					limit.set(i);
@@ -580,10 +559,7 @@ public class TokenAnalysis {
 		
 		MutablePrimitiveWrapper<List<List<Token>>> result = new MutablePrimitiveWrapper<List<List<Token>>>(null);
 		
-		log.info("cardinality: " + virtualCardinality);
-		
 		tokenCombinations(indexList -> {
-			log.info("current index list: " + indexList);
 			
 			// no context analysis // TODO why?
 			List<List<Token>> tokenListsForPath = getTokenPaths(element, virtualCardinality, indexList, false);
@@ -619,15 +595,15 @@ public class TokenAnalysis {
 		}
 		
 		tokenCombinations(indexList -> {
-			log.info("current index list: " + indexList);
 			
 			// will throw TokenAnalysisAborted if any path is too short
 			List<List<List<Token>>> tokenListsForPaths = paths.stream()
-					//.peek(p -> log.info("next path: " + p))
+					.peek(p -> {
+						if (config.isDebug())
+							log.info("next path: " + p);
+					})
 					.map(p -> getTokenPaths(p, indexList, true))
 					.collect(Collectors.toList());
-
-			log.info("token lists: " + tokenListsForPaths);
 			
 			int size = result.size();
 			for (int i = 0; i < size; i++) {

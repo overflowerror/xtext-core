@@ -123,9 +123,7 @@ public class HoistingGeneratorBenchmark extends AbstractXtextTests {
       final Injector injector = Guice.createInjector(_defaultGeneratorModule);
       final HoistingGeneratorBenchmark.InMemFSA inMem = new HoistingGeneratorBenchmark.InMemFSA();
       final AntlrOptions options = new AntlrOptions();
-      System.out.println("production grammar");
       injector.<AntlrDebugProductionGrammarGenerator>getInstance(AntlrDebugProductionGrammarGenerator.class).generate(grammar, options, inMem);
-      System.out.println("content assist grammar");
       injector.<AntlrDebugContentAssistGrammarGenerator>getInstance(AntlrDebugContentAssistGrammarGenerator.class).generate(grammar, options, inMem);
     } catch (Throwable _e) {
       throw Exceptions.sneakyThrow(_e);

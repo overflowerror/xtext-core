@@ -226,7 +226,8 @@ public class HoistingProcessor {
 	boolean hasSeen = false;
 	
 	private HoistingGuard findGuardForAlternatives(CompoundElement alternatives, AbstractRule currentRule, boolean skipCache) {
-		log.info("find guard for alternative");
+		if (config.isDebug())
+			log.info("find guard for alternative");
 		
 		List<AbstractElement> paths = new ArrayList<>(alternatives.getElements());
 		List<MergedPathGuard> guards = paths.stream()
@@ -246,7 +247,8 @@ public class HoistingProcessor {
 			}
 		}
 
-		log.info("path identity check");
+		if (config.isDebug())
+			log.info("path identity check");
 		int size = paths.size();
 		try {
 			for (int i = 0; i < size; i++) {
@@ -265,15 +267,17 @@ public class HoistingProcessor {
 			throw new TokenAnalysisAbortedException(e.getMessage(), e, currentRule);
 		}
 		
-		log.info("paths:" + paths);
+		if (config.isDebug())
+			log.info("paths:" + paths);
 		
-		log.info("minimal path difference");
+		if (config.isDebug())
+			log.info("minimal path difference");
 		
 		// if all paths are empty the above step will eliminate all paths
 		// -> size = 1
 		if (size > 1) {
 			try {
-				AlternativesGuard result = StreamUtils.zip(
+				return StreamUtils.zip(
 					analysis.findMinimalPathDifference(paths).stream()
 						.map(a -> a.stream()
 							.map(s -> s.stream()
@@ -281,21 +285,15 @@ public class HoistingProcessor {
 									.collect(Collectors.toList())
 							)
 							.map(TokenSequenceGuard::new)
-							.peek(g -> log.info(g))
 							.map(TokenGuard::reduce)
-							.peek(g -> log.info(g))
 							.collect(Collectors.toList())
 						)
 						.map(AlternativeTokenSequenceGuard::new)
-						.peek(g -> log.info(g))
-						.map(TokenGuard::reduce)
-						.peek(g -> log.info(g)),
+						.map(TokenGuard::reduce),
 					guards.stream(),
 					(TokenGuard tokenGuard, MergedPathGuard pathGuard) -> Tuples.pair(tokenGuard, pathGuard)
 				).map(p -> new PathGuard(p.getFirst(), p.getSecond()))
 				.collect(AlternativesGuard.collector());
-				log.info(result);
-				return result;
 			} catch(NestedPrefixAlternativesException e) {
 				// nested prefix alternatives
 				// -> flatten paths to alternative and try again
@@ -364,7 +362,8 @@ public class HoistingProcessor {
 	
 	// TODO: make private
 	public HoistingGuard findGuardForRule(AbstractRule rule) {
-		log.info("finding guard for rule: " + rule.getName());
+		if (config.isDebug())
+			log.info("finding guard for rule: " + rule.getName());
 		return findGuardForElement(rule.getAlternatives(), rule, false);
 	}
 	
@@ -453,7 +452,8 @@ public class HoistingProcessor {
 			path = getPathOfElement(element);
 			guard = elementCache.get(path);
 			if (guard != null) {
-				log.info("from cache: " + path);
+				if (config.isDebug())
+					log.info("from cache: " + path);
 				return guard;
 			}
 		}

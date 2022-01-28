@@ -72,9 +72,7 @@ class HoistingGeneratorBenchmark extends AbstractXtextTests {
 		val injector = Guice.createInjector(new DefaultGeneratorModule)
 		val inMem = new InMemFSA
 		val options = new AntlrOptions
-		System.out.println("production grammar")
 		injector.getInstance(AntlrDebugProductionGrammarGenerator).generate(grammar, options, inMem)
-		System.out.println("content assist grammar");
 		injector.getInstance(AntlrDebugContentAssistGrammarGenerator).generate(grammar, options, inMem)
 	}
 	
