@@ -769,4 +769,38 @@ public class GrammarUtil {
 		// and changes to the copied path will be considered for .equals()
 		return grammar.getRules().get(0).getName().equals(rule.getName());
 	}
+	
+	public static String getPathOfElement(AbstractRule element) {
+		return element.getName();
+	}
+	
+	public static String getPathOfElement(AbstractElement element) {
+		String path = element.eClass().getName();
+		EObject container = element;
+		EObject _element = element;
+		while (
+			container != null && (
+				container == element || (
+					!(container instanceof AbstractElement) &&
+					!(container instanceof AbstractRule)
+				)
+			)
+		) {
+			_element = container;
+			container = container.eContainer();
+		}
+		
+		if (container == null) {
+			System.out.println("no container: " + element.eClass().getName());
+			return path;
+		} else if (container instanceof CompoundElement) {
+			CompoundElement compoundElement = (CompoundElement) container;
+			int i = compoundElement.getElements().indexOf(_element);
+			return getPathOfElement(compoundElement) + "." + i + "." + path;
+		} else if (container instanceof AbstractRule) {
+			return getPathOfElement((AbstractRule) container) + "." + path;
+		} else {
+			return getPathOfElement((AbstractElement) container) + "." + path;
+		}
+	}
 }

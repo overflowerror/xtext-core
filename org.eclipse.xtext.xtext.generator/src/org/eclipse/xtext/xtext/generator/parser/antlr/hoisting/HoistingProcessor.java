@@ -11,8 +11,6 @@ package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -82,8 +80,8 @@ public class HoistingProcessor {
 		analysis = new TokenAnalysis(config, grammar);
 	}
 	
-	private HoistingGuard findGuardForOptionalCardinalityWithoutContext(AbstractElement element, AbstractRule currentRule) {
-		HoistingGuard pathGuard = findGuardForElementWithTrivialCardinality(element, currentRule);
+	private HoistingGuard findGuardForOptionalCardinalityWithoutContext(AbstractElement element, AbstractRule currentRule, boolean skipCache) {
+		HoistingGuard pathGuard = findGuardForElementWithTrivialCardinality(element, currentRule, skipCache);
 		
 		if (pathGuard.isTrivial()) {
 			// path can be skipped
@@ -227,12 +225,12 @@ public class HoistingProcessor {
 	
 	boolean hasSeen = false;
 	
-	private HoistingGuard findGuardForAlternatives(CompoundElement alternatives, AbstractRule currentRule) {
+	private HoistingGuard findGuardForAlternatives(CompoundElement alternatives, AbstractRule currentRule, boolean skipCache) {
 		log.info("find guard for alternative");
 		
 		List<AbstractElement> paths = new ArrayList<>(alternatives.getElements());
 		List<MergedPathGuard> guards = paths.stream()
-				.map(p -> findGuardForElement(p, currentRule))
+				.map(p -> findGuardForElement(p, currentRule, skipCache))
 				.map(MergedPathGuard::new)
 				.collect(Collectors.toList());
 		
@@ -324,7 +322,7 @@ public class HoistingProcessor {
 				}
 				hasSeen=true;*/
 				
-				return findGuardForAlternatives(flattened, currentRule);
+				return findGuardForAlternatives(flattened, currentRule, true);
 			} catch(TokenAnalysisAbortedException e) {
 				throw new TokenAnalysisAbortedException(e.getMessage(), e, currentRule);
 			}
@@ -333,7 +331,7 @@ public class HoistingProcessor {
 		}
 	}
 	
-	private HoistingGuard findGuardForUnorderedGroup(UnorderedGroup element, AbstractRule currentRule) {
+	private HoistingGuard findGuardForUnorderedGroup(UnorderedGroup element, AbstractRule currentRule, boolean skipCache) {
 		// Unordered group (A & B) is the same as (A | B)+ or (A | B)* (if A and B are optional)
 		// but the cardinality doesn't matter for hoisting
 		// if A and B are optional the guard for the alternatives need to check the context
@@ -341,14 +339,14 @@ public class HoistingProcessor {
 		
 		// TODO: check if hasTerminal is valid
 		
-		return findGuardForAlternatives(element, currentRule);
+		return findGuardForAlternatives(element, currentRule, skipCache);
 	}
 	
-	private HoistingGuard findGuardForGroup(Group group, AbstractRule currentRule) {
+	private HoistingGuard findGuardForGroup(Group group, AbstractRule currentRule, boolean skipCache) {
 		GroupGuard groupGuard = new GroupGuard();
 		
 		for(AbstractElement element : group.getElements()) {
-			HoistingGuard guard = findGuardForElement(element, currentRule);
+			HoistingGuard guard = findGuardForElement(element, currentRule, skipCache);
 			groupGuard.add(guard);
 			
 			// if cardinality is + and there is a terminal we don't need to consider
@@ -367,7 +365,7 @@ public class HoistingProcessor {
 	// TODO: make private
 	public HoistingGuard findGuardForRule(AbstractRule rule) {
 		log.info("finding guard for rule: " + rule.getName());
-		return findGuardForElement(rule.getAlternatives(), rule);
+		return findGuardForElement(rule.getAlternatives(), rule, false);
 	}
 	
 	private boolean pathHasTokenOrAction(AbstractElement path) {
@@ -394,7 +392,6 @@ public class HoistingProcessor {
 		}
 	}
 	
-	@SuppressWarnings("unused")
 	private boolean pathHasHoistablePredicate(AbstractElement path) {
 		// we are only interested in whether or not there could be any hoistable predicate on this path
 		// -> ignore cardinality
@@ -433,9 +430,9 @@ public class HoistingProcessor {
 		
 		AbstractRule rule = containingParserRule(element);
 		if (element instanceof UnorderedGroup) {
-			return findGuardForAlternatives(((CompoundElement) element), rule);
+			return findGuardForAlternatives(((CompoundElement) element), rule, false);
 		} else {
-			return findGuardForElementWithTrivialCardinality(element, rule);
+			return findGuardForElementWithTrivialCardinality(element, rule, false);
 		}
 	}
 	
@@ -444,40 +441,47 @@ public class HoistingProcessor {
 			log.info("hoisting guard of: \n" + abstractElementToString(element));
 		
 		// should only be called for valid AST elements, so element can never be floating
-		return findGuardForElement(element, containingParserRule(element));
+		return findGuardForElement(element, containingParserRule(element), false);
 	}
 	
-	private HoistingGuard findGuardForElement(AbstractElement element, AbstractRule currentRule) {
-		String path = getPathOfElement(element);
-		
-		HoistingGuard guard = null;//elementCache.get(path);
-		if (guard != null) {
-			log.info("from cache: " + path);
-			return guard;
+	private HoistingGuard findGuardForElement(AbstractElement element, AbstractRule currentRule, boolean skipCache) {
+
+		String path = null; 
+		HoistingGuard guard;
+
+		if (!skipCache) {
+			path = getPathOfElement(element);
+			guard = elementCache.get(path);
+			if (guard != null) {
+				log.info("from cache: " + path);
+				return guard;
+			}
 		}
 		
 		if (isTrivialCardinality(element) ||
 			isOneOrMoreCardinality(element)
 		) {
-			guard = findGuardForElementWithTrivialCardinality(element, currentRule);
+			guard = findGuardForElementWithTrivialCardinality(element, currentRule, skipCache);
 		} else if (isOptionalCardinality(element)) {
-			guard = findGuardForOptionalCardinalityWithoutContext(element, currentRule);
+			guard = findGuardForOptionalCardinalityWithoutContext(element, currentRule, skipCache);
 		} else {
 			throw new IllegalArgumentException("unknown cardinality: " + element.getCardinality());
 		}
 		
-		elementCache.put(path, guard);
+		if (!skipCache) {
+			elementCache.put(path, guard);
+		}
 		return guard;
 	}
 	
-	private HoistingGuard findGuardForElementWithTrivialCardinality(AbstractElement element, AbstractRule currentRule) {
+	private HoistingGuard findGuardForElementWithTrivialCardinality(AbstractElement element, AbstractRule currentRule, boolean skipCache) {
 		if (config.isDebug())
 			log.info(currentRule.getName() + ": " + abstractElementToShortString(element));
 		
 		if (element instanceof Alternatives) {
-			return findGuardForAlternatives((Alternatives) element, currentRule);
+			return findGuardForAlternatives((Alternatives) element, currentRule, skipCache);
 		} else if (element instanceof Group) {
-			return findGuardForGroup((Group) element, currentRule);
+			return findGuardForGroup((Group) element, currentRule, skipCache);
 		} else if (element instanceof AbstractSemanticPredicate) {
 			return new PredicateGuard((AbstractSemanticPredicate) element);
 		} else if (Token.isToken(element)) {
@@ -491,9 +495,9 @@ public class HoistingProcessor {
 		} else if (element instanceof JavaAction) {
 			return HoistingGuard.action();
 		} else if (element instanceof UnorderedGroup) {
-			return findGuardForUnorderedGroup((UnorderedGroup) element, currentRule);
+			return findGuardForUnorderedGroup((UnorderedGroup) element, currentRule, skipCache);
 		} else if (element instanceof Assignment) {
-			return findGuardForElement(((Assignment) element).getTerminal(), currentRule);
+			return findGuardForElement(((Assignment) element).getTerminal(), currentRule, skipCache);
 		} else {
 			if (!pathHasHoistablePredicate(currentRule.getAlternatives())) {
 				// unsupported construct but rule doesn't contain hoistable predicates
