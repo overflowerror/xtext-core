@@ -13,13 +13,13 @@ import java.util.function.Function;
 /**
  * @author overflow - Initial contribution and API
  */
-public class MutablePrimitiveWrapper<T> {
+public class MutableWrapper<T> {
 	private T value;
 	
-	public MutablePrimitiveWrapper() {
+	public MutableWrapper() {
 	}	
 	
-	public MutablePrimitiveWrapper(T value) {
+	public MutableWrapper(T value) {
 		this.value = value;
 	}
 	

@@ -223,8 +223,6 @@ public class HoistingProcessor {
 		return flattened;
 	}
 	
-	boolean hasSeen = false;
-	
 	private HoistingGuard findGuardForAlternatives(CompoundElement alternatives, AbstractRule currentRule, boolean skipCache) {
 		if (config.isDebug())
 			log.info("find guard for alternative");
@@ -315,11 +313,6 @@ public class HoistingProcessor {
 					throw new NestedPrefixAlternativesException("nested prefix alternatives can't be analysed because of too many paths");
 				}
 				
-				/*if (hasSeen) {
-					throw new RuntimeException();
-				}
-				hasSeen=true;*/
-				
 				return findGuardForAlternatives(flattened, currentRule, true);
 			} catch(TokenAnalysisAbortedException e) {
 				throw new TokenAnalysisAbortedException(e.getMessage(), e, currentRule);
@@ -335,8 +328,6 @@ public class HoistingProcessor {
 		// if A and B are optional the guard for the alternatives need to check the context
 		// if not the alternatives are actual alternatives
 		
-		// TODO: check if hasTerminal is valid
-		
 		return findGuardForAlternatives(element, currentRule, skipCache);
 	}
 	
@@ -347,10 +338,8 @@ public class HoistingProcessor {
 			HoistingGuard guard = findGuardForElement(element, currentRule, skipCache);
 			groupGuard.add(guard);
 			
-			// if cardinality is + and there is a terminal we don't need to consider
-			// the following elements
-			// if cardinality is + and there is no token the guard won't change even if the
-			// element could be repeated
+			// no need to consider the following elements if the current one has a terminal
+			// following elements can't be hoisted anyway
 			if (guard.hasTerminal()) {
 				groupGuard.setHasTerminal();
 				break;
@@ -360,72 +349,17 @@ public class HoistingProcessor {
 		return groupGuard;
 	}
 	
-	// TODO: make private
 	public HoistingGuard findGuardForRule(AbstractRule rule) {
+		// public so the AntlrGrammarGenerator can access it if debug mode is enabled
+		
 		if (config.isDebug())
 			log.info("finding guard for rule: " + rule.getName());
 		return findGuardForElement(rule.getAlternatives(), rule, false);
 	}
 	
-	private boolean pathHasTokenOrAction(AbstractElement path) {
-		// we are only interested in whether or not there could be any tokens on this path
-		// -> ignore cardinality
-		
-		if (Token.isToken(path)) {
-			return true;
-		} else if (isEnumRuleCall(path)) {
-			return true;
-		} else if (path instanceof JavaAction) {
-			return true;
-		} else if (isParserRuleCall(path)) {
-			// can not be self recursive since ANTLR uses LL(*) and therefore does not support left recursion
-			return pathHasTokenOrAction(((RuleCall) path).getRule().getAlternatives());
-		} else if (path instanceof Assignment) {
-			return pathHasTokenOrAction(((Assignment) path).getTerminal());
-		} else if (path instanceof CompoundElement) {
-			return ((CompoundElement) path).getElements().stream()
-					.anyMatch(this::pathHasTokenOrAction);
-		} else {
-			// Actions, Predicates, ...
-			return false;
-		}
-	}
-	
-	private boolean pathHasHoistablePredicate(AbstractElement path) {
-		// we are only interested in whether or not there could be any hoistable predicate on this path
-		// -> ignore cardinality
-		
-		if (path instanceof AbstractSemanticPredicate) {
-			return true;
-		} else if (isParserRuleCall(path)) {
-			// can not be self recursive since ANTLR uses LL(*) and therefore does not support left recursion
-			return pathHasHoistablePredicate(((RuleCall) path).getRule().getAlternatives());
-		} else if (path instanceof Assignment) {
-			return pathHasHoistablePredicate(((Assignment) path).getTerminal());
-		} else if (path instanceof Alternatives ||
-		           path instanceof UnorderedGroup) {
-			return ((CompoundElement) path).getElements().stream()
-					.anyMatch(this::pathHasHoistablePredicate);
-		} else if (path instanceof Group) {
-			for (AbstractElement element : ((CompoundElement) path).getElements()) {
-				if (pathHasHoistablePredicate(element)) {
-					return true;
-				}
-				if (pathHasTokenOrAction(element)) {
-					return false;
-				}
-			}
-			return false;
-		} else {
-			// Tokens, EnumRule, Actions, JavaActions, ...
-			return false;
-		}
-	}
-	
 	public HoistingGuard findHoistingGuardIgnoreCardinality(AbstractElement element) {
 		if (config.isDebug())
 			log.info("hoisting (trivial) guard of: \n" + abstractElementToString(element));
-		// should only be called for valid AST elements, so element can never be floating
 		
 		AbstractRule rule = containingParserRule(element);
 		if (element instanceof UnorderedGroup) {
@@ -439,12 +373,10 @@ public class HoistingProcessor {
 		if (config.isDebug())
 			log.info("hoisting guard of: \n" + abstractElementToString(element));
 		
-		// should only be called for valid AST elements, so element can never be floating
 		return findGuardForElement(element, containingParserRule(element), false);
 	}
 	
 	private HoistingGuard findGuardForElement(AbstractElement element, AbstractRule currentRule, boolean skipCache) {
-
 		String path = null; 
 		HoistingGuard guard;
 
@@ -458,7 +390,8 @@ public class HoistingProcessor {
 			}
 		}
 		
-		if (isTrivialCardinality(element) ||
+		if (
+			isTrivialCardinality(element) || 
 			isOneOrMoreCardinality(element)
 		) {
 			guard = findGuardForElementWithTrivialCardinality(element, currentRule, skipCache);
@@ -483,14 +416,18 @@ public class HoistingProcessor {
 		} else if (element instanceof Group) {
 			return findGuardForGroup((Group) element, currentRule, skipCache);
 		} else if (element instanceof AbstractSemanticPredicate) {
-			return new PredicateGuard((AbstractSemanticPredicate) element);
+			// TODO: change to GatedSemanticPredicate
+			return new PredicateGuard((AbstractSemanticPredicate) element);	
 		} else if (Token.isToken(element)) {
 			return HoistingGuard.terminal();
-		} else if (isParserRuleCall(element) ||
-		           isEnumRuleCall(element)) {
+		} else if (
+			isParserRuleCall(element) ||
+			isEnumRuleCall(element)
+		) {
 			RuleCall call = (RuleCall) element;
 			return findGuardForRule(call.getRule());
 		} else if (element instanceof Action) {
+			// this is an Xtext action, not a JavaAction
 			return HoistingGuard.unguarded();
 		} else if (element instanceof JavaAction) {
 			return HoistingGuard.action();
@@ -499,12 +436,7 @@ public class HoistingProcessor {
 		} else if (element instanceof Assignment) {
 			return findGuardForElement(((Assignment) element).getTerminal(), currentRule, skipCache);
 		} else {
-			if (!pathHasHoistablePredicate(currentRule.getAlternatives())) {
-				// unsupported construct but rule doesn't contain hoistable predicates
-				return HoistingGuard.unguarded();
-			} else {
-				throw new UnsupportedConstructException("element not supported: " + element.toString(), currentRule);
-			}
+			throw new UnsupportedConstructException("element not supported: " + element.toString(), currentRule);
 		}
 	}
 }

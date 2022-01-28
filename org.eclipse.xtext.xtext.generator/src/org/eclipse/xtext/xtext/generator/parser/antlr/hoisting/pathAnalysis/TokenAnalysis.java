@@ -8,6 +8,7 @@
  *******************************************************************************/
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.pathAnalysis;
 
+import static org.eclipse.xtext.GrammarUtil.*;
 import static org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.DebugUtils.*;
 
 import java.util.ArrayList;
@@ -38,14 +39,11 @@ import org.eclipse.xtext.UnorderedGroup;
 import org.eclipse.xtext.util.XtextSwitch;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.HoistingConfiguration;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.NestedPrefixAlternativesException;
-import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.SymbolicAnalysisFailedException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.TokenAnalysisAbortedException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.UnsupportedConstructException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token.Token;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.DebugUtils;
-import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.MutablePrimitiveWrapper;
-
-import static org.eclipse.xtext.GrammarUtil.*;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.MutableWrapper;
 
 /**
  * @author overflow - Initial contribution and API
@@ -71,15 +69,17 @@ public class TokenAnalysis {
 		AbstractElement _last = last;
 		AbstractElement container = last;
 		
-		while(container != null && (
+		while(
+			container != null && (
 				container == last ||
 				!(container instanceof CompoundElement) ||
 				container instanceof Alternatives
 			)
 		) {
 			EObject _container = _last;
-			while (_container == _last || 
-			       !(_container instanceof AbstractElement)
+			while (
+				_container == _last || 
+				!(_container instanceof AbstractElement)
 			) {
 				_container = _container.eContainer();
 				if (_container == null)
@@ -89,7 +89,7 @@ public class TokenAnalysis {
 			container = (AbstractElement) _container;
 			
 			if (considerCardinalities && last != _last && isMultipleCardinality(_last)) {
-				// last is + or * quantified
+				// last is + or * quantified, so it may be repeated -> add to result
 				result.add(_last);
 			}
 		}
@@ -100,23 +100,22 @@ public class TokenAnalysis {
 		if (compoundContainer == null) {
 			if (config.isDebug())
 				log.info("no container");
+			
 			// no container element; this is last element in a rule definition
 			AbstractRule rule = containingRule(last);
-			List<RuleCall> calls = findAllRuleCalls(grammar, rule).stream()
-					.filter(Predicate.not(visited::contains))
-					.collect(Collectors.toList());
 			
 			if (isStartRule(grammar, rule)) {
 				// context is EOF
 				result.add(null);
 			}
 			
-			for (RuleCall call : calls) {
-				Set<AbstractElement> _visited = new HashSet<>(visited);
-				_visited.add(call);
-				result.addAll(getNextElementsInContext(call, considerCardinalities, _visited));
-			}
-			
+			findAllRuleCalls(grammar, rule).stream()
+				.filter(Predicate.not(visited::contains))
+				.forEach(call -> {
+					Set<AbstractElement> _visited = new HashSet<>(visited);
+					_visited.add(call);
+					result.addAll(getNextElementsInContext(call, considerCardinalities, _visited));
+				});
 		} else if (compoundContainer instanceof Group) {
 			if (config.isDebug())
 				log.info("group container");
@@ -134,11 +133,13 @@ public class TokenAnalysis {
 			// skip simple non-token-elements
 			while (index < size - 1) {
 				next = elements.get(index + 1);
-				if (!(
+				if (
+					!(
 						(next instanceof Action) ||
 						(next instanceof JavaAction) ||
 						(next instanceof AbstractSemanticPredicate)
-				)) {
+					)
+				) {
 					break;
 				}
 					
@@ -175,9 +176,10 @@ public class TokenAnalysis {
 		return getTokenPathsContext(last, prefix, true, new HashSet<>());
 	}
 	
-	private TokenAnalysisPaths getTokenPathsContext(AbstractElement last, TokenAnalysisPaths prefix, boolean considerCardinalities, Set<AbstractElement> callStack) {
+	private TokenAnalysisPaths getTokenPathsContext(AbstractElement last, TokenAnalysisPaths prefix, boolean considerCardinalities, Set<AbstractElement> visitedElements) {
 		if (config.isDebug())
-			log.info("get context for: " + abstractElementToShortString(last) + (considerCardinalities ? " with" : " without") + " cardinalities");
+			log.info("get context for: " + abstractElementToShortString(last) + 
+				(considerCardinalities ? " with" : " without") + " cardinalities");
 		
 		List<AbstractElement> context = getNextElementsInContext(last, considerCardinalities);
 		
@@ -192,11 +194,13 @@ public class TokenAnalysis {
 				log.info("context element: " + abstractElementToShortString(element));
 			TokenAnalysisPaths path = new TokenAnalysisPaths(prefix);
 			path.resetProgress();
+			
 			// shortcut endless loops instead of throwing exception
 			path = getTokenPaths(element, path, false, false, true);
+			
 			if (!path.isDone() && element != null) {
 				boolean _considerCardinalities = considerCardinalities;
-				if (callStack.contains(element) && !path.hasProgress()) {
+				if (visitedElements.contains(element) && !path.hasProgress()) {
 					if (_considerCardinalities) {
 						_considerCardinalities = false;
 					} else {
@@ -206,9 +210,9 @@ public class TokenAnalysis {
 						continue;
 					}
 				}
-				Set<AbstractElement> localCallStack = new HashSet<>(callStack);
-				localCallStack.add(element);
-				path = getTokenPathsContext(element, path, _considerCardinalities, localCallStack);
+				Set<AbstractElement> localVisitedElements = new HashSet<>(visitedElements);
+				localVisitedElements.add(element);
+				path = getTokenPathsContext(element, path, _considerCardinalities, localVisitedElements);
 			}
 			if (path.isDone()) {
 				result = result.merge(path);
@@ -221,12 +225,16 @@ public class TokenAnalysis {
 		}
 		
 		if (actualNumberOfElements == 0) {
-			// TODO: is this special case n)ecessary?
+			// necessary in case all possible path are ignored
+			// (considerCardinalities is false, all elements were visited and there was no progress)
+
+			if (config.isDebug())
+				log.info("context analysis failed: no context");
 			throw new TokenAnalysisAbortedException("context analysis failed: no context");
 		}
 		
 		if (config.isDebug())
-			log.info("done");
+			log.info("context analysis done");
 		return result;
 	}
 	
@@ -314,12 +322,13 @@ public class TokenAnalysis {
 			};
 			@Override
 			public TokenAnalysisPaths caseRuleCall(RuleCall call) {
-				if (isParserRuleCall(call) || 
-				    isEnumRuleCall(call)
+				if (
+					isParserRuleCall(call) || 
+					isEnumRuleCall(call)
 				) {
 					return getTokenPaths(call.getRule().getAlternatives(), prefix, false, false, shortcutEndlessLoops);
 				} else {
-					// go to default case
+					// probably terminal rule call -> go to default case
 					return null;
 				}
 			};
@@ -333,7 +342,7 @@ public class TokenAnalysis {
 					return result;
 				} else {
 					// Actions, Predicates, JavaActions, ...
-					// create new state with out empty flag
+					// create new state without empty flag
 					return new TokenAnalysisPaths(prefix);
 				}
 			};
@@ -363,6 +372,7 @@ public class TokenAnalysis {
 			return result;
 		}
 		
+		// use actual cardinality from path
 		return getTokenPaths(path, path.getCardinality(), prefix, analyseContext, needsLength, shortcutEndlessLoops);
 	}
 	
@@ -441,16 +451,24 @@ public class TokenAnalysis {
 		return result;
 	}
 	
-	private List<List<Token>> getTokenPaths(AbstractElement path, List<Integer> indexes, boolean analyseContext) throws TokenAnalysisAbortedException {
-		return getTokenPaths(path, new TokenAnalysisPaths(indexes), analyseContext, true, false).getTokenPaths();
-	}
-
-	private List<List<Token>> getTokenPaths(AbstractElement path, String virtualCardinality, List<Integer> indexes, boolean analyseContext) throws TokenAnalysisAbortedException {
-		return getTokenPaths(path, virtualCardinality, new TokenAnalysisPaths(indexes), analyseContext, true, false).getTokenPaths();
+	private TokenAnalysisPaths getTokenPaths(AbstractElement path, List<Integer> indexes, boolean analyseContext, boolean needsLength, boolean shortcutEndlessLoops) {
+		return getTokenPaths(path, new TokenAnalysisPaths(indexes), analyseContext, needsLength, shortcutEndlessLoops);
 	}
 	
-	private List<List<Token>> getTokenPathsContextOnly(AbstractElement path, List<Integer> indexes) {
-		return getTokenPathsContext(path, new TokenAnalysisPaths(indexes)).getTokenPaths();
+	private TokenAnalysisPaths getTokenPathsNoLength(AbstractElement path, List<Integer> indexes) {
+		return getTokenPaths(path, new TokenAnalysisPaths(indexes), false, false, false);
+	}
+	
+	private TokenAnalysisPaths getTokenPathsContext(AbstractElement path, List<Integer> indexes) {
+		return getTokenPaths(path, new TokenAnalysisPaths(indexes), true, true, false);
+	}
+	
+	private TokenAnalysisPaths getTokenPaths(AbstractElement path, String virtualCardinality, List<Integer> indexes, boolean analyseContext, boolean needsLength, boolean shortcutEndlessLoops) {
+		return getTokenPaths(path, virtualCardinality, new TokenAnalysisPaths(indexes), analyseContext, needsLength, shortcutEndlessLoops);
+	}
+	
+	private TokenAnalysisPaths getTokenPathsContextOnly(AbstractElement path, List<Integer> indexes) throws TokenAnalysisAbortedException {
+		return getTokenPathsContext(path, new TokenAnalysisPaths(indexes));
 	}
 	
 	private List<Integer> range(int i, int j) {
@@ -463,50 +481,47 @@ public class TokenAnalysis {
 			log.info("path2: " + abstractElementToString(path2));
 		}
 		
-		int i;
 		// + 1, because otherwise identical paths of length token limit can't be checked
 		int limit = config.getTokenLimit() + 1;
-		for (i = 0; i < limit; i++) {
+		for (int i = 0; i < limit; i++) {
 			TokenAnalysisPaths tokenPaths1;
 			TokenAnalysisPaths tokenPaths2;
 			
 			List<Integer> range = range(0,  i);
 			
 			// there shouldn't be a TokenAnalysisAbortedException if needsLength is false
-			tokenPaths1 = getTokenPaths(path1, new TokenAnalysisPaths(range), false, false, false);
-			tokenPaths2 = getTokenPaths(path2, new TokenAnalysisPaths(range), false, false, false);
+			tokenPaths1 = getTokenPathsNoLength(path1, range);
+			tokenPaths2 = getTokenPathsNoLength(path2, range);
 			
 			Set<Set<Token>> tokenListSet1 = tokenPaths1.getTokenPaths().stream().map(HashSet::new).collect(Collectors.toSet());
 			Set<Set<Token>> tokenListSet2 = tokenPaths2.getTokenPaths().stream().map(HashSet::new).collect(Collectors.toSet());
-			
-			int maxPosition1 = tokenPaths1.getMaxPosition();
-			int maxPosition2 = tokenPaths2.getMaxPosition();
 			
 			if (!tokenListSet1.equals(tokenListSet2)) {
 				return false;
 			}
 			
-			if (maxPosition1 < i + 1) {
+			if (tokenPaths1.getMaxPosition() < i + 1) {
 				// different max positions would have failed the equals-Operation
 				// if the max position is smaller than i + 1 the end of the path has been reached
+				// -> the paths are identical
 				return true;
 			}
 		}
 		
 		// token analysis limit reached
 		// we can't analyze the paths any further
-		// TODO maybe assume paths are equal and show warning instead of exception
 		throw new TokenAnalysisAbortedException("token limit exhausted while looking for identical paths");
 	}
 	
 	private void tokenCombinations(Function<List<Integer>, Boolean> callback) {
-		MutablePrimitiveWrapper<Integer> limit = new MutablePrimitiveWrapper<>(config.getTokenLimit());
+		MutableWrapper<Integer> limit = new MutableWrapper<>(config.getTokenLimit());
 		
 		for (int i = 1; i <= limit.get(); i++) {
 			if (tokenCombinations(0, 0, i, callback, limit)) {
 				return;
 			}
 		}
+		
 		// we tried all possible combinations
 		// -> abort
 		if (limit.get().equals(config.getTokenLimit())) {
@@ -517,10 +532,11 @@ public class TokenAnalysis {
 			throw new NestedPrefixAlternativesException();
 		}
 	}
-	private boolean tokenCombinations(long prefix, int prefixLength, int ones, Function<List<Integer>, Boolean> callback, MutablePrimitiveWrapper<Integer> limit) {
+	private boolean tokenCombinations(long prefix, int prefixLength, int ones, Function<List<Integer>, Boolean> callback, MutableWrapper<Integer> limit) {
 		if (ones == 0) {
 			List<Integer> indexes = new ArrayList<>(limit.get());
-			for (int i = 0; i < limit.get(); i++) {
+			int l = limit.get();
+			for (int i = 0; i < l; i++) {
 				if ((prefix & (1 << i)) > 0) {
 					indexes.add(i);
 				}
@@ -530,6 +546,7 @@ public class TokenAnalysis {
 			// prefix is too long
 			return false;
 		} else {
+			// we can not cache the value of limit here since it might be modified during the recursion
 			for (int i = prefixLength; i < limit.get() - ones + 1; i++) {
 				long current = prefix | (1 << i);
 				try {
@@ -554,16 +571,22 @@ public class TokenAnalysis {
 		// this method is for finding the path differences between the 
 		// element (with optional cardinality) and the context
 		
+		// virtualCardinality is what should be used instead of the actual cardinality of the root element
+		// this way ? and * can both be handled by this method
+		
 		// first dimension of result corresponds to the alternatives
 		// the second dimension are tokens of the alternatives
+		// no need return the context tokens
 		
-		MutablePrimitiveWrapper<List<List<Token>>> result = new MutablePrimitiveWrapper<List<List<Token>>>(null);
+		MutableWrapper<List<List<Token>>> result = new MutableWrapper<List<List<Token>>>(null);
 		
 		tokenCombinations(indexList -> {
 			
 			// no context analysis // TODO why?
-			List<List<Token>> tokenListsForPath = getTokenPaths(element, virtualCardinality, indexList, false);
-			List<List<Token>> tokenListForContext = getTokenPathsContextOnly(element, indexList);
+			List<List<Token>> tokenListsForPath = getTokenPaths(element, virtualCardinality, indexList, false, true, false)
+				.getTokenPaths();
+			List<List<Token>> tokenListForContext = getTokenPathsContextOnly(element, indexList)
+				.getTokenPaths();
 				
 			if (!tokenListsForPath.stream()
 					.anyMatch(tokenListForContext::contains)
@@ -602,7 +625,7 @@ public class TokenAnalysis {
 						if (config.isDebug())
 							log.info("next path: " + p);
 					})
-					.map(p -> getTokenPaths(p, indexList, true))
+					.map(p -> getTokenPathsContext(p, indexList).getTokenPaths())
 					.collect(Collectors.toList());
 			
 			int size = result.size();
@@ -615,7 +638,7 @@ public class TokenAnalysis {
 				if (!tokenListOfCurrentPath.stream()
 					.anyMatch(tokenList -> tokenListsForPaths.stream()
 							.filter(s -> s != tokenListOfCurrentPath)
-							// does any other path contain a similar token list (= alternative)
+							// does any other path contain a similar token list (= alternative) ?
 							.anyMatch(s -> s.contains(tokenList))
 					)
 				) {
@@ -625,6 +648,7 @@ public class TokenAnalysis {
 				
 			}
 			
+			// abort when all paths have an identifying token sequence set
 			return result.stream()
 					.allMatch(Objects::nonNull);
 		});
@@ -634,7 +658,7 @@ public class TokenAnalysis {
 	
 	public List<List<AbstractElement>> getAllPossiblePaths(AbstractElement path) {
 		// token limit + 2 so identity analysis will recognize paths that are identical up to the token limit on the flattened tree
-		return getTokenPaths(path, new TokenAnalysisPaths(range(0, config.getTokenLimit() + 2)), false, false, true)
+		return getTokenPaths(path, range(0, config.getTokenLimit() + 2), false, false, true)
 				.getTokenPaths()
 				.stream()
 				.map(l -> l.stream()
