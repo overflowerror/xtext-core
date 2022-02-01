@@ -269,11 +269,11 @@ public class TokenAnalysis {
 			result = TokenAnalysisPaths.empty(prefix);
 		}
 		
-		int currentPosition = result.getMinPosition();
-		
 		do {
 			current = TokenAnalysisPaths.empty(result);
 			current.resetProgress();
+			int currentPosition = current.getMinPosition();
+			
 			for (AbstractElement element : path.getElements()) {
 				current = current.merge(getTokenPaths(element, result, false, false, shortcutEndlessLoops));
 			}
@@ -283,7 +283,7 @@ public class TokenAnalysis {
 			
 			if (current.getMinPosition() == currentPosition) {
 				// endless loop
-				// result will never be done since there is no progress to the shortest path
+				// current will never be done since there is no progress to the shortest path
 				if (shortcutEndlessLoops) {
 					if (!result.hasProgress()) {
 						// no progress
@@ -408,10 +408,10 @@ public class TokenAnalysis {
 		
 		boolean loop = isVirtualMultipleCardinality(cardinality);
 		
-		int currentMinPosition = result.getMinPosition();
-		
 		do {
+			int currentMinPosition = result.getMinPosition();
 			result.resetProgress();
+			
 			TokenAnalysisPaths tokenPaths = getTokenPathsTrivial(path, result, shortcutEndlessLoops);
 			
 			if (tokenPaths.isDone()) {
@@ -533,7 +533,7 @@ public class TokenAnalysis {
 		}
 	}
 	private boolean tokenCombinations(long prefix, int prefixLength, int ones, Function<List<Integer>, Boolean> callback, MutableWrapper<Integer> limit) {
-		if (ones == 0) {
+		if (ones <= 0) {
 			List<Integer> indexes = new ArrayList<>(limit.get());
 			int l = limit.get();
 			for (int i = 0; i < l; i++) {
