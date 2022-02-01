@@ -10,6 +10,7 @@ package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.pathAnalysis;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.eclipse.xtext.AbstractElement;
@@ -20,7 +21,7 @@ import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.StreamUtils
  * @author overflow - Initial contribution and APILinkedHashSet
  */
 public class TokenAnalysisPaths {
-	private LinkedHashSet<TokenAnalysisPath> tokenPaths = new LinkedHashSet<>();
+	private Set<TokenAnalysisPath> tokenPaths = new LinkedHashSet<>();
 	private boolean isEmpty = false;
 	private boolean hasProgress = false;
 	
@@ -60,7 +61,9 @@ public class TokenAnalysisPaths {
 	
 	public TokenAnalysisPaths merge(TokenAnalysisPaths other) {
 		if (isEmpty) {
-			return other;
+			return other.clone();
+		} else if (other.isEmpty) {
+			return this.clone();
 		} else {
 			// set hasProgress if other has progress and progress is merged
 			if (this.tokenPaths.addAll(other.tokenPaths)) {
@@ -97,5 +100,12 @@ public class TokenAnalysisPaths {
 					+ tokenPaths.stream().map(TokenAnalysisPath::toString).collect(Collectors.joining(",\n  "))
 					+ "\n)";
 		}
+	}
+	
+	@Override
+	public TokenAnalysisPaths clone() {
+		TokenAnalysisPaths clone = new TokenAnalysisPaths(this);
+		clone.isEmpty = this.isEmpty;
+		return clone;
 	}
 }
