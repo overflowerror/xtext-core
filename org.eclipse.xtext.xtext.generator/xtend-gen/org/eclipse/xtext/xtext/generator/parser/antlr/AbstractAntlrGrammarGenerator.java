@@ -842,9 +842,8 @@ public abstract class AbstractAntlrGrammarGenerator {
         String _renderPredicate = this._hoistingProcessor.findHoistingGuard(e).renderPredicate();
         _builder.append(_renderPredicate);
         _builder.newLineIfNotEmpty();
-        _builder.append("\t");
         String _dataTypeEbnf = this.dataTypeEbnf(e, supportActions);
-        _builder.append(_dataTypeEbnf, "\t");
+        _builder.append(_dataTypeEbnf);
         _builder.newLineIfNotEmpty();
       }
     }

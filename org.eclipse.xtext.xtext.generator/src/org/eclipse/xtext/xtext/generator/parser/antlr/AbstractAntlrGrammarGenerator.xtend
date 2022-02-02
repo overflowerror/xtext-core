@@ -340,7 +340,7 @@ abstract class AbstractAntlrGrammarGenerator {
 
 	protected dispatch def String dataTypeEbnf2(Alternatives it, boolean supportActions) '''
 		«FOR e:elements SEPARATOR '\n    |'»«e.findHoistingGuard.renderPredicate»
-			«e.dataTypeEbnf(supportActions)»
+		«e.dataTypeEbnf(supportActions)»
 		«ENDFOR»
 	'''
 
