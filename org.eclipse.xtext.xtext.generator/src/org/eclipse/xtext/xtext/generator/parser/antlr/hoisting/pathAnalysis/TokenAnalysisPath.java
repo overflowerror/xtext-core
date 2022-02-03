@@ -23,11 +23,11 @@ public class TokenAnalysisPath {
 	private List<Integer> remainingIndexes;
 	private int position = 1;
 	
-	public TokenAnalysisPath(List<Integer> indexes) {
+	TokenAnalysisPath(List<Integer> indexes) {
 		this.remainingIndexes = new LinkedList<>(indexes);
 	}
 	
-	public TokenAnalysisPath(TokenAnalysisPath prefix) {
+	TokenAnalysisPath(TokenAnalysisPath prefix) {
 		this(prefix.remainingIndexes);
 		path = new LinkedList<>(prefix.path);
 		position = prefix.position;
@@ -37,7 +37,7 @@ public class TokenAnalysisPath {
 		return position - 1;
 	}
 	
-	public boolean isDone() {
+	boolean isDone() {
 		return remainingIndexes.isEmpty();
 	}
 	
@@ -49,7 +49,7 @@ public class TokenAnalysisPath {
 		}
 	}
 	
-	public boolean add(AbstractElement element) {
+	boolean add(AbstractElement element) {
 		if (isDone())
 			return false;
 		
@@ -93,10 +93,7 @@ public class TokenAnalysisPath {
 		if (getClass() != obj.getClass())
 			return false;
 		TokenAnalysisPath other = (TokenAnalysisPath) obj;
-		if (path == null) {
-			if (other.path != null)
-				return false;
-		} else if (!path.equals(other.path))
+		if (!path.equals(other.path))
 			return false;
 		if (position != other.position)
 			return false;

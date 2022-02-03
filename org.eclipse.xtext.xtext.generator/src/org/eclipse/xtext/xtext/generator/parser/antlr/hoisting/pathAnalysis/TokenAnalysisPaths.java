@@ -8,29 +8,20 @@
  *******************************************************************************/
 package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.pathAnalysis;
 
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.eclipse.xtext.AbstractElement;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token.Token;
-import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.StreamUtils;
 
 /**
  * @author overflow - Initial contribution and APILinkedHashSet
  */
 public class TokenAnalysisPaths {
-	private Set<TokenAnalysisPath> tokenPaths = new LinkedHashSet<>();
+	private List<TokenAnalysisPath> tokenPaths = new ArrayList<>(10);
 	private boolean isEmpty = false;
 	private boolean hasProgress = false;
-	
-	public List<List<Token>> getTokenPaths() {
-		return tokenPaths.stream()
-				.map(TokenAnalysisPath::getTokenPath)
-				.distinct()
-				.collect(Collectors.toList());
-	}
 	
 	public TokenAnalysisPaths(List<Integer> indexes) {
 		tokenPaths.add(new TokenAnalysisPath(indexes));
@@ -39,8 +30,15 @@ public class TokenAnalysisPaths {
 	public TokenAnalysisPaths(TokenAnalysisPaths prefix) {
 		this.tokenPaths = prefix.tokenPaths.stream()
 				.map(TokenAnalysisPath::new)
-				.collect(StreamUtils.collectToLinkedHashSet());
+				.collect(Collectors.toList());
 		this.hasProgress = prefix.hasProgress;
+	}
+	
+	public List<List<Token>> getTokenPaths() {
+		return tokenPaths.stream()
+				.map(TokenAnalysisPath::getTokenPath)
+				.distinct()
+				.collect(Collectors.toList());
 	}
 	
 	public boolean isDone() {
@@ -59,6 +57,17 @@ public class TokenAnalysisPaths {
 		tokenPaths.forEach(p -> hasProgress = p.add(element) || hasProgress);
 	}
 	
+	private boolean addAllDistinct(TokenAnalysisPaths other) {
+		boolean changes = false;
+		for(TokenAnalysisPath path : other.tokenPaths) {
+			if (!tokenPaths.contains(path)) {
+				changes = true;
+				tokenPaths.add(path);
+			}
+		}
+		return changes;
+	}
+	
 	public TokenAnalysisPaths merge(TokenAnalysisPaths other) {
 		if (isEmpty) {
 			return other.clone();
@@ -66,7 +75,7 @@ public class TokenAnalysisPaths {
 			return this.clone();
 		} else {
 			// set hasProgress if other has progress and progress is merged
-			if (this.tokenPaths.addAll(other.tokenPaths)) {
+			if (addAllDistinct(other)) {
 				this.hasProgress |= other.hasProgress;
 			}
 			return this;
