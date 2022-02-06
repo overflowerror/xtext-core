@@ -31,8 +31,18 @@ public class AlternativesGuard implements HoistingGuard {
 	}
 	
 	public AlternativesGuard(List<PathGuard> paths) {
+		// collapsing nested alternatives might reduce output size
+		// -> try both and use smaller one
+		
+		this.paths = paths;
+		int lengthWithoutCollapse = render().length();
 		this.paths = PathGuard.collapse(paths);
+		int lengthWithCollapse = render().length();
+		
+		if (lengthWithoutCollapse < lengthWithCollapse)
+			this.paths = paths;
 	}
+	
 	
 	// package private so PathGuard can access this method
 	List<PathGuard> getPaths() {

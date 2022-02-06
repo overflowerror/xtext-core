@@ -802,7 +802,25 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		
-		assertEquals("(" + keyword("a", 2) + " || " + keyword("b", 1) + " || ((p0) && (p2))) && (" + keyword("b", 2) + " || " + keyword("b", 1) + " || ((p0) && (p3))) && (" + keyword("a", 1) + " || (p1))", guard.render());
+		// collapsed version is actually not optimal
+		//assertEquals("(" + keyword("a", 2) + " || " + keyword("b", 1) + " || ((p0) && (p2))) && (" + keyword("b", 2) + " || " + keyword("b", 1) + " || ((p0) && (p3))) && (" + keyword("a", 1) + " || (p1))", guard.render());
+		assertEquals(
+				"(" + 
+					keyword("b", 1) + " || " +
+					"(" +
+						"(p0) && (" +
+							keyword("a", 2) + " || " +
+							"(p2)" + 
+						") && (" + 
+							keyword("b", 2) + " || " +
+							"(p3)" + 
+						")" +
+					")" +
+				") && (" + 
+					keyword("a", 1) + " || " + 
+					"(p1)" + 
+				")",
+			guard.render());
 	}
 	
 	// currently not able to find optimal solution
@@ -833,7 +851,27 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		//assertEquals("(" + keyword("a", 1) + " || (" + keyword("c", 3) + " && " + eof(3) + ") || ((p0) && (p2))) && (" + keyword("c", 1) + " || ((p0) && (p3))) && (" + keyword("d", 3) + " || (p1))", guard.render());
 		
 		// still valid but non-optimal
-		assertEquals("(" + keyword("a", 1) + " || (" + keyword("a", 3)+ " && " + keyword("b", 3) + " && " + keyword("c", 3) + " && " + eof(3) + ") || ((p0) && (p2))) && (" + keyword("b", 1) + " || (" + keyword("a", 3)+ " && " + keyword("b", 3) + " && " + keyword("c", 3) + " && " + eof(3) + ") || ((p0) && (p3))) && (" + keyword("d", 3) + " || (p1))", guard.render());
+		assertEquals(
+				"(" + 
+					"(" +
+						keyword("a", 3) + " && " +
+						keyword("b", 3) + " && " +
+						keyword("c", 3) + " && " +
+						eof(3) + 
+					") || (" +
+						"(p0) && (" +
+							keyword("a", 1) + " || " +
+							"(p2)" +
+						") && (" +
+							keyword("b", 1) + " || " +
+							"(p3)" +
+						")" +
+					")" + 
+				") && (" +
+					keyword("d", 3) + " || " +
+					"(p1)" +
+				")",
+			guard.render());
 	}
 	
 	@Test

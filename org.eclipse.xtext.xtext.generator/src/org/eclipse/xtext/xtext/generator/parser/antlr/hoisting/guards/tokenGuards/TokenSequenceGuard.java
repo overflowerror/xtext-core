@@ -28,8 +28,10 @@ public class TokenSequenceGuard implements TokenGuard {
 	
 	public TokenSequenceGuard(Collection<? extends TokenGuard> sequence) {
 		Set<Integer> checkedPositions = new HashSet<>();
+		// remove all guards from sequences who's positions are already in the sequence
 		this.sequence = sequence.stream()
 				.flatMap(g -> {
+					// special case: reduce TokenSequenceGuards
 					if (g instanceof TokenSequenceGuard) {
 						return ((TokenSequenceGuard) g).sequence.stream()
 								.filter(s -> !s.getPositions().stream()
@@ -65,7 +67,7 @@ public class TokenSequenceGuard implements TokenGuard {
 	@Override
 	public String render() {
 		if (sequence.size() == 1) {
-		return sequence.stream().findAny().get().render();
+			return sequence.stream().findAny().get().render();
 		} else {
 			return render(ContextConnective.DISJUNCTION);
 		}
