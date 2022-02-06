@@ -212,7 +212,7 @@ public class HoistingGeneratorTest extends AbstractXtextTests {
     _builder_1.append("(");
     _builder_1.newLine();
     _builder_1.append("\t\t");
-    _builder_1.append("{(p0)}?=>");
+    _builder_1.append("{p0}?=>");
     _builder_1.newLine();
     _builder_1.append("\t\t\t");
     _builder_1.append("(");
@@ -242,7 +242,7 @@ public class HoistingGeneratorTest extends AbstractXtextTests {
     _builder_1.append("|");
     _builder_1.newLine();
     _builder_1.append("\t\t");
-    _builder_1.append("{(p1)}?=>");
+    _builder_1.append("{p1}?=>");
     _builder_1.newLine();
     _builder_1.append("\t\t\t");
     _builder_1.append("(");
@@ -431,7 +431,7 @@ public class HoistingGeneratorTest extends AbstractXtextTests {
     _builder_1.append("(");
     _builder_1.newLine();
     _builder_1.append("\t\t");
-    _builder_1.append("{(p0)}?=>");
+    _builder_1.append("{p0}?=>");
     _builder_1.newLine();
     _builder_1.append("\t\t");
     _builder_1.append("(");
@@ -809,7 +809,7 @@ public class HoistingGeneratorTest extends AbstractXtextTests {
     _builder_1.append(":");
     _builder_1.newLine();
     _builder_1.append("\t");
-    _builder_1.append("{(p0)}?=>(");
+    _builder_1.append("{p0}?=>(");
     _builder_1.newLine();
     _builder_1.append("\t\t");
     _builder_1.append("{ before(grammarAccess.getSAccess().getGroup_0()); }");
@@ -833,7 +833,7 @@ public class HoistingGeneratorTest extends AbstractXtextTests {
     _builder_1.append("|");
     _builder_1.newLine();
     _builder_1.append("\t");
-    _builder_1.append("{(p1)}?=>(");
+    _builder_1.append("{p1}?=>(");
     _builder_1.newLine();
     _builder_1.append("\t\t");
     _builder_1.append("{ before(grammarAccess.getSAccess().getGroup_1()); }");
@@ -1262,7 +1262,7 @@ public class HoistingGeneratorTest extends AbstractXtextTests {
     _builder_1.append("(");
     _builder_1.newLine();
     _builder_1.append("\t\t\t");
-    _builder_1.append("{(p0)}?=>");
+    _builder_1.append("{p0}?=>");
     _builder_1.newLine();
     _builder_1.append("\t\t\t");
     _builder_1.append("rule__S__Group__0");

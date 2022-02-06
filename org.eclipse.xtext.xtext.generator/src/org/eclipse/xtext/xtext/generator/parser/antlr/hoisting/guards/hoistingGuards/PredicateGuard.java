@@ -6,13 +6,17 @@
  * 
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
-package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards;
+package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.hoistingGuards;
 
 import org.eclipse.xtext.AbstractSemanticPredicate;
 import org.eclipse.xtext.xtext.generator.parser.antlr.JavaCodeUtils;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.ContextConnective;
 
 /**
  * @author overflow - Initial contribution and API
+ * 
+ * PredicateGuards represent the atomic guard condition of a predicate.
+ * 
  */
 public class PredicateGuard implements HoistingGuard {
 
@@ -29,8 +33,15 @@ public class PredicateGuard implements HoistingGuard {
 
 	@Override
 	public String render() {
-		return "(" + JavaCodeUtils.getSource(element.getCode()) + ")";
+		// no parentheses if this is the root element
+		return JavaCodeUtils.getSource(element.getCode());
 	}
+	
+	@Override
+	public String render(ContextConnective connective) {
+		return "(" + render() + ")";
+	}
+
 
 	@Override
 	public boolean hasTerminal() {

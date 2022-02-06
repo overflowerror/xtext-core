@@ -25,10 +25,7 @@ public class JavaCodeUtils {
 	}
 	
 	static public String formatPredicateForGrammar(String predicate) {
-		return formatCodeForGrammar(
-				// remove parentheses
-				predicate.substring(1, predicate.length() - 1)
-			);
+		return formatCodeForGrammar(predicate);
 	}
 	
 	static public String formatGuardForGrammar(Guard guard) {

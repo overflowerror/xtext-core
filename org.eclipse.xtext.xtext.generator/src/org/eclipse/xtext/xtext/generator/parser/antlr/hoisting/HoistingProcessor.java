@@ -42,20 +42,20 @@ import org.eclipse.xtext.util.Tuples;
 import static org.eclipse.xtext.GrammarUtil.*;
 
 import org.eclipse.xtext.xtext.generator.parser.antlr.JavaCodeUtils;
-import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.NestedPrefixAlternativesException;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.NestedIdenticalPathException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.TokenAnalysisAbortedException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.UnsupportedConstructException;
-import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.AlternativeTokenSequenceGuard;
-import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.AlternativesGuard;
-import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.GroupGuard;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.Guard;
-import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.HoistingGuard;
-import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.MergedPathGuard;
-import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.PathGuard;
-import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.PredicateGuard;
-import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.SingleTokenGuard;
-import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.TokenGuard;
-import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.TokenSequenceGuard;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.hoistingGuards.AlternativesGuard;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.hoistingGuards.GroupGuard;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.hoistingGuards.HoistingGuard;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.hoistingGuards.MergedPathGuard;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.hoistingGuards.PathGuard;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.hoistingGuards.PredicateGuard;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.tokenGuards.AlternativeTokenSequenceGuard;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.tokenGuards.SingleTokenGuard;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.tokenGuards.TokenGuard;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.tokenGuards.TokenSequenceGuard;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.pathAnalysis.TokenAnalysis;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token.Token;
 import static org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.DebugUtils.*;
@@ -292,11 +292,11 @@ public class HoistingProcessor {
 					(TokenGuard tokenGuard, MergedPathGuard pathGuard) -> Tuples.pair(tokenGuard, pathGuard)
 				).map(p -> new PathGuard(p.getFirst(), p.getSecond()))
 				.collect(AlternativesGuard.collector());
-			} catch(NestedPrefixAlternativesException e) {
-				// nested prefix alternatives
+			} catch(NestedIdenticalPathException e) {
+				// nested identical paths
 				// -> flatten paths to alternative and try again
 				// this is very inefficient
-				log.warn("nested prefix alternatives detected");
+				log.warn("nested identical paths detected");
 				log.warn("avoid these since they can't be handled efficiently");
 				
 				if (config.isDebug())
@@ -310,7 +310,7 @@ public class HoistingProcessor {
 				log.info(flattened.getElements().size());
 				// TODO: value configurable?
 				if (flattened.getElements().size() > 100) {
-					throw new NestedPrefixAlternativesException("nested prefix alternatives can't be analysed because of too many paths");
+					throw new NestedIdenticalPathException("nested identical paths can't be analysed because of too many paths");
 				}
 				
 				return findGuardForAlternatives(flattened, currentRule, true);

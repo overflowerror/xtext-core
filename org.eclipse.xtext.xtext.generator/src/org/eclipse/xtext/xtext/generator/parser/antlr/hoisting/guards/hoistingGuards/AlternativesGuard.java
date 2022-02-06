@@ -6,7 +6,7 @@
  * 
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
-package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards;
+package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.hoistingGuards;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -15,8 +15,13 @@ import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.ContextConnective;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.Guard;
+
 /**
  * @author overflow - Initial contribution and API
+ * 
+ * AlternativesGuards are the guard conditions of non-empty alternatives.
  */
 public class AlternativesGuard implements HoistingGuard {
 	private List<PathGuard> paths;
@@ -36,29 +41,49 @@ public class AlternativesGuard implements HoistingGuard {
 	
 	@Override
 	public boolean isTrivial() {
+		// should never be true, otherwise findAlternativeGuard would 
+		// produce unguarded path hoisting guard
 		return paths.stream().allMatch(Guard::isTrivial);
 	}
 
 	@Override
+	public String render(ContextConnective connective) {
+		// there is at least one path that is not trivial
+		List<HoistingGuard> relevantGuards = paths.stream()
+				.filter(Predicate.not(Guard::isTrivial))
+				.collect(Collectors.toList());
+			
+		if (relevantGuards.size() == 1) {
+			return paths.get(0).render(connective);
+		} else {
+			String result = relevantGuards.stream()
+					.map(g -> g.render(ContextConnective.CONJUNCTION))
+					.collect(Collectors.joining(" && "));
+			return connective.addParenthesesIfNot(result, ContextConnective.CONJUNCTION);
+		}
+	}
+	
+	@Override
 	public String render() {
-		List<String> renderedGuards = paths.stream()
-			.filter(Predicate.not(Guard::isTrivial))
-			.map(Guard::render)
-			.collect(Collectors.toList());
-		
-		if (renderedGuards.size() == 1) {
+		// there is at least one path that is not trivial
+		List<HoistingGuard> relevantGuards = paths.stream()
+				.filter(Predicate.not(Guard::isTrivial))
+				.collect(Collectors.toList());
+
+		if (relevantGuards.size() == 1) {
 			return paths.get(0).render();
-		} else {		
-			return "(" + 
-						String.join(" && ", renderedGuards) +
-					")";
+		} else {
+			return render(ContextConnective.CONJUNCTION);
 		}
 	}
 
 	@Override
 	public boolean hasTerminal() {
-		// empty paths are only allowed when all paths are empty
-		// in that case a MergedPathGuard is returned.
+		// using the current method there is no way of handling predicates
+		// after alternatives with empty paths the same way antlr does
+		// => assume that the alternative always contains tokens
+		// the only case that works is when all paths are empty
+		// => a MergedPathGuard is returned by findGuardForAlternatives
 		return true;
 	}
 	

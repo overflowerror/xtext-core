@@ -6,7 +6,7 @@
  * 
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
-package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards;
+package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.hoistingGuards;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,9 +16,14 @@ import java.util.stream.Collectors;
 
 import org.eclipse.xtext.util.Pair;
 import org.eclipse.xtext.util.Tuples;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.ContextConnective;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.Guard;
 
 /**
  * @author overflow - Initial contribution and API
+ * 
+ * GroupGuards represent the conditions for group elements.
+ * 
  */
 public class GroupGuard implements HoistingGuard {
 	private List<Guard> elementGuards = new LinkedList<>();
@@ -50,6 +55,7 @@ public class GroupGuard implements HoistingGuard {
 	Pair<List<Guard>, AlternativesGuard> deconstructPaths() {
 		// there can be at most 1 AlternativesGuard since they always have tokens
 		// if alternatives don't have token the result will be a MergedPathGuard
+		
 		if (!elementGuards.stream().anyMatch(g -> g instanceof AlternativesGuard)) {
 			return null;
 		} else {
@@ -60,7 +66,7 @@ public class GroupGuard implements HoistingGuard {
 					elementGuards.stream()
 						.filter(g -> g instanceof AlternativesGuard)
 						.map(g -> (AlternativesGuard) g)
-						.findAny().get());
+						.findFirst().get());
 		}
 	}
 	
@@ -74,11 +80,19 @@ public class GroupGuard implements HoistingGuard {
 		if (elementGuards.size() == 1) {
 			return elementGuards.get(0).render();
 		} else {
-			return "(" + 
-					elementGuards.stream()
-						.map(Guard::render)
-						.collect(Collectors.joining(" && ")) +
-					")";
+			return render(ContextConnective.CONJUNCTION);
+		}
+	}
+	
+	@Override
+	public String render(ContextConnective connective) {
+		if (elementGuards.size() == 1) {
+			return elementGuards.get(0).render(connective);
+		} else {
+			String result = elementGuards.stream()
+				.map(g -> g.render(ContextConnective.CONJUNCTION))
+				.collect(Collectors.joining(" && "));
+			return connective.addParenthesesIfNot(result, ContextConnective.CONJUNCTION);
 		}
 	}
 

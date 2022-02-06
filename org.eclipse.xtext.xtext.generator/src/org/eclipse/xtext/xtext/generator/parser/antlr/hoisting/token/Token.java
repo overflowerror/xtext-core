@@ -14,6 +14,7 @@ import org.eclipse.xtext.EnumLiteralDeclaration;
 import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.TerminalRule;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.NotATokenException;
 
 /**
  * @author overflow - Initial contribution and API
@@ -22,6 +23,8 @@ public interface Token {
 	String negatedCondition();
 	
 	AbstractElement getElement();
+	
+	int getPosition();
 	
 	static boolean isToken(AbstractElement element) {
 		if (element == null) {
@@ -53,6 +56,4 @@ public interface Token {
 		
 		throw new NotATokenException(element.eClass().getName());
 	}
-
-	int getPosition();
 }

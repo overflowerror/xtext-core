@@ -38,7 +38,7 @@ import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.UnorderedGroup;
 import org.eclipse.xtext.util.XtextSwitch;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.HoistingConfiguration;
-import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.NestedPrefixAlternativesException;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.NestedIdenticalPathException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.TokenAnalysisAbortedException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.UnsupportedConstructException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token.Token;
@@ -486,8 +486,8 @@ public class TokenAnalysis {
 			throw new TokenAnalysisAbortedException("token limit exhausted while searching for minimal differences");
 		} else {
 			// path length exhausted while searching for minimal differences
-			// this indicates nested prefix alternatives
-			throw new NestedPrefixAlternativesException();
+			// this indicates the presence of nested identical paths
+			throw new NestedIdenticalPathException();
 		}
 	}
 	private boolean tokenCombinations(long prefix, int prefixLength, int ones, Function<List<Integer>, Boolean> callback, MutableWrapper<Integer> limit) {

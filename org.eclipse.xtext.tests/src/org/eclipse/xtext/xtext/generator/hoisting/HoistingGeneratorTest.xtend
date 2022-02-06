@@ -105,7 +105,7 @@ class HoistingGeneratorTest extends AbstractXtextTests {
 				leaveRule();
 			}:
 				(
-					{(p0)}?=>
+					{p0}?=>
 						(
 							(
 							)
@@ -115,7 +115,7 @@ class HoistingGeneratorTest extends AbstractXtextTests {
 							}
 						)
 					    |
-					{(p1)}?=>
+					{p1}?=>
 						(
 							(
 							)
@@ -202,7 +202,7 @@ class HoistingGeneratorTest extends AbstractXtextTests {
 				leaveRule();
 			}:
 				(
-					{(p0)}?=>
+					{p0}?=>
 					(
 					)
 					otherlv_1='a'
@@ -376,7 +376,7 @@ class HoistingGeneratorTest extends AbstractXtextTests {
 					int stackSize = keepStackSize();
 				}
 			:
-				{(p0)}?=>(
+				{p0}?=>(
 					{ before(grammarAccess.getSAccess().getGroup_0()); }
 					(
 						rule__S__Group_0__0
@@ -384,7 +384,7 @@ class HoistingGeneratorTest extends AbstractXtextTests {
 					{ after(grammarAccess.getSAccess().getGroup_0()); }
 				)
 				|
-				{(p1)}?=>(
+				{p1}?=>(
 					{ before(grammarAccess.getSAccess().getGroup_1()); }
 					(
 						rule__S__Group_1__0
@@ -571,7 +571,7 @@ class HoistingGeneratorTest extends AbstractXtextTests {
 				(
 					{ before(grammarAccess.getSAccess().getGroup()); }
 					(
-						{(p0)}?=>
+						{p0}?=>
 						rule__S__Group__0
 					)
 				*

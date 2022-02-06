@@ -6,15 +6,21 @@
  * 
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
-package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards;
+package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.hoistingGuards;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.ContextConnective;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.Guard;
+
 /**
  * @author overflow - Initial contribution and API
+ * 
+ * MergedPathGuards are used to combine identical paths in alternatives.
+ * This class is also used for alternatives that only have empty paths.
  */
 public class MergedPathGuard implements HoistingGuard {
 	private List<HoistingGuard> pathGuards = new LinkedList<>();
@@ -49,19 +55,26 @@ public class MergedPathGuard implements HoistingGuard {
 		if (pathGuards.size() == 1) {
 			return pathGuards.get(0).render();
 		} else {
-			return "(" + renderWithoutParentheses() + ")";
+			return render(ContextConnective.DISJUNCTION);
 		}
 	}
 	
-	String renderWithoutParentheses() {
-		return pathGuards.stream()
-				.map(Guard::render)
+	@Override
+	public String render(ContextConnective connective) {
+		if (pathGuards.size() == 1) {
+			return pathGuards.get(0).render(connective);
+		} else {
+			String result = pathGuards.stream()
+				.map(g -> g.render(ContextConnective.DISJUNCTION))
 				.collect(Collectors.joining(" || "));
+			return connective.addParenthesesIfNot(result, ContextConnective.DISJUNCTION);
+		}
 	}
 
 	@Override
 	public boolean hasTerminal() {
-		// only need to check first element since all paths should be identical
+		// only need to check first element since all paths should be 
+		// identical with regards to tokens.
 		return pathGuards.get(0).hasTerminal();
 	}
 	

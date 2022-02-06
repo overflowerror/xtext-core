@@ -6,22 +6,26 @@
  * 
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
-package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards;
+package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.tokenGuards;
+
+import java.util.Set;
+
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.Guard;
 
 /**
  * @author overflow - Initial contribution and API
+ * 
+ * TokenGuards represent the tokens necessary for the given path. 
+ * Usually only tokens that distinguish the current path from other alternative paths are used. 
+ * 
  */
-public interface Guard {
-	boolean isTrivial();
-	/**
-	 * should only be used for the root guard when rendering.
-	 * 
-	 * assume context connective matches inner connective
-	 */
-	String render();
+public interface TokenGuard extends Guard {
+	@Override
+	default boolean isTrivial() {
+		return false;
+	}
 	
-	/**
-	 * don't render parentheses if inner connective matches context
-	 */
-	String render(ContextConnective connective);
+	Set<Integer> getPositions();
+	
+	TokenGuard reduce();
 }

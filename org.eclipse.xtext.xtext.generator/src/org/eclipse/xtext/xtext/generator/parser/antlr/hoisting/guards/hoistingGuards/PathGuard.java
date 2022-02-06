@@ -6,7 +6,7 @@
  * 
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
-package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards;
+package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.hoistingGuards;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -14,9 +14,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.eclipse.xtext.util.Pair;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.ContextConnective;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.Guard;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.tokenGuards.TokenGuard;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.tokenGuards.TokenSequenceGuard;
 
 /**
  * @author overflow - Initial contribution and API
+ * 
+ * PathGuards represent that conditions for single paths in alternatives.
+ * 
  */
 public class PathGuard implements HoistingGuard {
 	private TokenGuard tokenGuard;
@@ -34,32 +41,28 @@ public class PathGuard implements HoistingGuard {
 
 	@Override
 	public boolean hasTerminal() {
-		// empty paths are only allowed when all paths are empty
-		// in that case a MergedPathGuard is returned by findGuardForAlternatives.
+		// using the current method there is no way of handling predicates
+		// after alternatives with empty paths the same way antlr does
+		// => assume that alternative paths always contain tokens
+		// the only case that works is when all paths are empty
+		// => a MergedPathGuard is returned by findGuardForAlternatives
 		return true;
 	}
 	
 	@Override
 	public String render() {
-		// parentheses needed since tokenGuard is never empty
-		String result = "(";
+		return render(ContextConnective.DISJUNCTION);
+	}
+	
+	@Override
+	public String render(ContextConnective connective) {
+		String result = "";
 		
-		if (tokenGuard instanceof TokenSequenceGuard) {
-			result += ((TokenSequenceGuard) tokenGuard).renderWithoutParenthesis();
-		} else {
-			result += tokenGuard.render();
-		}
-		
+		result += tokenGuard.render(ContextConnective.DISJUNCTION);
 		result += " || ";
+		result += hoistngGuard.render(ContextConnective.DISJUNCTION);
 		
-		if (hoistngGuard instanceof MergedPathGuard) {
-			result += ((MergedPathGuard) hoistngGuard).renderWithoutParentheses();
-		} else {
-			result += hoistngGuard.render();
-		}
-		
-		result += ")";
-		return result;
+		return connective.addParenthesesIfNot(result, ContextConnective.DISJUNCTION);
 	}
 	
 	public static List<PathGuard> collapse(List<PathGuard> paths) {

@@ -6,7 +6,7 @@
  * 
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
-package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards;
+package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.tokenGuards;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,10 +15,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.ContextConnective;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.utils.StreamUtils;
 
 /**
  * @author overflow - Initial contribution and API
+ * 
+ * A TokenSequenceGuard represents a sequence of tokens as a TokenGuard.
  */
 public class TokenSequenceGuard implements TokenGuard {
 	private Collection<? extends TokenGuard> sequence;
@@ -61,26 +64,23 @@ public class TokenSequenceGuard implements TokenGuard {
 	
 	@Override
 	public String render() {
-		boolean addParentheses = sequence.size() != 1;
-		String result = "";
-		
-		if (addParentheses) {
-			result += "(";
+		if (sequence.size() == 1) {
+		return sequence.stream().findAny().get().render();
+		} else {
+			return render(ContextConnective.DISJUNCTION);
 		}
-		
-		result += renderWithoutParenthesis();
-
-		if (addParentheses) {
-			result += ")";
-		}
-		
-		return result;
 	}
 	
-	public String renderWithoutParenthesis() {
-		return sequence.stream()
-				.map(TokenGuard::render)
+	@Override
+	public String render(ContextConnective connective) {
+		if (sequence.size() == 1) {
+			return sequence.stream().findAny().get().render(connective);
+		} else {
+			String result = sequence.stream()
+				.map(g -> g.render(ContextConnective.DISJUNCTION))
 				.collect(Collectors.joining(" || "));
+			return connective.addParenthesesIfNot(result, ContextConnective.DISJUNCTION);
+		}
 	}
 	
 	@Override

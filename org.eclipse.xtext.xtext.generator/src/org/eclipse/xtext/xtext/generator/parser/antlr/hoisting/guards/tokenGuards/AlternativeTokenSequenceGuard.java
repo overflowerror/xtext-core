@@ -6,7 +6,7 @@
  * 
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
-package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards;
+package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.tokenGuards;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,8 +14,13 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.ContextConnective;
+
 /**
  * @author overflow - Initial contribution and API
+ * 
+ * An AlternativeTokenSequenceGuard represents alternative token paths as a TokenGuard.
+ * 
  */
 public class AlternativeTokenSequenceGuard implements TokenGuard {
 	private Collection<? extends TokenGuard> alternatives;
@@ -26,7 +31,7 @@ public class AlternativeTokenSequenceGuard implements TokenGuard {
 	
 	public TokenGuard reduce() {
 		if (alternatives.size() == 1) {
-			return alternatives.stream().findAny().get();
+			return alternatives.stream().findFirst().get();
 		} else {
 			return this;
 		}
@@ -34,14 +39,22 @@ public class AlternativeTokenSequenceGuard implements TokenGuard {
 	
 	@Override
 	public String render() {
-		if (alternatives.size() != 1) {
-			return "(" + 
-					alternatives.stream()
-						.map(TokenGuard::render)
-						.collect(Collectors.joining(" && ")) + 
-					")";
-		} else {
+		if (alternatives.size() == 1) {
 			return alternatives.stream().findAny().get().render();
+		} else {
+			return render(ContextConnective.CONJUNCTION);
+		}
+	}
+	
+	@Override
+	public String render(ContextConnective connective) {
+		if (alternatives.size() == 1) {
+			return alternatives.stream().findAny().get().render(connective);
+		} else {
+			String result = alternatives.stream()
+				.map(g -> g.render(ContextConnective.CONJUNCTION))
+				.collect(Collectors.joining(" && "));
+			return connective.addParenthesesIfNot(result, ContextConnective.CONJUNCTION);
 		}
 	}
 	

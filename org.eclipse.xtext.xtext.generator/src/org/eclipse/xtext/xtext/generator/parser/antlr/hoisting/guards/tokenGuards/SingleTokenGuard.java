@@ -6,12 +6,13 @@
  * 
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
-package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards;
+package org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.tokenGuards;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.ContextConnective;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.token.Token;
 
 /**
@@ -32,6 +33,11 @@ public class SingleTokenGuard implements TokenGuard {
 	@Override
 	public String render() {
 		return token.negatedCondition();
+	}
+	
+	@Override
+	public String render(ContextConnective connective) {
+		return render();
 	}
 	
 	@Override
