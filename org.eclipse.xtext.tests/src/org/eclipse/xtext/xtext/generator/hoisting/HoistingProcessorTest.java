@@ -69,9 +69,12 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 	private String keyword(String keyword, int offset) {
 		return "!\"" + keyword + "\".equals(input.LT(" + offset + ").getText())";
 	}
+	
+	@SuppressWarnings("unused")
 	private String terminal(String terminal, int offset) {
 		return "input.LA(" + offset + ") != " + terminal;
 	}
+	
 	private String eof(int offset) {
 		return "input.LA(" + offset + ") != EOF";
 	}
@@ -315,7 +318,6 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
-			"hoistingDebug\n" +
 			"S: A 'b';\n" +
 			"A: ($$ p0 $$?=> 'a')?;";
 		// @formatter:off
@@ -345,7 +347,6 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		System.out.println(guard);
 		assertEquals(keyword("a", 1) + " || (p0)", guard.render());
 	}
 	
@@ -371,8 +372,6 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
-			"tokenLimit 3\n" +
-			"hoistingDebug\n" +
 			"S: ($$ p0 $$?=> 'a')* ;";
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
@@ -437,7 +436,10 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("(" + keyword("a", 1) + " || (p0)) && (" + keyword("b", 1) + " || (p1))", guard.render());
+		assertEquals(
+				"(" + keyword("a", 1) + " || (p0)) && " + 
+				"(" + keyword("b", 1) + " || (p1))", 
+			guard.render());
 	}
 	
 	// predicates in unordered group with optional paths are currently not supported by the algorithm
@@ -447,7 +449,6 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
-			"hoistingDebug\n" +
 			"S: ($$ p0 $$?=> 'a')? & ($$ p1 $$?=> 'b');";
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
@@ -458,7 +459,10 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("(" + keyword("a", 1) + " || (p0)) && (" + keyword("b", 1) + " || (p1))", guard.render());
+		assertEquals(
+				"(" + keyword("a", 1) + " || (p0)) && " + 
+				"(" + keyword("b", 1) + " || (p1))",
+			guard.render());
 	}
 	
 	// predicates in unordered group with optional paths are currently not supported by the algorithm
@@ -468,7 +472,6 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
-			"hoistingDebug\n" + 
 			"S: (($$ p0 $$?=> 'a')? & ($$ p1 $$?=> 'b')?) $$ p2 $$?=> 's';";
 		// @formatter:off
 		XtextResource resource = getResourceFromString(model);
@@ -479,7 +482,10 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("(" + keyword("a", 1) + " || (p0)) && (" + keyword("b", 1) + " || (p1))", guard.render());
+		assertEquals(
+				"(" + keyword("a", 1) + " || (p0)) && " + 
+				"(" + keyword("b", 1) + " || (p1))",
+			guard.render());
 	}
 	
 	// predicates in unordered group with optional paths are currently not supported by the algorithm
@@ -501,8 +507,10 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		System.out.println(guard.toString());
-		assertEquals("(" + keyword("a", 1) + " || (p0)) && (" + keyword("b", 1) + " || (p1))", guard.render());
+		assertEquals(
+				"(" + keyword("a", 1) + " || (p0)) && " + 
+				"(" + keyword("b", 1) + " || (p1))",
+			guard.render());
 	}
 	
 	@Test
@@ -520,7 +528,10 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("(" + keyword("a", 1) + " || (p0)) && (" + keyword("b", 1) + " || (p1))", guard.render());
+		assertEquals(
+				"(" + keyword("a", 1) + " || (p0)) && " + 
+				"(" + keyword("b", 1) + " || (p1))",
+			guard.render());
 		
 		// check sizes of groups in unordered group
 		Group group = (Group) rule.getAlternatives();
@@ -588,8 +599,10 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		System.out.println(guard.toString());
-		assertEquals("(" + keyword("s", 2) + " || (p0)) && (" + keyword("b", 2) + " || (p1))", guard.render());
+		assertEquals(
+				"(" + keyword("s", 2) + " || (p0)) && " + 
+				"(" + keyword("b", 2) + " || (p1))",
+			guard.render());
 	}
 
 	@Test
@@ -610,7 +623,15 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("((" + keyword("a", 1) + " && " + keyword("b", 1) + ") || (p0)) && ((" + keyword("c", 1) + " && " + keyword("d", 1) + ") || (p1))", guard.render());
+		assertEquals(
+				"(" + 
+					"(" + keyword("a", 1) + " && " + keyword("b", 1) + ") || " + 
+					"(p0)" + 
+				") && (" + 
+					"(" + keyword("c", 1) + " && " + keyword("d", 1) + ") || " + 
+					"(p1)" + 
+				")",
+			guard.render());
 	}
 	
 	@Test
@@ -630,7 +651,10 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("(" + keyword("a", 2) + " || (p0)) && (" + keyword("b", 2) + " || (p1))", guard.render());
+		assertEquals(
+				"(" + keyword("a", 2) + " || (p0)) && " + 
+				"(" + keyword("b", 2) + " || (p1))",
+			guard.render());
 	}
 	
 	@Test
@@ -651,7 +675,10 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("(" + keyword("j", 10) + " || (p0) || (p1)) && (" + keyword("k", 10) + " || (p2))", guard.render());
+		assertEquals(
+				"(" + keyword("j", 10) + " || (p0) || (p1)) && " + 
+				"(" + keyword("k", 10) + " || (p2))",
+			guard.render());
 	}
 	
 	@Test
@@ -672,7 +699,10 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("(" + keyword("a", 1) + " || (p0) || (p1)) && (" + keyword("b", 1) + " || (p2))", guard.render());
+		assertEquals(
+				"(" + keyword("a", 1) + " || (p0) || (p1)) && " + 
+				"(" + keyword("b", 1) + " || (p2))",
+			guard.render());
 		
 		// number of elements in Alternatives object has to stay the same
 		// even though the identical paths are collapsed during the hoisting process
@@ -713,7 +743,15 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("(" + keyword("a", 1) + " || (p0)) && ((" + keyword("b", 1) + " && " + keyword("c", 1) + ") || (p1))", guard.render());
+		assertEquals(
+				"(" + 
+					keyword("a", 1) + " || (p0)" + 
+				") && (" + 
+					"(" + 
+						keyword("b", 1) + " && " + keyword("c", 1) + 
+					") || (p1)" + 
+				")",
+			guard.render());
 	}
 	
 	@Test
@@ -756,7 +794,29 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("(((" + keyword("b", 2) + " || " + keyword("b", 3) + ") && (" + keyword("c", 2) + " || " + keyword("c", 3) + ")) || (p0)) && (((" + keyword("b", 2) + " || " + keyword("c", 3) + ") && (" + keyword("c", 2) + " || " + keyword("b", 3) + ")) || (p1))", guard.render());
+		assertEquals(
+				"(" + 
+					"(" + 
+						"(" + 
+							keyword("b", 2) + " || " + 
+							keyword("b", 3) + 
+						") && (" + 
+							keyword("c", 2) + " || " + 
+							keyword("c", 3) + 
+						")" + 
+					") || (p0)" + 
+				") && (" + 
+					"(" + 
+						"(" + 
+							keyword("b", 2) + " || " + 
+							keyword("c", 3) + 
+						") && (" + 
+							keyword("c", 2) + " || " + 
+							keyword("b", 3) + 
+						")" + 
+					") || (p1)" + 
+				")",
+			guard.render());
 	}
 	
 	@Test
@@ -779,7 +839,17 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		
-		assertEquals("(" + keyword("b", 3) + " || ((p0) && (p2))) && (" + keyword("c", 3) + " || ((p0) && (p3))) && (" + keyword("d", 3) + " || (p1))", guard.render());
+		assertEquals(
+				"(" + 
+					keyword("b", 3) + " || " + 
+					"((p0) && (p2))" + 
+				") && (" + 
+					keyword("c", 3) + " || " + 
+					"((p0) && (p3))" + 
+				") && (" + 
+					keyword("d", 3) + " || " + 
+					"(p1))",
+			guard.render());
 	}
 	
 	@Test
@@ -845,12 +915,12 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
 		
-		// algorithm is not optimal
+		// algorithm is currently not optimal
 		
-		// optimal result
+		// optimal result:
 		//assertEquals("(" + keyword("a", 1) + " || (" + keyword("c", 3) + " && " + eof(3) + ") || ((p0) && (p2))) && (" + keyword("c", 1) + " || ((p0) && (p3))) && (" + keyword("d", 3) + " || (p1))", guard.render());
 		
-		// still valid but non-optimal
+		// still valid but non-optimal:
 		assertEquals(
 				"(" + 
 					"(" +
@@ -905,7 +975,10 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		AbstractRule rule = getRule(grammar, "S");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
-		assertEquals("(" + eof(3) + " || (p0)) && (" + keyword("c", 3) + " || (p1))", guard.render());
+		assertEquals(
+				"(" + eof(3) + " || (p0)) && " + 
+				"(" + keyword("c", 3) + " || (p1))",
+			guard.render());
 	}
 	
 	@Test
@@ -923,7 +996,10 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		AbstractRule rule = getRule(grammar, "A");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
-		assertEquals("(" + keyword("d", 4) + " || (p0)) && (" + keyword("c", 4) + " || (p1))", guard.render());
+		assertEquals(
+				"(" + keyword("d", 4) + " || (p0)) && " + 
+				"(" + keyword("c", 4) + " || (p1))",
+			guard.render());
 	}
 	
 	@Test
@@ -942,7 +1018,17 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		AbstractRule rule = getRule(grammar, "A");
 		
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
-		assertEquals("((" + keyword("c", 2) + " && " + keyword("d", 2) + ") || (p0)) && (" + keyword("b", 2) + " || (p1))", guard.render());
+		assertEquals(
+				"(" + 
+					"(" + 
+						keyword("c", 2) + " && " + 
+						keyword("d", 2) + 
+					") || (p0)" + 
+				") && (" + 
+					keyword("b", 2) + " || " + 
+					"(p1)" + 
+				")",
+			guard.render());
 	}
 	
 	@Test(expected = TokenAnalysisAbortedException.class)
@@ -978,7 +1064,6 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		System.out.println(guard.render());
 	}
 	
 	@Test
@@ -1004,7 +1089,6 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		System.out.println(guard.toString());
 		assertEquals(
 				"(" + keyword("a", 1) + " || " + eof(2) + " || (p0) || (p1)) && " + 
 				"(" + keyword("b", 2) + " || (p0)) && " + 
@@ -1019,7 +1103,6 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
-			"hoistingDebug\n" +
 			"S: {S} $$ p0 $$?=> ('a')? \n" +
 			" | {S} $$ p1 $$?=> ('b')? ;\n";
 		// @formatter:off
@@ -1089,7 +1172,17 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("((" + keyword("a", 2) + " && " + eof(2) + ") || (p0)) && (" + keyword("b", 2) + " || (p1))", guard.render());
+		assertEquals(
+				"(" + 
+					"(" + 
+						keyword("a", 2) + " && " + 
+						eof(2) + 
+					") || (p0)" + 
+				") && (" + 
+					keyword("b", 2) + " || " + 
+					"(p1)" + 
+				")",
+			guard.render());
 	}
 	
 	@Test
@@ -1109,7 +1202,16 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("((" + keyword("a", 2) + " && " + eof(2) + ") || (p0)) && (" + keyword("b", 2) + " || (p1))", guard.render());
+		assertEquals(
+				"(" + 
+					"(" + 
+						keyword("a", 2) + " && " + 
+						eof(2) + 
+					") || (p0)" + 
+				") && (" + 
+					keyword("b", 2) + " || " + 
+					"(p1)" + 
+				")", guard.render());
 	}
 	
 	@Test
@@ -1129,7 +1231,17 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("((" + keyword("a", 2) + " && " + eof(2) + ") || (p0)) && (" + keyword("b", 2) + " || (p1))", guard.render());
+		assertEquals(
+				"(" + 
+					"(" + 
+						keyword("a", 2) + " && " + 
+						eof(2) + 
+					") || (p0)" + 
+				") && (" + 
+					keyword("b", 2) + " || " + 
+					"(p1)" + 
+				")",
+			guard.render());
 	}
 	
 	@Test
@@ -1149,7 +1261,10 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("(" + eof(2) + " || (p0)) && (" + keyword("a", 2) + " || (p1))", guard.render());
+		assertEquals(
+				"(" + eof(2) + " || (p0)) && " + 
+				"(" + keyword("a", 2) + " || (p1))",
+			guard.render());
 	}
 	
 	@Test
@@ -1168,7 +1283,10 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("(" + eof(2) + " || (p0)) && (" + keyword("a", 2) + " || (p1))", guard.render());
+		assertEquals(
+				"(" + eof(2) + " || (p0)) && " + 
+				"(" + keyword("a", 2) + " || (p1))",
+			guard.render());
 	}
 	
 	@Test
@@ -1189,7 +1307,17 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("((" + eof(2) + " && " + keyword("c", 2) + ") || (p0)) && (" + keyword("b", 2) + " || (p1))", guard.render());
+		assertEquals(
+				"(" + 
+					"(" + 
+						eof(2) + " && " + 
+						keyword("c", 2) + 
+					") || (p0)" + 
+				") && (" + 
+					keyword("b", 2) + " || " + 
+					"(p1)" + 
+				")",
+			guard.render());
 	}
 	
 	@Test
@@ -1211,7 +1339,17 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("((" + eof(2) + " && " + keyword("c", 2) + ") || (p0)) && (" + keyword("b", 2) + " || (p1))", guard.render());
+		assertEquals(
+				"(" + 
+					"(" + 
+						eof(2) + " && " + 
+						keyword("c", 2) + 
+					") || (p0)" + 
+				") && (" + 
+					keyword("b", 2) + " || " + 
+					"(p1)" + 
+				")",
+			guard.render());
 	}
 	
 	@Test
@@ -1219,8 +1357,6 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		// @formatter:off
 		String model =
 			MODEL_PREAMBLE +
-			"tokenLimit 3\n" +
-			"hoistingDebug\n" +
 			"S: a=A c+=C+ ;\n" +
 			"A: $$ p0 $$?=> 'a' " + 
 			" | $$ p1 $$?=> 'a' s=S ;\n" +
@@ -1235,6 +1371,16 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 		HoistingGuard guard = hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 		assertFalse(guard.isTrivial());
 		assertTrue(guard.hasTerminal());
-		assertEquals("((" + eof(2) + " && " + keyword("c", 2) + ") || (p0)) && (" + keyword("a", 2) + " || (p1))", guard.render());
+		assertEquals(
+				"(" + 
+					"(" + 
+						eof(2) + " && " + 
+						keyword("c", 2) + 
+					") || (p0)" + 
+				") && (" + 
+					keyword("a", 2) + " || " + 
+					"(p1)" + 
+				")",
+			guard.render());
 	}
 }
