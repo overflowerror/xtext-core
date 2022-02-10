@@ -99,9 +99,12 @@ class ParentProjectDescriptor extends ProjectDescriptor {
 					repositories {
 						mavenCentral()
 						«IF config.xtextVersion.isSnapshot»
-							maven {
-								url 'https://oss.sonatype.org/content/repositories/snapshots'
-							}
+							maven { url 'https://ci.eclipse.org/xtext/job/xtext-lib/job/cd_reload4j/lastSuccessfulBuild/artifact/build/maven-repository/' }
+							maven { url 'https://ci.eclipse.org/xtext/job/xtext-core/job/cd_reload4j/lastSuccessfulBuild/artifact/build/maven-repository/' }
+							maven { url 'https://ci.eclipse.org/xtext/job/xtext-extras/job/cd_reload4j/lastSuccessfulBuild/artifact/build/maven-repository/' }
+							maven { url 'https://ci.eclipse.org/xtext/job/xtext-xtend/job/cd_reload4j/lastSuccessfulBuild/artifact/build/maven-repository/' }
+							maven { url 'https://ci.eclipse.org/xtext/job/xtext-maven/job/cd_reload4j/lastSuccessfulBuild/artifact/build/maven-repository/' }
+							maven { url 'https://ci.eclipse.org/xtext/job/xtext-web/job/cd_reload4j/lastSuccessfulBuild/artifact/build/maven-repository/' }
 						«ENDIF»
 					}
 
@@ -549,10 +552,28 @@ class ParentProjectDescriptor extends ProjectDescriptor {
 					</repository>
 					«IF config.xtextVersion.isSnapshot»
 						<repository>
-							<id>sonatype-snapshots</id>
-							<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-							<releases><enabled>false</enabled></releases>
-							<snapshots><enabled>true</enabled></snapshots>
+							<id>lib</id>
+							<url>https://ci.eclipse.org/xtext/job/xtext-lib/job/cd_reload4j/lastSuccessfulBuild/artifact/build/maven-repository/</url>
+						</repository>
+						<repository>
+							<id>core</id>
+							<url>https://ci.eclipse.org/xtext/job/xtext-core/job/cd_reload4j/lastSuccessfulBuild/artifact/build/maven-repository/</url>
+						</repository>
+						<repository>
+							<id>extras</id>
+							<url>https://ci.eclipse.org/xtext/job/xtext-extras/job/cd_reload4j/lastSuccessfulBuild/artifact/build/maven-repository/</url>
+						</repository>
+						<repository>
+							<id>xtend</id>
+							<url>https://ci.eclipse.org/xtext/job/xtext-xtend/job/cd_reload4j/lastSuccessfulBuild/artifact/build/maven-repository/</url>
+						</repository>
+						<repository>
+							<id>web</id>
+							<url>https://ci.eclipse.org/xtext/job/xtext-web/job/cd_reload4j/lastSuccessfulBuild/artifact/build/maven-repository/</url>
+						</repository>
+						<repository>
+							<id>maven</id>
+							<url>https://ci.eclipse.org/xtext/job/xtext-maven/job/cd_reload4j/lastSuccessfulBuild/artifact/build/maven-repository/</url>
 						</repository>
 					«ENDIF»
 				</repositories>
@@ -570,10 +591,28 @@ class ParentProjectDescriptor extends ProjectDescriptor {
 					</pluginRepository>
 					«IF config.xtextVersion.isSnapshot»
 						<pluginRepository>
-							<id>sonatype-snapshots</id>
-							<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-							<releases><enabled>false</enabled></releases>
-							<snapshots><enabled>true</enabled></snapshots>
+							<id>libp</id>
+							<url>https://ci.eclipse.org/xtext/job/xtext-lib/job/cd_reload4j/lastSuccessfulBuild/artifact/build/maven-repository/</url>
+						</pluginRepository>
+						<pluginRepository>
+							<id>corep</id>
+							<url>https://ci.eclipse.org/xtext/job/xtext-core/job/cd_reload4j/lastSuccessfulBuild/artifact/build/maven-repository/</url>
+						</pluginRepository>
+						<pluginRepository>
+							<id>extrasp</id>
+							<url>https://ci.eclipse.org/xtext/job/xtext-extras/job/cd_reload4j/lastSuccessfulBuild/artifact/build/maven-repository/</url>
+						</pluginRepository>
+						<pluginRepository>
+							<id>xtendp</id>
+							<url>https://ci.eclipse.org/xtext/job/xtext-xtend/job/cd_reload4j/lastSuccessfulBuild/artifact/build/maven-repository/</url>
+						</pluginRepository>
+						<pluginRepository>
+							<id>webp</id>
+							<url>https://ci.eclipse.org/xtext/job/xtext-web/job/cd_reload4j/lastSuccessfulBuild/artifact/build/maven-repository/</url>
+						</pluginRepository>
+						<pluginRepository>
+							<id>mavenp</id>
+							<url>https://ci.eclipse.org/xtext/job/xtext-maven/job/cd_reload4j/lastSuccessfulBuild/artifact/build/maven-repository/</url>
 						</pluginRepository>
 					«ENDIF»
 					«IF config.needsTychoBuild && tychoVersion.endsWith("-SNAPSHOT")»
