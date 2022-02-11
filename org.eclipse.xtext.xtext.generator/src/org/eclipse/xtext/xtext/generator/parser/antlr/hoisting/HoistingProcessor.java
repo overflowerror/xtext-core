@@ -42,6 +42,7 @@ import org.eclipse.xtext.util.Tuples;
 import static org.eclipse.xtext.GrammarUtil.*;
 
 import org.eclipse.xtext.xtext.generator.parser.antlr.JavaCodeUtils;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.EndlessPrefixException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.NestedIdenticalPathException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.TokenAnalysisAbortedException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.UnsupportedConstructException;
@@ -223,6 +224,37 @@ public class HoistingProcessor {
 		return flattened;
 	}
 	
+	private boolean hasEndlessPath(AbstractElement path) {
+		return hasEndlessPath(path, new ArrayList<>());
+	}
+	private boolean hasEndlessPath(AbstractElement path, final List<RuleCall> calls) {
+		if (isMultipleCardinality(path)) {
+			return true;
+		}
+		
+		if (path instanceof Assignment) {
+			return hasEndlessPath(((Assignment) path).getTerminal(), calls);
+		} else if (path instanceof CompoundElement) {
+			return ((CompoundElement) path).getElements().stream().anyMatch(p -> hasEndlessPath(p, calls));
+		} else if (path instanceof RuleCall) {
+			if (calls.stream().anyMatch(c -> EcoreUtil.equals(c, path))) {
+				return true;
+			}
+			
+			List<RuleCall> _calls = new ArrayList<>(calls);
+			_calls.add((RuleCall) path);
+			return hasEndlessPath(((RuleCall) path).getRule().getAlternatives(), _calls);
+		}
+		
+		return false;
+	}
+	
+	private boolean hasEndlessPrefix(List<AbstractElement> paths) {
+		return paths.stream()
+			.filter(this::hasEndlessPath)
+			.count() >= 2; // only a problem if more than 2 paths are endless
+	}
+	
 	private HoistingGuard findGuardForAlternatives(CompoundElement alternatives, AbstractRule currentRule, boolean skipCache) {
 		if (config.isDebug())
 			log.info("find guard for alternative");
@@ -293,6 +325,14 @@ public class HoistingProcessor {
 				).map(p -> new PathGuard(p.getFirst(), p.getSecond()))
 				.collect(AlternativesGuard.collector());
 			} catch(NestedIdenticalPathException e) {
+				if (hasEndlessPrefix(paths)) {
+					// endless paths in combination with a NestedIndenticalPathException means
+					// there are probably endless prefixes in this element
+					
+					// TODO: maybe only use predicates (analog to ANTLR) instead of error-ing out
+					throw new EndlessPrefixException("endless prefix in more than two paths", currentRule);
+				}
+				
 				// nested identical paths
 				// -> flatten paths to alternative and try again
 				// this is very inefficient

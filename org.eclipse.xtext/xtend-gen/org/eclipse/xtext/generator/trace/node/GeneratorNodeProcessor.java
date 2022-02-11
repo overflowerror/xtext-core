@@ -104,8 +104,8 @@ public class GeneratorNodeProcessor {
       return this.contents;
     }
     
-    public char charAt(final int arg0) {
-      return this.contents.charAt(arg0);
+    public char charAt(final int index) {
+      return this.contents.charAt(index);
     }
     
     public IntStream chars() {
@@ -120,8 +120,8 @@ public class GeneratorNodeProcessor {
       return this.contents.length();
     }
     
-    public CharSequence subSequence(final int arg0, final int arg1) {
-      return this.contents.subSequence(arg0, arg1);
+    public CharSequence subSequence(final int start, final int end) {
+      return this.contents.subSequence(start, end);
     }
   }
   

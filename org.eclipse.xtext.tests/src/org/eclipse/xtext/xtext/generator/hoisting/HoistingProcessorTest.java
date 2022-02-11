@@ -21,6 +21,7 @@ import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.testing.GlobalRegistries;
 import org.eclipse.xtext.tests.AbstractXtextTests;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.HoistingProcessor;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.EndlessPrefixException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.TokenAnalysisAbortedException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.guards.hoistingGuards.HoistingGuard;
 import org.junit.After;
@@ -1382,5 +1383,26 @@ public class HoistingProcessorTest extends AbstractXtextTests {
 					"(p1)" + 
 				")",
 			guard.render());
+	}
+	
+	@Test(expected = EndlessPrefixException.class)
+	public void testRecursionInNestedAlternatives_bugEndlessLoop_expectEndlessPrefixException() throws Exception {
+		// @formatter:off
+		String model =
+			MODEL_PREAMBLE +
+			"hoistingDebug\n" +
+			"S: $$ p0 $$?=> a=A 's'\n" + 
+			" | $$ p1 $$?=> a=A 't';\n" +
+			"A: $$ p2 $$?=> b=B 'u'\n" + 
+			" | $$ p3 $$?=> b=B 'v';\n" +
+			"B: $$ p4 $$?=> 'a' 'b' 'c'\n" + 
+			" | $$ p5 $$?=> 'z' s=S;\n";
+		// @formatter:off
+		XtextResource resource = getResourceFromString(model);
+		Grammar grammar = ((Grammar) resource.getContents().get(0));
+		hoistingProcessor.init(grammar);
+		AbstractRule rule = getRule(grammar, "S");
+		
+		hoistingProcessor.findHoistingGuard(rule.getAlternatives());
 	}
 }
