@@ -22,6 +22,7 @@ public class TokenAnalysisPaths {
 	private List<TokenAnalysisPath> tokenPaths = new ArrayList<>(10);
 	private boolean isEmpty = false;
 	private boolean hasProgress = false;
+	private boolean hasCandidates = false;
 	
 	public TokenAnalysisPaths(List<Integer> indexes) {
 		tokenPaths.add(new TokenAnalysisPath(indexes));
@@ -49,11 +50,17 @@ public class TokenAnalysisPaths {
 		return hasProgress;
 	}
 	
+	public boolean hasCandidates() {
+		return hasCandidates;
+	}
+	
 	public void resetProgress() {
 		hasProgress = false;
+		hasCandidates = false;
 	}
 	
 	public void add(AbstractElement element) {
+		hasCandidates = true;
 		tokenPaths.forEach(p -> hasProgress = p.add(element) || hasProgress);
 	}
 	
@@ -78,6 +85,7 @@ public class TokenAnalysisPaths {
 			if (addAllDistinct(other)) {
 				this.hasProgress |= other.hasProgress;
 			}
+			this.hasCandidates |= other.hasCandidates;
 			return this;
 		}
 	}

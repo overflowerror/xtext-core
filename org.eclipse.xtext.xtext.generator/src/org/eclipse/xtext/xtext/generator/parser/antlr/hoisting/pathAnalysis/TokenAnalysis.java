@@ -173,10 +173,16 @@ public class TokenAnalysis {
 	}
 	
 	private TokenAnalysisPaths getTokenPathsContext(AbstractElement last, TokenAnalysisPaths prefix) {
-		return getTokenPathsContext(last, prefix, true, new HashSet<>());
+		return getTokenPathsContext(last, prefix, true, new HashSet<>(), new HashSet<>());
 	}
 	
-	private TokenAnalysisPaths getTokenPathsContext(AbstractElement last, TokenAnalysisPaths prefix, boolean considerCardinalities, Set<AbstractElement> visitedElements) {
+	private TokenAnalysisPaths getTokenPathsContext(
+			AbstractElement last, 
+			TokenAnalysisPaths prefix, 
+			boolean considerCardinalities, 
+			Set<AbstractElement> visitedElements,
+			Set<AbstractElement> blacklistedElements
+	) {
 		if (config.isDebug())
 			log.info("get context for: " + abstractElementToShortString(last) + 
 				(considerCardinalities ? " with" : " without") + " cardinalities");
@@ -192,27 +198,35 @@ public class TokenAnalysis {
 		for (AbstractElement element : context) {
 			if (config.isDebug())
 				log.info("context element: " + abstractElementToShortString(element));
+			
+			if (blacklistedElements.contains(element)) {
+				if (config.isDebug())
+					log.info("blacklisted element");
+				
+				continue;
+			}
+			
 			TokenAnalysisPaths path = new TokenAnalysisPaths(prefix);
 			path.resetProgress();
-			
-			// shortcut endless loops instead of throwing exception
 			path = getTokenPaths(element, path, false, false);
 			
 			if (!path.isDone() && element != null) {
-				boolean _considerCardinalities = considerCardinalities;
-				if (visitedElements.contains(element) && !path.hasProgress()) {
-					if (_considerCardinalities) {
-						_considerCardinalities = false;
-					} else {
-						// considerCardinalities is already false
-						log.info("failed to analyse cardinalities in context");
-						// ignore this branch
-						continue;
-					}
-				}
+				boolean _considerCardinalities = true;
+				
 				Set<AbstractElement> localVisitedElements = new HashSet<>(visitedElements);
-				localVisitedElements.add(element);
-				path = getTokenPathsContext(element, path, _considerCardinalities, localVisitedElements);
+				Set<AbstractElement> localBlacklst = new HashSet<>(blacklistedElements);
+				
+				if (visitedElements.contains(element) && !path.hasCandidates()) {
+					_considerCardinalities = false;
+					if (!considerCardinalities) {
+						log.warn("context analysis: analyzing cardinalities failed: blacklisting element");
+						localBlacklst.add(element);
+					}
+				} else {
+					localVisitedElements.add(element);
+				}
+				
+				path = getTokenPathsContext(element, path, _considerCardinalities, localVisitedElements, localBlacklst);
 			}
 			if (path.isDone()) {
 				result = result.merge(path);
@@ -576,12 +590,14 @@ public class TokenAnalysis {
 		}
 		
 		tokenCombinations(indexList -> {
+			if (config.isDebug())
+				log.info(indexList);
 			
 			// will throw TokenAnalysisAborted if any path is too short
 			List<List<List<Token>>> tokenListsForPaths = paths.stream()
 					.peek(p -> {
 						if (config.isDebug())
-							log.info("next path: " + p);
+							log.info("next path: " + abstractElementToShortString(p));
 					})
 					.map(p -> getTokenPathsContext(p, indexList).getTokenPaths())
 					.collect(Collectors.toList());
