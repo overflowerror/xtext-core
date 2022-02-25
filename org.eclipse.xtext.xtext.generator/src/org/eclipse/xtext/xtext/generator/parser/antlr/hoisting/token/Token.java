@@ -19,14 +19,24 @@ import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.NotATo
 /**
  * @author overflow - Initial contribution and API
  */
-public interface Token {
-	String negatedCondition();
+public abstract class Token {
+	public abstract String negatedCondition();
 	
-	AbstractElement getElement();
+	public abstract AbstractElement getElement();
 	
-	int getPosition();
+	protected int position;
+	private boolean inContext;
 	
-	static boolean isToken(AbstractElement element) {
+	public int getPosition() {
+		return position;
+	}
+	
+	public boolean isInContext() {
+		return inContext;
+	}
+	
+	
+	public static boolean isToken(AbstractElement element) {
 		if (element == null) {
 			return true;
 		} else if (element instanceof Keyword) {
@@ -40,20 +50,29 @@ public interface Token {
 		}
 	}
 	
-	static Token fromElement(AbstractElement element, int position) {
+	public static Token fromElement(AbstractElement element, int position, boolean inContext) {
+		
+		Token token = null;
+		
 		if (element == null) {
-			return new EofToken(position);
+			token = new EofToken();
 		} else if (element instanceof Keyword) {
-			return new KeywordToken((Keyword) element, position);
+			token = new KeywordToken((Keyword) element);
 		} else if (element instanceof RuleCall) {
 			AbstractRule rule = ((RuleCall) element).getRule();
 			if (rule instanceof TerminalRule) {
-				return new TerminalRuleToken((RuleCall) element, (TerminalRule) rule, position);
+				token = new TerminalRuleToken((RuleCall) element, (TerminalRule) rule);
 			}
 		} else if (element instanceof EnumLiteralDeclaration) {
-			return new KeywordToken(((EnumLiteralDeclaration) element).getLiteral(), position);
+			token = new KeywordToken(((EnumLiteralDeclaration) element).getLiteral());
 		}
 		
-		throw new NotATokenException(element.eClass().getName());
+		if (token == null) {
+			throw new NotATokenException(element.eClass().getName());
+		} else {
+			token.position = position;
+			token.inContext = inContext;
+			return token;
+		}
 	}
 }

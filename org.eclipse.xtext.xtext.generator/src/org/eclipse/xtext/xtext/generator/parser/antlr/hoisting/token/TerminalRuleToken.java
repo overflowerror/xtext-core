@@ -15,15 +15,13 @@ import org.eclipse.xtext.TerminalRule;
 /**
  * @author overflow - Initial contribution and API
  */
-public class TerminalRuleToken implements Token {
+public class TerminalRuleToken extends Token {
 	private RuleCall call;
 	private TerminalRule rule;
-	private int position;
 	
-	TerminalRuleToken(RuleCall call, TerminalRule rule, int position) {
+	TerminalRuleToken(RuleCall call, TerminalRule rule) {
 		this.call = call;
 		this.rule = rule;
-		this.position = position;
 	}
 
 	@Override
@@ -67,10 +65,5 @@ public class TerminalRuleToken implements Token {
 	@Override
 	public AbstractElement getElement() {
 		return call;
-	}
-	
-	@Override
-	public int getPosition() {
-		return position;
 	}
 }

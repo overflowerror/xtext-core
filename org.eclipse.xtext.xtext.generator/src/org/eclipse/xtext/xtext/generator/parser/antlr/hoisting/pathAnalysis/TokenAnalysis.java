@@ -38,6 +38,7 @@ import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.UnorderedGroup;
 import org.eclipse.xtext.util.XtextSwitch;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.HoistingConfiguration;
+import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.EndlessPrefixException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.NestedIdenticalPathException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.TokenAnalysisAbortedException;
 import org.eclipse.xtext.xtext.generator.parser.antlr.hoisting.exceptions.UnsupportedConstructException;
@@ -208,7 +209,7 @@ public class TokenAnalysis {
 			
 			TokenAnalysisPaths path = new TokenAnalysisPaths(prefix);
 			path.resetProgress();
-			path = getTokenPaths(element, path, false, false);
+			path = getTokenPaths(element, path, false, false, true);
 			
 			if (!path.isDone() && element != null) {
 				boolean _considerCardinalities = true;
@@ -252,11 +253,11 @@ public class TokenAnalysis {
 		return result;
 	}
 	
-	private TokenAnalysisPaths getTokenPathsTrivial(Group path, TokenAnalysisPaths prefix) {
+	private TokenAnalysisPaths getTokenPathsTrivial(Group path, TokenAnalysisPaths prefix, boolean inContext) {
 		TokenAnalysisPaths result = new TokenAnalysisPaths(prefix);
 		
 		for(AbstractElement element : path.getElements()) {
-			result = getTokenPaths(element, result, false, false);
+			result = getTokenPaths(element, result, false, false, inContext);
 			if (result.isDone()) {
 				break;
 			}
@@ -264,16 +265,16 @@ public class TokenAnalysis {
 		
 		return result;
 	}
-	private TokenAnalysisPaths getTokenPathsTrivial(Alternatives path, TokenAnalysisPaths prefix) {
+	private TokenAnalysisPaths getTokenPathsTrivial(Alternatives path, TokenAnalysisPaths prefix, boolean inContext) {
 		TokenAnalysisPaths result = TokenAnalysisPaths.empty(prefix);
 		
 		for(AbstractElement element : path.getElements()) {
-			result = result.merge(getTokenPaths(element, prefix, false, false));
+			result = result.merge(getTokenPaths(element, prefix, false, false, inContext));
 		}
 		
 		return result;
 	}
-	private TokenAnalysisPaths getTokenPathsTrivial(UnorderedGroup path, TokenAnalysisPaths prefix) {		
+	private TokenAnalysisPaths getTokenPathsTrivial(UnorderedGroup path, TokenAnalysisPaths prefix, boolean inContext) {		
 		TokenAnalysisPaths result;
 		TokenAnalysisPaths current;
 		
@@ -288,7 +289,7 @@ public class TokenAnalysis {
 			current.resetProgress();
 			
 			for (AbstractElement element : path.getElements()) {
-				current = current.merge(getTokenPaths(element, result, false, false));
+				current = current.merge(getTokenPaths(element, result, false, false, inContext));
 			}
 			
 			result.resetProgress();
@@ -299,23 +300,23 @@ public class TokenAnalysis {
 		return result;
 	}
 	
-	private TokenAnalysisPaths getTokenPathsTrivial(AbstractElement path, TokenAnalysisPaths prefix) {
+	private TokenAnalysisPaths getTokenPathsTrivial(AbstractElement path, TokenAnalysisPaths prefix, boolean inContext) {
 		return new XtextSwitch<TokenAnalysisPaths>() {
 			@Override
 			public TokenAnalysisPaths caseGroup(Group group) {
-				return getTokenPathsTrivial(group, prefix);
+				return getTokenPathsTrivial(group, prefix, inContext);
 			};
 			@Override
 			public TokenAnalysisPaths caseAlternatives(Alternatives alternatives) {
-				return getTokenPathsTrivial(alternatives, prefix);
+				return getTokenPathsTrivial(alternatives, prefix, inContext);
 			};
 			@Override
 			public TokenAnalysisPaths caseUnorderedGroup(UnorderedGroup unorderedGroup) {
-				return getTokenPathsTrivial(unorderedGroup, prefix);
+				return getTokenPathsTrivial(unorderedGroup, prefix, inContext);
 			};
 			@Override
 			public TokenAnalysisPaths caseAssignment(Assignment assignment) {
-				return getTokenPaths(assignment.getTerminal(), prefix, false, false);
+				return getTokenPaths(assignment.getTerminal(), prefix, false, false, inContext);
 			};
 			@Override
 			public TokenAnalysisPaths caseRuleCall(RuleCall call) {
@@ -323,7 +324,7 @@ public class TokenAnalysis {
 					isParserRuleCall(call) || 
 					isEnumRuleCall(call)
 				) {
-					return getTokenPaths(call.getRule().getAlternatives(), prefix, false, false);
+					return getTokenPaths(call.getRule().getAlternatives(), prefix, false, false, inContext);
 				} else {
 					// probably terminal rule call -> go to default case
 					return null;
@@ -335,7 +336,7 @@ public class TokenAnalysis {
 				
 				if (Token.isToken(element)) {
 					TokenAnalysisPaths result = new TokenAnalysisPaths(prefix);
-					result.add(element);
+					result.add(element, inContext);
 					return result;
 				} else {
 					// Actions, Predicates, JavaActions, ...
@@ -357,6 +358,12 @@ public class TokenAnalysis {
 	private TokenAnalysisPaths getTokenPaths(
 			AbstractElement path, TokenAnalysisPaths prefix, boolean analyseContext, boolean needsLength
 	) {
+		return getTokenPaths(path, prefix, analyseContext, needsLength, false);
+	}
+
+	private TokenAnalysisPaths getTokenPaths(
+			AbstractElement path, TokenAnalysisPaths prefix, boolean analyseContext, boolean needsLength, boolean inContext
+	) {
 		if (prefix.isDone()) {
 			return prefix;
 		}
@@ -365,16 +372,22 @@ public class TokenAnalysis {
 			// empty path means EOF
 			TokenAnalysisPaths result;
 			result = new TokenAnalysisPaths(prefix);
-			result.add(path);
+			result.add(path, inContext);
 			return result;
 		}
 		
 		// use actual cardinality from path
-		return getTokenPaths(path, path.getCardinality(), prefix, analyseContext, needsLength);
+		return getTokenPaths(path, path.getCardinality(), prefix, analyseContext, needsLength, inContext);
+	}
+
+	private TokenAnalysisPaths getTokenPaths(
+			AbstractElement path, String cardinality, TokenAnalysisPaths prefix, boolean analyseContext, boolean needsLength
+	) {
+		return getTokenPaths(path, cardinality, prefix, analyseContext, needsLength, false);
 	}
 	
 	private TokenAnalysisPaths getTokenPaths(
-			AbstractElement path, String cardinality, TokenAnalysisPaths prefix, boolean analyseContext, boolean needsLength
+			AbstractElement path, String cardinality, TokenAnalysisPaths prefix, boolean analyseContext, boolean needsLength, boolean inContext
 	) {
 		// analyseContext implies needsLength
 		
@@ -387,7 +400,7 @@ public class TokenAnalysis {
 		if (path == null) {
 			// empty path means EOF
 			result = new TokenAnalysisPaths(prefix);
-			result.add(path);
+			result.add(path, inContext);
 			return result;
 		}
 		
@@ -408,7 +421,7 @@ public class TokenAnalysis {
 		do {
 			result.resetProgress();
 			
-			TokenAnalysisPaths tokenPaths = getTokenPathsTrivial(path, result);
+			TokenAnalysisPaths tokenPaths = getTokenPathsTrivial(path, result, inContext);
 			
 			if (tokenPaths.isDone()) {
 				result = result.merge(tokenPaths);
@@ -501,7 +514,7 @@ public class TokenAnalysis {
 		} else {
 			// path length exhausted while searching for minimal differences
 			// this indicates the presence of nested identical paths
-			throw new NestedIdenticalPathException();
+			throw new EndlessPrefixException();
 		}
 	}
 	private boolean tokenCombinations(long prefix, int prefixLength, int ones, Function<List<Integer>, Boolean> callback, MutableWrapper<Integer> limit) {
@@ -525,6 +538,8 @@ public class TokenAnalysis {
 					if (tokenCombinations(current, i + 1, ones - 1, callback, limit)) {
 						return true;
 					}
+				} catch (NestedIdenticalPathException e) {
+					throw e;
 				} catch (TokenAnalysisAbortedException e) {
 					if (config.isDebug())
 						log.info("tokens exhausted: " + e.getMessage());
@@ -590,6 +605,9 @@ public class TokenAnalysis {
 		}
 		
 		tokenCombinations(indexList -> {
+			int numberOfIndices = indexList.size();
+			boolean isFullIndexList = indexList.get(numberOfIndices - 1) == numberOfIndices - 1;
+			
 			if (config.isDebug())
 				log.info(indexList);
 			
@@ -605,19 +623,62 @@ public class TokenAnalysis {
 			int size = result.size();
 			for (int i = 0; i < size; i++) {
 				if (result.get(i) != null) {
+					// we already have a result for this path
 					continue;
 				}
 				
-				List<List<Token>> tokenListOfCurrentPath = tokenListsForPaths.get(i);
-				if (!tokenListOfCurrentPath.stream()
-					.anyMatch(tokenList -> tokenListsForPaths.stream()
-							.filter(s -> s != tokenListOfCurrentPath)
-							// does any other path contain a similar token list (= alternative) ?
-							.anyMatch(s -> s.contains(tokenList))
-					)
-				) {
+				List<List<Token>> tokenListsOfCurrentPath = tokenListsForPaths.get(i);
+				
+				boolean setResult = true;
+				
+				for (List<Token> tokenListOfCurrentPath : tokenListsOfCurrentPath) {
+					boolean doContextCheck = 
+						isFullIndexList && // index list is full (no jumps)
+						numberOfIndices >= 2 && // check that number of tokens is enough
+						tokenListOfCurrentPath.get(numberOfIndices - 1).isInContext() && // context is used
+						!tokenListOfCurrentPath.get(numberOfIndices - 2).isInContext(); // we are only interested in the last token not in context
+					boolean doContextCheckWithoutToken = // for empty paths
+						isFullIndexList && // index list is full (no jumps)
+						numberOfIndices == 1 && // only one token given
+						tokenListOfCurrentPath.get(0).isInContext(); // first token is in context
+						
+					
+					for (int j = 0; j < size; j++) {
+						if (i == j) {
+							// don't compare to current path
+							continue;
+						}
+						
+						for (List<Token> tokenListOfOther : tokenListsForPaths.get(j)) {
+							if (tokenListOfCurrentPath.equals(tokenListOfOther)) {
+								setResult = false;
+								
+								if (doContextCheck) {
+									if (tokenListOfOther.get(numberOfIndices - 1).isInContext()) {
+										// last token of other is in context
+										if (!tokenListOfOther.get(numberOfIndices - 2).isInContext()) {
+											// context start is at the same position
+											// -> paths are identical
+											
+											throw new NestedIdenticalPathException("identical context start in identical token path");
+										}
+									}
+								}
+								if (doContextCheckWithoutToken) {
+									if (tokenListOfOther.get(0).isInContext()) {
+										// this path also is empty
+										
+										throw new NestedIdenticalPathException("empty nested identical path");
+									}
+								}
+							}
+						}
+					}
+				}
+				
+				if (setResult) {
 					// token list set is unique for path i
-					result.set(i, tokenListOfCurrentPath);
+					result.set(i, tokenListsOfCurrentPath);
 				}
 				
 			}

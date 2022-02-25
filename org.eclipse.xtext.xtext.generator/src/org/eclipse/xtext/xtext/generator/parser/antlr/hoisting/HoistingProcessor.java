@@ -324,15 +324,14 @@ public class HoistingProcessor {
 					(TokenGuard tokenGuard, MergedPathGuard pathGuard) -> Tuples.pair(tokenGuard, pathGuard)
 				).map(p -> new PathGuard(p.getFirst(), p.getSecond()))
 				.collect(AlternativesGuard.collector());
-			} catch(NestedIdenticalPathException e) {
+			} catch (EndlessPrefixException e) {
 				if (hasEndlessPrefix(paths)) {
-					// endless paths in combination with a NestedIndenticalPathException means
-					// there are probably endless prefixes in this element
-					
 					// TODO: maybe only use predicates (analog to ANTLR) instead of error-ing out
 					throw new EndlessPrefixException("endless prefix in more than two paths", currentRule);
+				} else {
+					throw new TokenAnalysisAbortedException("difference analysis failed: probably insufficient context", e, currentRule);
 				}
-				
+			} catch(NestedIdenticalPathException e) {
 				// nested identical paths
 				// -> flatten paths to alternative and try again
 				// this is very inefficient
@@ -346,7 +345,7 @@ public class HoistingProcessor {
 				
 				if (config.isDebug())
 					log.info(abstractElementToString(flattened));
-				
+					
 				log.info(flattened.getElements().size());
 				// TODO: value configurable?
 				if (flattened.getElements().size() > 100) {

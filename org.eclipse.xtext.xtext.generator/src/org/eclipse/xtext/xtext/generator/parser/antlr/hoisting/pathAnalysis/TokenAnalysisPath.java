@@ -49,12 +49,12 @@ public class TokenAnalysisPath {
 		}
 	}
 	
-	boolean add(AbstractElement element) {
+	boolean add(AbstractElement element, boolean inContext) {
 		if (isDone())
 			return false;
 		
 		if (remainingIndexes.get(0) <= 0) {
-			path.add(Token.fromElement(element, position));
+			path.add(Token.fromElement(element, position, inContext));
 			remainingIndexes.remove(0);
 			shift();
 			return true;

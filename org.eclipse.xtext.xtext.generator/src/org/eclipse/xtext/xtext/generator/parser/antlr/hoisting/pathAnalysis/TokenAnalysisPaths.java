@@ -59,9 +59,9 @@ public class TokenAnalysisPaths {
 		hasCandidates = false;
 	}
 	
-	public void add(AbstractElement element) {
+	public void add(AbstractElement element, boolean inContext) {
 		hasCandidates = true;
-		tokenPaths.forEach(p -> hasProgress = p.add(element) || hasProgress);
+		tokenPaths.forEach(p -> hasProgress = p.add(element, inContext) || hasProgress);
 	}
 	
 	private boolean addAllDistinct(TokenAnalysisPaths other) {

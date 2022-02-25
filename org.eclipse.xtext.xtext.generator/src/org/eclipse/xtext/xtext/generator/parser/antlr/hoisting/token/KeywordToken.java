@@ -14,13 +14,11 @@ import org.eclipse.xtext.Keyword;
 /**
  * @author overflow - Initial contribution and API
  */
-public class KeywordToken implements Token {
+public class KeywordToken extends Token {
 	private Keyword keyword;
-	private int position;
 	
-	public KeywordToken(Keyword keyword, int position) {
+	KeywordToken(Keyword keyword) {
 		this.keyword = keyword;
-		this.position = position;
 	}
 
 	@Override
@@ -64,10 +62,5 @@ public class KeywordToken implements Token {
 	@Override
 	public AbstractElement getElement() {
 		return keyword;
-	}
-	
-	@Override
-	public int getPosition() {
-		return position;
 	}
 }

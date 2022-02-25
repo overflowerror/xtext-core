@@ -13,12 +13,9 @@ import org.eclipse.xtext.AbstractElement;
 /**
  * @author overflow - Initial contribution and API
  */
-public class EofToken implements Token {
-
-	private int position;
+public class EofToken extends Token {
 	
-	public EofToken(int position) {
-		this.position = position;
+	EofToken() {
 	}
 	
 	@Override
@@ -56,10 +53,5 @@ public class EofToken implements Token {
 	@Override
 	public AbstractElement getElement() {
 		return null;
-	}
-
-	@Override
-	public int getPosition() {
-		return position;
 	}
 }
